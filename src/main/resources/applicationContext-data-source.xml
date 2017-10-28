@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+
+<bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+   <property name="driverClassName" value="${db.driver.class}" />
+   <property name="jdbcUrl" value="${db.jdbc.url}" />
+   <property name="username" value="${db.username}"/>
+   <property name="password" value="${db.password}"/>
+  
+</bean>
+
+   <bean id="jdbcQueryDAO" class="com.jpa.repositories.JDBCQueryDAO">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+   
+  <!--     	<bean id="hibernate3AnnotatedSessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+
+		<property name="annotatedClasses">
+			<list>
+				<value>com.jpa.entities.User</value>
+			</list>
+		</property>
+	<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.current_session_context_class">thread</prop>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<prop key="hibernate.show_sql">true</prop>
+			</props>
+		</property>
+	</bean>
+
+	
+	 <bean id="userRepo" class="com.jpa.repositories.UserRepoImpl">
+	 	<property name="sessionFactory" ref="hibernate3AnnotatedSessionFactory" />
+    </bean> -->
+   
+</beans>
