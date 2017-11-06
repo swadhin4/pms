@@ -174,9 +174,12 @@ public class TicketServiceImpl implements TicketService {
 					
 			Status status = statusRepo.findOne(customerTicketVO.getStatusId());
 			if(status!=null){
-			customerTicket.setStatus(status);
+				customerTicket.setStatus(status);
+				if(status.getStatusId().intValue()==7){
+					Date serviceRestorationDate = new Date();
+					customerTicket.setServiceRestorationTime(serviceRestorationDate);
+				}
 			}
-			
 			customerTicket = customerTicketRepo.save(customerTicket);
 			LOGGER.info("Customer Ticket : "+ customerTicket);
 		
@@ -185,6 +188,8 @@ public class TicketServiceImpl implements TicketService {
 			customerTicketVO.setTicketId(customerTicket.getId());
 			customerTicketVO.setTicketNumber(customerTicket.getTicketNumber());
 			customerTicketVO.setAssignedSPEmail(serviceProvider.getHelpDeskEmail());
+			LOGGER.info("Email triggers to "+ serviceProvider.getServiceProviderId() +"/"+ serviceProvider.getHelpDeskEmail());
+			customerTicketVO.setAssignedTo(serviceProvider.getServiceProviderId());
 			customerTicketVO.setStatusId(customerTicket.getStatus().getStatusId());
 			customerTicketVO.setStatus(customerTicket.getStatus().getStatus());
 			String slaDueDate = jdbcQueryDAO.getSlaDate(customerTicket.getTicketNumber(), customerTicketVO.getDuration(), customerTicketVO.getUnit());
@@ -199,6 +204,8 @@ public class TicketServiceImpl implements TicketService {
 			customerTicketVO.setTicketId(customerTicket.getId());
 			customerTicketVO.setAssignedSPEmail(serviceProvider.getHelpDeskEmail());
 			customerTicketVO.setTicketNumber(customerTicket.getTicketNumber());
+			LOGGER.info("Email triggers to "+ serviceProvider.getServiceProviderId() +"/"+ serviceProvider.getHelpDeskEmail());
+			customerTicketVO.setAssignedTo(serviceProvider.getServiceProviderId());
 			customerTicketVO.setStatusId(customerTicket.getStatus().getStatusId());
 			customerTicketVO.setStatus(customerTicket.getStatus().getStatus());
 			customerTicketVO.setMessage("UPDATED");
@@ -222,7 +229,9 @@ public class TicketServiceImpl implements TicketService {
 				siteIdList.add(userSiteAccess.getSite().getSiteId());
 			}
 		List<CustomerTicket> savedCustomerTicketList = customerTicketRepo.findBySiteSiteIdIn(siteIdList);
+		
 		if(!savedCustomerTicketList.isEmpty()){
+			Collections.sort(savedCustomerTicketList, (o1, o2) -> o1.getCreatedOn().compareTo(o2.getCreatedOn()));
 			for(CustomerTicket customerTicket:savedCustomerTicketList){
 				TicketVO tempCustomerTicketVO=new TicketVO();
 				tempCustomerTicketVO.setTicketId(customerTicket.getId());
@@ -233,6 +242,7 @@ public class TicketServiceImpl implements TicketService {
 				tempCustomerTicketVO.setSiteName(customerTicket.getSite().getSiteName());
 				tempCustomerTicketVO.setAssetId(customerTicket.getAsset().getAssetId());
 				tempCustomerTicketVO.setAssetName(customerTicket.getAsset().getAssetName());
+				tempCustomerTicketVO.setAssetCode(customerTicket.getAsset().getAssetCode());
 				tempCustomerTicketVO.setCategoryId(customerTicket.getTicketCategory().getId());
 				tempCustomerTicketVO.setCategoryName(customerTicket.getTicketCategory().getDescription());
 				tempCustomerTicketVO.setAssignedSP(customerTicket.getAssignedTo().getName());
@@ -240,7 +250,7 @@ public class TicketServiceImpl implements TicketService {
 				tempCustomerTicketVO.setPriorityDescription(customerTicket.getPriority());
 				tempCustomerTicketVO.setStatusId(customerTicket.getStatus().getStatusId());
 				tempCustomerTicketVO.setStatus(customerTicket.getStatus().getStatus());
-				SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-YYYY HH:MM:ss");
+				SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-YYYY HH:mm:ss");
 				tempCustomerTicketVO.setRaisedOn(simpleDateFormat.format(customerTicket.getCreatedOn()));
 				tempCustomerTicketVO.setRaisedBy(customerTicket.getCreatedBy());
 				tempCustomerTicketVO.setTicketStartTime(simpleDateFormat.format(customerTicket.getTicketStarttime()));
@@ -264,6 +274,10 @@ public class TicketServiceImpl implements TicketService {
 				
 				if(StringUtils.isNotBlank(customerTicket.getModifiedBy())){
 					tempCustomerTicketVO.setModifiedBy(customerTicket.getModifiedBy());
+				}
+				
+				if(customerTicket.getServiceRestorationTime()!=null){
+					tempCustomerTicketVO.setServiceRestorationTime(simpleDateFormat.format(customerTicket.getServiceRestorationTime()));
 				}
 				Date slaDueDate = customerTicket.getSlaDuedate();
 				Date creationTime = customerTicket.getCreatedOn();
@@ -442,7 +456,7 @@ public class TicketServiceImpl implements TicketService {
 					}else if(unit.equalsIgnoreCase("days")){
 						slaDate = DateUtils.addDays(new Date(), duration);
 					}
-					SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy HH:MM:ss");
+					SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 					ticketPrioritySLAVO.setPriorityId(ticketPriority.getPriorityId());
 					ticketPrioritySLAVO.setPriorityName(ticketPriority.getDescription());
 					ticketPrioritySLAVO.setServiceProviderId(spSLADetails.getServiceProvider().getServiceProviderId());
@@ -578,7 +592,7 @@ public class TicketServiceImpl implements TicketService {
 				ticketHistoryVO.setAction(ticketHistory.getAction());
 				ticketHistoryVO.setMessage(ticketHistory.getMessage());
 				ticketHistoryVO.setColumnName(ticketHistory.getColumnName());
-				SimpleDateFormat simpleDateFormat=new SimpleDateFormat("dd-MM-YYYY");
+				SimpleDateFormat simpleDateFormat=new SimpleDateFormat("dd-MM-YYYY HH:mm:ss");
 				ticketHistoryVO.setTimeStamp(simpleDateFormat.format(ticketHistory.getTimeStamp()));
 				ticketHistoryVO.setValueBefore(ticketHistory.getValueBefore());
 				ticketHistoryVO.setValueAfter(ticketHistory.getValueAfter());
@@ -614,7 +628,7 @@ public class TicketServiceImpl implements TicketService {
 			for(TicketComment  ticketComment : commentList){
 				TicketCommentVO ticketCommentVO = new TicketCommentVO();
 				ticketCommentVO.setCreatedBy(ticketComment.getCreatedBy());
-				SimpleDateFormat simpleDateFormat=new SimpleDateFormat("dd-MM-YYYY");
+				SimpleDateFormat simpleDateFormat=new SimpleDateFormat("dd-MM-YYYY HH:mm:ss");
 				ticketCommentVO.setCreatedDate(simpleDateFormat.format(ticketComment.getCreatedDate()));
 				ticketCommentVO.setTicketNumber(ticketComment.getCustTicketNumber());
 				ticketCommentVO.setTicketId(ticketComment.getTicketId());
@@ -641,7 +655,7 @@ public class TicketServiceImpl implements TicketService {
 				ticketCommentVO.setCommentId(ticketComment.getCommentId());
 				ticketCommentVO.setComment(ticketComment.getComment());
 				ticketCommentVO.setCreatedBy(ticketComment.getCreatedBy());
-				SimpleDateFormat simpleDateFormat=new SimpleDateFormat("dd-MM-YYYY");
+				SimpleDateFormat simpleDateFormat=new SimpleDateFormat("dd-MM-YYYY HH:mm:ss");
 				ticketCommentVO.setCreatedDate(simpleDateFormat.format(ticketComment.getCreatedDate()));
 			}
 		return ticketCommentVO;
@@ -674,7 +688,7 @@ public class TicketServiceImpl implements TicketService {
 						tempCustomerTicketVO.setPriorityDescription(customerTicket.getPriority());
 						tempCustomerTicketVO.setStatusId(customerTicket.getStatus().getStatusId());
 						tempCustomerTicketVO.setStatus(customerTicket.getStatus().getStatus());
-						SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-YYYY HH:MM:ss");
+						SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-YYYY HH:mm:ss");
 						tempCustomerTicketVO.setRaisedOn(simpleDateFormat.format(customerTicket.getCreatedOn()));
 						tempCustomerTicketVO.setRaisedBy(customerTicket.getCreatedBy());
 						tempCustomerTicketVO
@@ -778,7 +792,7 @@ public class TicketServiceImpl implements TicketService {
 				ticketCommentVO.setCommentId(ticketComment.getCommentId());
 				ticketCommentVO.setComment(ticketComment.getComment());
 				ticketCommentVO.setCreatedBy(ticketComment.getCreatedBy());
-				SimpleDateFormat simpleDateFormat=new SimpleDateFormat("dd-MM-YYYY");
+				SimpleDateFormat simpleDateFormat=new SimpleDateFormat("dd-MM-YYYY HH:mm:ss");
 				ticketCommentVO.setCreatedDate(simpleDateFormat.format(ticketComment.getCreatedDate()));
 			}
 			}

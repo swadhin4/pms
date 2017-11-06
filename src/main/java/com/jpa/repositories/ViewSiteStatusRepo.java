@@ -8,5 +8,5 @@ import com.jpa.entities.ViewSiteStatus;
 
 public interface ViewSiteStatusRepo extends JpaRepository<ViewSiteStatus, Long> {
 
-	public List<ViewSiteStatus> findBySiteId(Long siteId);
+	public List<ViewSiteStatus> findBySiteIdIn(List<Long> siteId);
 }

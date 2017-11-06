@@ -118,7 +118,7 @@ chrisApp.controller('serviceProviderController',  ['$rootScope', '$scope', '$fil
 		$scope.getPriorities=function(){
 			$scope.priorities =[];
 			$scope.priorityValues =[];
-			var priorityList=['Critical', 'Medium', 'High', 'Low'];
+			var priorityList=['Critical', 'High', 'Medium', 'Low'];
 			for(var i=1;i<=4;i++){
 				var priority={
 						slaId:null,

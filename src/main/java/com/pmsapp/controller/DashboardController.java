@@ -1,5 +1,6 @@
 package com.pmsapp.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
@@ -13,14 +14,19 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.jpa.entities.ServiceProvider;
+import com.jpa.entities.UserSiteAccess;
 import com.jpa.entities.ViewSPPriority;
 import com.jpa.entities.ViewSPStatus;
 import com.jpa.entities.ViewSitePriority;
 import com.jpa.entities.ViewSiteStatus;
+import com.jpa.repositories.ServiceProviderRepo;
+import com.jpa.repositories.UserSiteAccessRepo;
 import com.jpa.repositories.ViewSPPriorityRepo;
 import com.jpa.repositories.ViewSPStatusRepo;
 import com.jpa.repositories.ViewSitePriorityRepo;
 import com.jpa.repositories.ViewSiteStatusRepo;
+import com.pmsapp.view.vo.AssetVO;
 import com.pmsapp.view.vo.LoginUser;
 import com.web.util.RestResponse;
 
@@ -45,7 +51,13 @@ public class DashboardController extends BaseController {
 	@Autowired
 	private ViewSPPriorityRepo viewSPPriorityRepo;
 	
+	@Autowired
+	private UserSiteAccessRepo userSiteAccessRepo;
+	
 
+	@Autowired
+	private ServiceProviderRepo serviceProvderRepo;
+	
 	@RequestMapping(value = "/site/ticket/status", method = RequestMethod.GET,produces="application/json")
 	public ResponseEntity<RestResponse> getSiteTicketStatusById(final HttpSession session) {
 		LOGGER.info("Inside DashboardController .. getSiteStatusById");
@@ -55,15 +67,25 @@ public class DashboardController extends BaseController {
 		LoginUser loginUser = getCurrentLoggedinUser(session);
 		if(loginUser!=null){
 			try {
-				siteticketStatusList = viewStatusRepo.findAll();
-				if(!siteticketStatusList.isEmpty()){				
-					response.setStatusCode(200);
-					response.setObject(siteticketStatusList);
-					responseEntity = new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+				List<UserSiteAccess> userSiteAccessList = userSiteAccessRepo.findSiteAssignedFor(loginUser.getUserId());
+				if(userSiteAccessList.isEmpty()){
+					LOGGER.info("User donot have any access to sites");
 				}else{
-					response.setStatusCode(404);
-					response.setMessage("No Ticket Status found");
-					responseEntity = new ResponseEntity<RestResponse>(response, HttpStatus.NOT_FOUND);
+					LOGGER.info("User is having access to "+userSiteAccessList.size()+" sites");
+					List<Long> siteIdList = new ArrayList<Long>();
+					for(UserSiteAccess userSiteAccess: userSiteAccessList){
+						siteIdList.add(userSiteAccess.getSite().getSiteId());
+					}
+					siteticketStatusList = viewStatusRepo.findBySiteIdIn(siteIdList);
+					if(!siteticketStatusList.isEmpty()){				
+						response.setStatusCode(200);
+						response.setObject(siteticketStatusList);
+						responseEntity = new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+					}else{
+						response.setStatusCode(404);
+						response.setMessage("No Ticket Status found");
+						responseEntity = new ResponseEntity<RestResponse>(response, HttpStatus.NOT_FOUND);
+					}
 				}
 			} catch (Exception e) {
 				response.setStatusCode(505);
@@ -87,7 +109,16 @@ public class DashboardController extends BaseController {
 		LoginUser loginUser = getCurrentLoggedinUser(session);
 		if(loginUser!=null){
 			try {
-				siteTicketPriority = viewSitePriorityRepo.findAll();
+				List<UserSiteAccess> userSiteAccessList = userSiteAccessRepo.findSiteAssignedFor(loginUser.getUserId());
+				if(userSiteAccessList.isEmpty()){
+					LOGGER.info("User donot have any access to sites");
+				}else{
+					LOGGER.info("User is having access to "+userSiteAccessList.size()+" sites");
+					List<Long> siteIdList = new ArrayList<Long>();
+					for(UserSiteAccess userSiteAccess: userSiteAccessList){
+						siteIdList.add(userSiteAccess.getSite().getSiteId());
+					}
+				siteTicketPriority = viewSitePriorityRepo.findBySiteIdIn(siteIdList);
 				if(!siteTicketPriority.isEmpty()){				
 					response.setStatusCode(200);
 					response.setObject(siteTicketPriority);
@@ -96,6 +127,7 @@ public class DashboardController extends BaseController {
 					response.setStatusCode(404);
 					response.setMessage("No Site Priority found");
 					responseEntity = new ResponseEntity<RestResponse>(response, HttpStatus.NOT_FOUND);
+				}
 				}
 			} catch (Exception e) {
 				response.setStatusCode(505);
@@ -119,15 +151,22 @@ public class DashboardController extends BaseController {
 		LoginUser loginUser = getCurrentLoggedinUser(session);
 		if(loginUser!=null){
 			try {
-				spTicketPriority = viewSPPriorityRepo.findAll();
-				if(!spTicketPriority.isEmpty()){				
-					response.setStatusCode(200);
-					response.setObject(spTicketPriority);
-					responseEntity = new ResponseEntity<RestResponse>(response, HttpStatus.OK);
-				}else{
-					response.setStatusCode(404);
-					response.setMessage("No SP Priority found");
-					responseEntity = new ResponseEntity<RestResponse>(response, HttpStatus.NOT_FOUND);
+				List<Long> spList = new ArrayList<>(0);
+				List<ServiceProvider> serviceProviderList =  serviceProvderRepo.findByCompany(loginUser.getCompany().getCompanyId());
+				if(!serviceProviderList.isEmpty()){
+					for(ServiceProvider serviceProvider:serviceProviderList){
+						spList.add(serviceProvider.getServiceProviderId());
+					}
+						spTicketPriority = viewSPPriorityRepo.findBySpIdIn(spList);
+						if(!spTicketPriority.isEmpty()){				
+							response.setStatusCode(200);
+							response.setObject(spTicketPriority);
+							responseEntity = new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+						}else{
+							response.setStatusCode(404);
+							response.setMessage("No SP Priority found");
+							responseEntity = new ResponseEntity<RestResponse>(response, HttpStatus.NOT_FOUND);
+					}
 				}
 			} catch (Exception e) {
 				response.setStatusCode(505);
@@ -151,15 +190,22 @@ public class DashboardController extends BaseController {
 		LoginUser loginUser = getCurrentLoggedinUser(session);
 		if(loginUser!=null){
 			try {
-				spTicketStatus = viewSPStatusRepo.findAll();
-				if(!spTicketStatus.isEmpty()){				
-					response.setStatusCode(200);
-					response.setObject(spTicketStatus);
-					responseEntity = new ResponseEntity<RestResponse>(response, HttpStatus.OK);
-				}else{
-					response.setStatusCode(404);
-					response.setMessage("No SP Status found");
-					responseEntity = new ResponseEntity<RestResponse>(response, HttpStatus.NOT_FOUND);
+				List<Long> spList = new ArrayList<>(0);
+				List<ServiceProvider> serviceProviderList =  serviceProvderRepo.findByCompany(loginUser.getCompany().getCompanyId());
+				if(!serviceProviderList.isEmpty()){
+					for(ServiceProvider serviceProvider:serviceProviderList){
+						spList.add(serviceProvider.getServiceProviderId());
+					}
+					spTicketStatus = viewSPStatusRepo.findBySpIdIn(spList);
+					if(!spTicketStatus.isEmpty()){				
+						response.setStatusCode(200);
+						response.setObject(spTicketStatus);
+						responseEntity = new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+					}else{
+						response.setStatusCode(404);
+						response.setMessage("No SP Status found");
+						responseEntity = new ResponseEntity<RestResponse>(response, HttpStatus.NOT_FOUND);
+					}
 				}
 			} catch (Exception e) {
 				response.setStatusCode(505);

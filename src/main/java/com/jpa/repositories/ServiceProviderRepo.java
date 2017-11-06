@@ -16,7 +16,12 @@ public interface ServiceProviderRepo extends JpaRepository<ServiceProvider, Long
 	@Query("from ServiceProvider sp where sp.company.companyId=:customerId")
 	public List<ServiceProvider> findByCompany(@Param(value="customerId") Long customerId);
 
-	public List<ServiceProvider> findByCompanyCompanyIdIn(List<Long> companyId);
+	@Query("from ServiceProvider sp where sp.company.companyId in :customerId order by sp.name")
+	public List<ServiceProvider> findByCompanyCompanyIdIn(@Param("customerId") List<Long> companyId);
 	
 	public ServiceProvider findBySpUsername(String username);
+
+	@Query(value="select sp_username from pm_service_provider sp where sp_username = :uniqueUser", nativeQuery=true)
+	public String validateSPUser(@Param(value="uniqueUser") String uniqueUser);
+	
 }

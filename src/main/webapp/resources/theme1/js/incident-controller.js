@@ -440,6 +440,9 @@ function populateDataTable(data, tableDivName){
 				else if(full.statusId==6){
 					return '<a href style="color:red"> <i class="fa fa-times-circle" aria-hidden="true"></i> '+data+'</a>';
 				 }
+				else if(full.statusId==7){
+					return '<a href style="color:#F033FF"> <i class="fa fa-check-circle-o" aria-hidden="true"></i> '+data+'</a>';
+				 }
 			}
 		}]
 	});

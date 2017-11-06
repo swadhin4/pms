@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -127,6 +128,39 @@ public class SiteController extends BaseController {
 		}
 
 		logger.info("Exit SiteController .. createNewSite");
+		return responseEntity;
+	}
+	
+	@RequestMapping(value = "/selected/{siteId}", method = RequestMethod.GET, produces = "application/json")
+	public ResponseEntity<RestResponse> getSelectedSite(@PathVariable(value="siteId") Long siteId, final HttpSession session) {
+		logger.info("Inside SiteController .. getSelectedSite");
+		RestResponse response = new RestResponse();
+		ResponseEntity<RestResponse> responseEntity = new ResponseEntity<RestResponse>(HttpStatus.NO_CONTENT);
+		LoginUser loginUser = getCurrentLoggedinUser(session);
+
+		CreateSiteVO savedSiteVO = null;
+		if(loginUser!=null){
+			try {
+				savedSiteVO= siteService.getSiteDetails(siteId);
+				if(savedSiteVO.getSiteId()!=null){
+						response.setStatusCode(200);
+						response.setObject(savedSiteVO);
+						responseEntity = new ResponseEntity<RestResponse>(response,HttpStatus.OK);
+					}else{
+						response.setStatusCode(404);
+						responseEntity = new ResponseEntity<RestResponse>(response,HttpStatus.NOT_FOUND);
+					}
+
+			} catch (Exception e) {
+				logger.info("Exception while getting site details for "+ siteId, e);
+				response.setMessage("Exception while getting site details for "+ siteId);
+				response.setStatusCode(500);
+				responseEntity = new ResponseEntity<RestResponse>(response,HttpStatus.NOT_FOUND);
+
+			}
+		}
+
+		logger.info("Exit SiteController .. getSelectedSite");
 		return responseEntity;
 	}
 }

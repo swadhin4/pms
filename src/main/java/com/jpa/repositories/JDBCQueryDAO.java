@@ -24,6 +24,7 @@ public class JDBCQueryDAO{
 	
 	private JdbcTemplate jdbcSqlCall;
 	
+	private SimpleJdbcCall jdbcSPCall;
 	
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
@@ -33,6 +34,12 @@ public class JDBCQueryDAO{
 	@Autowired
 	public void setSQLDataSource(DataSource dataSource) {
 		this.jdbcSqlCall =  new SimpleJdbcCall(dataSource).getJdbcTemplate();
+	}
+	
+	
+	@Autowired
+	public void setSPDataSource(DataSource dataSource) {
+		this.jdbcSPCall =  new SimpleJdbcCall(dataSource).withProcedureName("usp_generate_sp_unique_id");
 	}
 	
 	public String getSlaDate(String ticketNumber, Integer slaDuration, String slaUnit) {
@@ -68,5 +75,12 @@ public class JDBCQueryDAO{
 			}
 			
 		});
+	}
+	
+	public Integer getUniqueSPUserId() {
+		  SqlParameterSource in = new MapSqlParameterSource();
+	      Map<String, Object> out = jdbcSPCall.execute(in);
+	      Integer uniqueSPUserId = (Integer)out.get("rand_user_id");
+	      return uniqueSPUserId;
 	}
 }

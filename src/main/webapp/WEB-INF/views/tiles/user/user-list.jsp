@@ -129,9 +129,8 @@ $(function() {
   })
 </script>
 </head>
-<div id="page-content-wrapper">
-	<div class="page-content">
-		<div class="container-fluid" ng-controller="userController" id="userWindow">
+<div class="content-wrapper">
+		<div  ng-controller="userController" id="userWindow">
 		<div style="display:none" id="loadingDiv"><div class="loader">Loading...</div></div>
 			<section class="content" style="min-height:35px;display:none" id="messageWindow">
 				<div class="row">
@@ -483,8 +482,3 @@ $(function() {
 				
 		</div>
 	</div>
-</div>
-</section>
-</div>
-</div>
-</div>

@@ -24,6 +24,8 @@ public class ServiceProviderVO {
 	private String accessKey;
 	private int status;
 	private String message;
+	private String option;
+	private int version;
 
 	public Long getServiceProviderId() {
 		return serviceProviderId;
@@ -120,6 +122,18 @@ public class ServiceProviderVO {
 	}
 	public void setMessage(String message) {
 		this.message = message;
+	}
+	public String getOption() {
+		return option;
+	}
+	public void setOption(String option) {
+		this.option = option;
+	}
+	public int getVersion() {
+		return version;
+	}
+	public void setVersion(int version) {
+		this.version = version;
 	}
 
 

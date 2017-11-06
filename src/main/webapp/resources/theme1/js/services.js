@@ -163,7 +163,7 @@ chrisApp.factory("siteService", ['$http', '$q',function ($http, $q) {
 	 	
 	    function retrieveSiteDetails(siteId) {
             var def = $q.defer();
-            $http.get(hostLocation+"/test/api/site/"+siteId)
+            $http.get(hostLocation+"/site/selected/"+siteId)
                 .success(function(data) {
                      console.log(data)
                      SiteService.site=data;

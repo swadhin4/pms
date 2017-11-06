@@ -212,7 +212,7 @@
 				  'chartType': 'BarChart',
 				  'containerId': 'chart_site_bar_div',
 				  'options': {
-					'width': 480,
+					'width': "100%",
 					'height': 250,
 					'legend': {position: 'none'},
 					'pieSliceText': 'value',
@@ -231,6 +231,7 @@
 				dashboard.bind(donuCategoryFilter, barChart);
 				
 				dashboard.draw(view);	
+				
 				}else{
 				}
 
@@ -298,7 +299,7 @@
 				  'chartType': 'BarChart',
 				  'containerId': 'chart_SP_bar_div',
 				  'options': {
-					'width': 480,
+					'width': "100%",
 					'height': 250,
 					'legend': {position: 'none'},
 					'pieSliceText': 'value',

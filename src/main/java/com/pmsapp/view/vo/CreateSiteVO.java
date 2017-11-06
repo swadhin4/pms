@@ -36,8 +36,11 @@ public class CreateSiteVO {
 	@Required
 	private String primaryContact;
 	private String secondaryContact;
-	private String address;
-
+	private String siteAddress1;
+	private String siteAddress2;
+	private String siteAddress3;
+	private String siteAddress4;
+	private String fullAddress;
 	private List<SiteLicenceVO> siteLicense = new ArrayList<SiteLicenceVO>();
 	private List<SiteDeliveryVO> siteDelivery = new ArrayList<SiteDeliveryVO>();
 	private List<SiteOperationVO> siteOperation = new ArrayList<SiteOperationVO>();
@@ -55,6 +58,8 @@ public class CreateSiteVO {
 	private String fileInput;
 	private String fileExtension;
 	private String fileLocation;
+	
+	private String zipCode;
 
 
 	public CreateSiteVO() {
@@ -199,12 +204,37 @@ public class CreateSiteVO {
 		this.secondaryContact = secondaryContact;
 	}
 
-	public String getAddress() {
-		return address;
+	
+	public String getSiteAddress1() {
+		return siteAddress1;
 	}
 
-	public void setAddress(final String address) {
-		this.address = address;
+	public void setSiteAddress1(String siteAddress1) {
+		this.siteAddress1 = siteAddress1;
+	}
+
+	public String getSiteAddress2() {
+		return siteAddress2;
+	}
+
+	public void setSiteAddress2(String siteAddress2) {
+		this.siteAddress2 = siteAddress2;
+	}
+
+	public String getSiteAddress3() {
+		return siteAddress3;
+	}
+
+	public void setSiteAddress3(String siteAddress3) {
+		this.siteAddress3 = siteAddress3;
+	}
+
+	public String getSiteAddress4() {
+		return siteAddress4;
+	}
+
+	public void setSiteAddress4(String siteAddress4) {
+		this.siteAddress4 = siteAddress4;
 	}
 
 	public List<SiteLicenceVO> getSiteLicense() {
@@ -287,22 +317,36 @@ public class CreateSiteVO {
 		this.fileLocation = fileLocation;
 	}
 
-	@Override
-	public String toString() {
-		return "CreateSiteVO [siteId=" + siteId + ", siteName=" + siteName
-				+ ", owner=" + owner + ", district=" + district + ", area="
-				+ area + ", cluster=" + cluster + ", electricityId="
-				+ electricityId + ", siteNumber1=" + siteNumber1
-				+ ", siteNumber2=" + siteNumber2 + ", fileInput=" + fileInput
-				+ ", contactName=" + contactName + ", email=" + email
-				+ ", longitude=" + longitude + ", latitude=" + latitude
-				+ ", primaryContact=" + primaryContact + ", secondaryContact="
-				+ secondaryContact + ", address=" + address + ", siteLicense="
-				+ siteLicense + ", siteDelivery=" + siteDelivery
-				+ ", siteOperation=" + siteOperation + ", siteSubmeter="
-				+ siteSubmeter + "]";
+	public String getZipCode() {
+		return zipCode;
 	}
 
+	public void setZipCode(String zipCode) {
+		this.zipCode = zipCode;
+	}
+
+	public String getFullAddress() {
+		return fullAddress;
+	}
+
+	public void setFullAddress(String fullAddress) {
+		this.fullAddress = fullAddress;
+	}
+
+	@Override
+	public String toString() {
+		return "CreateSiteVO [siteId=" + siteId + ", siteName=" + siteName + ", owner=" + owner + ", district="
+				+ district + ", area=" + area + ", cluster=" + cluster + ", operator=" + operator + ", electricityId="
+				+ electricityId + ", siteNumber1=" + siteNumber1 + ", siteNumber2=" + siteNumber2 + ", contactName="
+				+ contactName + ", email=" + email + ", longitude=" + longitude + ", latitude=" + latitude
+				+ ", primaryContact=" + primaryContact + ", secondaryContact=" + secondaryContact + ", siteAddress1="
+				+ siteAddress1 + ", siteAddress2=" + siteAddress2 + ", siteAddress3=" + siteAddress3 + ", siteAddress4="
+				+ siteAddress4 + ", siteLicense=" + siteLicense + ", siteDelivery=" + siteDelivery + ", siteOperation="
+				+ siteOperation + ", siteSubmeter=" + siteSubmeter + ", createdBy=" + createdBy + ", site=" + site
+				+ ", validationMessage=" + validationMessage + ", status=" + status + ", fileInput=" + fileInput
+				+ ", fileExtension=" + fileExtension + ", fileLocation=" + fileLocation + "]";
+	}
+	
 
 
 }

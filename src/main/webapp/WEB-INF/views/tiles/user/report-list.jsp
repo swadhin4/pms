@@ -95,10 +95,9 @@ $(function() {
   
 </script>
 </head>
-<div id="page-content-wrapper" >
-	<div class="page-content">
+<div class="content-wrapper">
 	<c:set var="contextPath" value="${pageContext.request.contextPath}"></c:set>
-		<div class="container-fluid" ng-controller="reportController" id="reportWindow">
+		<div  ng-controller="reportController" id="reportWindow">
 		<div style="display:none" id="loadingDiv"><div class="loader">Loading...</div></div>
 			<section class="content">
 				<div class="row">
@@ -152,8 +151,3 @@ $(function() {
 		
 		</div>
 	</div>
-</div>
-</section>
-</div>
-</div>
-</div>

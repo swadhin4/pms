@@ -29,7 +29,6 @@ chrisApp.controller('incidentCreateController',  ['$rootScope', '$scope', '$filt
 		$scope.slaPercent = '60';
 		$scope.ticketComments=[];
 		
-		
 		$scope.statusList=[];
 		$scope.status={
 				selected:{},
@@ -161,6 +160,7 @@ chrisApp.controller('incidentCreateController',  ['$rootScope', '$scope', '$filt
 		$scope.getIncidentSelected=function(){
 			ticketService.getSelectedTicketFromSession()
 			.then(function(data){
+				console.log("Ticket DetailsXXXX")
 				console.log(data)
 				if(data.statusCode == 200){
 					$scope.ticketData=angular.copy(data.object);
@@ -172,7 +172,7 @@ chrisApp.controller('incidentCreateController',  ['$rootScope', '$scope', '$filt
 						$('#closeNote').prop("disabled", true);
 						$.each($scope.closeCodeList,function(key,val){
 							if(val.id == $scope.ticketData.closeCode){
-								$scope.ticketDate.codeClosed=val.code;
+								$scope.ticketData.codeClosed=val.code;								
 								$('#closeCode').prop("disabled", true);
 								return false;
 							}
@@ -526,6 +526,11 @@ chrisApp.controller('incidentCreateController',  ['$rootScope', '$scope', '$filt
 						$scope.ticketData.priorityDescription=null;
 	 					$("#ticketCategorySelect").empty();
 	 					 $("#assetSelect").empty();
+	 					if(type.toUpperCase()=='EQUIPMENT'){
+	 						$scope.assetTypechecked = 'E';
+	 					}else if(type.toUpperCase()=='SERVICE'){
+	 						$scope.assetTypechecked = 'S';
+	 					}
 				 }else{	 
 			 if(type.toUpperCase()=='EQUIPMENT'){
 				 $scope.assetTypechecked = 'E';
@@ -894,6 +899,7 @@ $scope.setTicketraisedOnDate=function(){
 				}
 				initializeEscalateTicket();
 				$scope.getLinkedTicketDetails($scope.ticketData.ticketId);
+				$scope.selectedEscalation ={};
 			},function(data){
 				console.log(data);
 			});
@@ -968,14 +974,24 @@ $scope.setTicketraisedOnDate=function(){
 	$scope.openAssetModal=function(){
 		 var selectedSite = $('#siteSelect').val();
 		 if(selectedSite == ""){
-			// alert ("No Site Selected");
+			 $('#messageWindow').show();
+				$('#successMessageDiv').hide();
+				$('#errorMessageDiv').show();
+				$('#errorMessageDiv').alert();
+				$scope.errorMessage="No site selected";
 			 
 		 }else{
 			if($scope.assetTypechecked == 'E'){
 				$scope.addEquipmentModal();
 			}
-			if($scope.assetTypechecked == 'S'){
+			else if($scope.assetTypechecked == 'S'){
 				$scope.addServiceModal();
+			}else{
+				$('#messageWindow').show();
+				$('#successMessageDiv').hide();
+				$('#errorMessageDiv').show();
+				$('#errorMessageDiv').alert();
+				$scope.errorMessage="Please select an option Equipment / Service to add asset";
 			}
 		 }
 	}

@@ -10,8 +10,8 @@
 <meta http-equiv='cache-control' content='no-cache'>
 <meta http-equiv='expires' content='0'>
 <meta http-equiv='pragma' content='no-cache'>
-<link rel="stylesheet"	href='<c:url value="/resources/theme1/css/bootstrap-toggle.min.css"></c:url>' />
-<script type="text/javascript" 	src='<c:url value="/resources/theme1/js/bootstrap-toggle.min.js"></c:url>'></script>
+<%-- <link rel="stylesheet"	href='<c:url value="/resources/theme1/css/bootstrap-toggle.min.css"></c:url>' />
+<script type="text/javascript" 	src='<c:url value="/resources/theme1/js/bootstrap-toggle.min.js"></c:url>'></script> --%>
 <link rel="stylesheet"	href='<c:url value="/resources/theme1/css/angucomplete-alt.css"></c:url>'>
 <link rel="stylesheet"	href='<c:url value="/resources/theme1/css/select2.min.css"></c:url>' />
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/select2.full.min.js"></c:url>'></script>
@@ -148,9 +148,8 @@ $(function() {
   
 </script>
 </head>
-<div id="page-content-wrapper" >
-	<div class="page-content">
-		<div class="container-fluid" ng-controller="siteController" id="siteWindow">
+<div class="content-wrapper">
+		<div  ng-controller="siteController" id="siteWindow">
 		<div style="display:none" id="loadingDiv"><div class="loader">Loading...</div></div>
 			<section class="content" style="min-height: 35px; display: none"
 				id="messageWindow">
@@ -181,7 +180,6 @@ $(function() {
 			<section class="content">
 				<div class="row">
 				<div class="col-md-6">
-				<div class="row">
 						<div class="box">
 							<div class="box-header with-border">
 								<h3 class="box-title">List of Sites</h3>
@@ -193,7 +191,7 @@ $(function() {
 									
 								</div>
 							</div>
-							<div class="box-body" style="height:70%" >
+							<div class="box-body" style="height:72%" >
 								<div class="row">
 	 								<div class="col-md-12">
 										<input type="text" class="form-control"	placeholder="Search Site" ng-model="searchSite">
@@ -201,7 +199,7 @@ $(function() {
 										<div class="col-md-12" ng-if="siteList.length> 0">
 											<ul class="products-list product-list-in-box">
 												<li class="item"
-													ng-repeat="site in siteList | filter:searchSite">
+													ng-repeat="site in siteList | filter:searchSite | orderBy:'siteName'">
 													<div class="product-img" style="margin-top: -12px;">
 														<img src="${contextPath}/resources/theme1/img/site-icon.png"
 															alt="Product Image">
@@ -210,7 +208,7 @@ $(function() {
 														<a href="javascript:void(0)"
 															ng-click="getSiteDetails(site)" class="product-title">{{site.siteName}}
 														</a> <span class="product-description">
-															{{site.address}} </span>
+															{{site.fullAddress}} </span>
 													</div>
 												</li>
 
@@ -248,7 +246,6 @@ $(function() {
 								</div>
 							</div>
 						</div>
-							</div>
 							
 						</div>
 						
@@ -258,24 +255,21 @@ $(function() {
 								<h3 class="box-title">Site Detail</h3>
 								<div class="box-tools pull-right">
 								<sec:authorize access="hasAnyRole('ROLE_SALES_MANAGER', 'ROLE_OPS_MANAGER')">
-								<div class="btn-group pull-right" ng-if="siteList.length> 0">
-								<a href class="btn btn-success" style="margin-right: 5px;"
-									 data-toggle="modal" ng-click="manageUserAccess(selectedSite)">Manage User Access <span class="fa fa-user"></span></a>
-									<a href class="btn btn-success" style="margin-right: 5px;"
-									 data-toggle="modal" ng-click="updateSiteModal(selectedSite)">Edit Site <span class="fa fa-edit"></span></a>
+								<div class="btn-group pull-right" >
 									<button type="button"
 										class="btn btn-success dropdown-toggle pull-right"
 										style="margin-right: 5px;" data-toggle="dropdown">
-										Manage Asset <span class="caret"></span>
+										Manage Site <span class="caret"></span>
 									</button>
-
 									<ul class="dropdown-menu" role="menu">
-										<li></li>
-										<li><a href data-toggle="modal" >Add
-												an Equipment</a></li>
-										<li><a href data-toggle="modal">Add	a Service</a></li>
-										<li><a href="#" >View Asset
-												</a></li>
+										<li ng-if="siteList.length> 0"><a href  style="margin-right: 5px;"
+									 data-toggle="modal" ng-click="manageUserAccess(selectedSite)">
+									 <span class="fa fa-user"></span> Manage User Access </a></li>
+									 	<li><a href  style="margin-right: 5px;"
+									 data-toggle="modal" ng-click="updateSiteModal(selectedSite)">
+									 <span class="fa fa-edit"></span> Edit Site </a></li>
+										<!-- <li><a href data-toggle="modal" >Add an Equipment</a></li>
+										<li><a href data-toggle="modal">Add	a Service</a></li> -->
 									</ul>
 
 								</div>
@@ -292,13 +286,13 @@ $(function() {
 											<thead>											
 											<tr><td style="width:40%">Site Name</td><td align="right">{{selectedSite.siteName}}</td>
 											</tr>
-											<tr><td style="width:40%">Address</td><td align="right">{{selectedSite.siteAddress}}</td>
-											</tr>
+											<!-- <tr><td style="width:40%">Address</td><td align="right">{{selectedSite.siteAddress}}</td>
+											</tr> -->
 											</thead>
 											<tbody>
 											<tr><td>Site Owner</td><td align="right">{{selectedSite.retailerName}}</td></tr>
 											<tr><td>Retailer</td><td align="right">{{sessionUser.company.companyName}}</td></tr>
-											<tr><td>Electricity ID</td><td align="right">{{selectedSite.electricityId}}</td></tr>
+											<tr><td>Electricity Id (MPAN)</td><td align="right">{{selectedSite.electricityId}}</td></tr>
 											<tr><td>Site Number1</td><td align="right">{{selectedSite.siteNumber1}}</td></tr>
 											<tr><td>Site Number2</td><td align="right">{{selectedSite.siteNumber2}}</td></tr>
 											<!-- <tr><td>Contact</td><td align="right">{{selectedSite.contactName}}</td></tr>
@@ -314,11 +308,13 @@ $(function() {
 							<div class="box-header with-border">
 								<h3 class="box-title">Contact Information</h3>
 							<div class="box-tools pull-right">
+							<sec:authorize access="hasAnyRole('ROLE_SALES_MANAGER', 'ROLE_OPS_MANAGER')">
 								<div class="btn-group pull-right">
 									<a href="" class="btn btn-info" style="margin-right: 5px;" title="Edit contact information"
 									data-toggle="modal" ng-click="viewTabSelected(selectedSite,'siteContactLink')">
 									<span class="fa fa-edit fa-2x" style="    font-size: 1.2em;"></span></a>
 								</div>
+								</sec:authorize>
 								</div>
 							</div>
 							<div class="box-body">
@@ -333,7 +329,7 @@ $(function() {
                     <th>Email</th><td>{{selectedSite.email}}</td>
                     </tr>
                     <tr>
-                    <th>Address</th><td>{{selectedSite.address}} </td>
+                    <th>Address</th><td>{{selectedSite.siteAddress}} </td>
                     </tr>
                     <tr>
                     <th>Latitude</th><td>{{selectedSite.latitude}} </td>
@@ -358,12 +354,14 @@ $(function() {
 							<div class="box-header with-border">
 								<h3 class="box-title">Licence Information</h3>
 							<div class="box-tools pull-right">
+							<sec:authorize access="hasAnyRole('ROLE_SALES_MANAGER', 'ROLE_OPS_MANAGER')">
 								<div class="btn-group pull-right">
 									<a href="" class="btn btn-info" style="margin-right: 5px;" title="Edit License information"
 									data-toggle="modal" ng-click="viewTabSelected(selectedSite,'siteLicenceLink')">
 									<span class="fa fa-edit fa-2x" style="font-size: 1.0em;"></span></a>
 								
 								</div>
+								</sec:authorize>
 								</div>
 							</div>
 							<div class="box-body">
@@ -432,10 +430,11 @@ $(function() {
 							<div class="box-header with-border">
 								<h3 class="box-title">Operation Timings</h3>
 							<div class="box-tools pull-right">
+							<sec:authorize access="hasAnyRole('ROLE_SALES_MANAGER', 'ROLE_OPS_MANAGER')">
 								<a href="" class="btn btn-info" style="margin-right: 5px;" title="Edit Operation timings"
 									data-toggle="modal" ng-click="viewTabSelected(selectedSite,'siteOperationLink')">
 									<span class="fa fa-edit fa-2x" style="font-size: 1.0em;"></span></a>
-								
+								</sec:authorize>
 								</div>
 							</div>
 							<div class="box-body">
@@ -450,21 +449,48 @@ $(function() {
 							  </tr>
 							  </thead>
 							  <tbody>
+							  
 							  <tr ng-repeat="timing in selectedSite.SalesOperation">
 								<td>{{timing.days}}</td>
 								<td ng-if="timing.from == 'NO TIME' && timing.to == 'NO TIME'">
+								<sec:authorize access="hasAnyRole('ROLE_SALES_MANAGER', 'ROLE_OPS_MANAGER')">
 								<a href data-toggle="modal" ng-click="updateSiteModal(selectedSite)">
-								<span class="label label-warning">Not Operating</span></a></td>
+								<span class="label label-warning">Not Operating</span></a>
+								</sec:authorize>
+								<sec:authorize access="hasAnyRole('ROLE_SITE_STAFF')">
+								<a href data-toggle="modal" >
+								<span class="label label-warning">Not Operating</span></a>
+								</sec:authorize>
+								</td>
 								<td ng-if="timing.from == 'NO TIME' && timing.to != 'NO TIME'">
+								<sec:authorize access="hasAnyRole('ROLE_SALES_MANAGER', 'ROLE_OPS_MANAGER')">
 								<a href data-toggle="modal" ng-click="updateSiteModal(selectedSite)">
 								<span class="label label-danger">
-								<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Update Start Time</span></a></td>	
+								<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Update Start Time</span></a>
+								</sec:authorize>
+								<sec:authorize access="hasAnyRole('ROLE_SITE_STAFF')">
+								<a href data-toggle="modal" >
+								<span class="label label-warning">Time not Updated</span></a>
+								</sec:authorize>
+								
+								</td>	
 								<td ng-if="timing.from != 'NO TIME' && timing.to == 'NO TIME'">
+								<sec:authorize access="hasAnyRole('ROLE_SALES_MANAGER', 'ROLE_OPS_MANAGER')">
 								<a href data-toggle="modal" ng-click="updateSiteModal(selectedSite)">
 								<span class="label label-danger">
-								<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Update End Time</span></a></td>
+								<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Update End Time</span></a>
+								</sec:authorize>
+								<sec:authorize access="hasAnyRole('ROLE_SITE_STAFF')">
+								<a href data-toggle="modal" >
+								<span class="label label-warning">Time not Updated</span></a>
+								</sec:authorize>
+								</td>
+								
 								<td ng-if="timing.from != 'NO TIME' && timing.to != 'NO TIME'">
-								<span class="label label-success">{{timing.from}} - {{timing.to}} </span> </td>													 
+								<span class="label label-success">{{timing.from}} - {{timing.to}} </span>
+								
+								
+								 </td>													 
 							  </tr>
 
 							  </tbody>
@@ -538,12 +564,14 @@ $(function() {
 							<div class="box-header with-border">
 								<h3 class="box-title">Submeter Details</h3>
 							<div class="box-tools pull-right">
+							<sec:authorize access="hasAnyRole('ROLE_SALES_MANAGER', 'ROLE_OPS_MANAGER')">
 								<div class="btn-group pull-right">
 									<a href="" class="btn btn-info" style="margin-right: 5px;" title="Edit Submeter details"
 									data-toggle="modal" ng-click="viewTabSelected(selectedSite,'siteSubmeterLink')">
 									<span class="fa fa-edit fa-2x" style="font-size: 1.0em;"></span></a>
 								
 								</div>
+								</sec:authorize>
 								</div>
 							</div>
 							<div class="box-body">
@@ -552,7 +580,7 @@ $(function() {
                 <table class="table no-margin">
                   <thead>
                   <tr>
-                    <th>Submeter Number</th>
+                    <th>Submeter Number/Electricity Id (MPAN)</th>
                     <th>User</th>
                     
                   </tr>
@@ -758,9 +786,9 @@ $(function() {
 								
 								<div class="row">
 								<div class="col-xs-4">
-					               <label for="electricityId">Electricity ID</label>
+					               <label for="electricityId">Electricity Id (MPAN)</label>
 									  <input type="text" maxlength="50" class="form-control" 
-									  placeholder="Enter Electricity ID Number" name="electricityId" ng-model="siteData.electricityId">
+									  placeholder="Enter Electricity ID (MPAN)" name="electricityId" ng-model="siteData.electricityId">
 					                </div>
 									<div class="col-xs-4 reqDiv required">
 					                <label class="control-label" for="siteNumber1">Site Number1</label>
@@ -789,6 +817,11 @@ $(function() {
               <div class="tab-pane" id="siteContactsTab">
 				  <div class="row">
 				   <div class="col-md-6">
+				   <div class="row">
+				<div class="col-md-12"> 
+				  <div class="panel panel-default">
+     <!-- <div class="panel-heading">Site Address</div> -->
+     <div class="panel-body"> 
 					<div class="box-body">
 						 <div class="row">
 						  <div class="col-md-12">
@@ -843,19 +876,80 @@ $(function() {
               </div>
 				   </div>
 				   </div>
+				   </div>
+				   </div>
+				   </div>
+				   
+				   
+				   </div>
 				<div class="col-md-6">
+				<!-- <div class="box-body"> -->
+				<div class="row">
+				<div class="col-md-12"> 
+				  <div class="panel panel-default">
+     <!-- <div class="panel-heading">Site Address</div> -->
+     <div class="panel-body"> 
+				<!-- <div class="col-md-6"> -->
 				<div class="box-body">
 				<div class="row">
 				<div class="col-md-12">
 				
-				<label for="siteAddress">Site Address</label>                  
+				<div class="col-xs-6">
+                <label for="Address1">Address Line1</label>
+                  <input type="text" min="0" maxlength="50" class="form-control" placeholder="Enter Address Line1" 
+                  name="Address1" ng-model="siteData.siteAddress1" >
+                </div>
+                <div class="col-xs-6">
+                <label for="Address2">Address Line2</label>
+                  <input type="text" min="0" maxlength="50" class="form-control" placeholder="Enter Address Line2" 
+                  name="Address2" ng-model="siteData.siteAddress2" >
+                </div>
+                
+				<!-- <label for="siteAddress">Site Address</label>                  
 				  <textarea class="form-control" style="width: 100%;
    				 height: 176px;" rows="3" placeholder="Enter site address" name="address" 
-   				 ng-model="siteData.address"></textarea>
+   				 ng-model="siteData.address"></textarea> -->
 				
 				</div>
-			   </div>
+				</div>
+				<div class="row" >
+				<div class="col-md-12">
+				<div class="col-xs-6">
+                <label for="Address3">Address Line3</label>
+                  <input type="text" min="0" maxlength="50" class="form-control" placeholder="Enter Address Line3" 
+                  name="Address3" ng-model="siteData.siteAddress3" >
+                </div>
+				<div class="col-xs-6">
+                <label for="Address4">Address Line4</label>
+                  <input type="text" min="0" maxlength="50" class="form-control" placeholder="Enter Address Line4" 
+                  name="Address4" ng-model="siteData.siteAddress4">
+                </div>
+                
+                
+				<!-- <label for="siteAddress">Site Address</label>                  
+				  <textarea class="form-control" style="width: 100%;
+   				 height: 176px;" rows="3" placeholder="Enter site address" name="address" 
+   				 ng-model="siteData.address"></textarea> -->
+				
+				</div>
+				</div>
+				<div class="row">
+				<div class="col-md-12">
+				<div class="col-xs-6">
+                <label for="Zip">Zip Code</label>
+                  <input type="text" min="0" maxlength="15" class="form-control" placeholder="Enter Zip code" 
+                  name="Zip" ng-model="siteData.zipCode">
+                </div>
+				</div>
+				</div>
+			   
 	   		   </div>
+	    	<!-- </div> -->
+           </div>
+           </div>
+           </div>
+			   </div>
+	   		   <!-- </div> -->
 	    	</div>
             </div>
 		</div>
@@ -1058,7 +1152,7 @@ $(function() {
                 <thead>
                 <tr>
                 <th><input type="checkbox" ng-model="selectedAll" ng-click="checkAllSubmeter()" /></th>
-                  <th>Submeter Number</th>
+                  <th>Submeter Number/Electricity Id (MPAN)</th>
                   <th>User</th>                                    
                 </tr>
                 </thead>
@@ -1212,14 +1306,8 @@ $(function() {
 		 </div>
 						</div>
 						</section>
-				</div>
 				
 				
 		
 		</div>
-	</div>
-</div>
-</section>
-</div>
-</div>
-</div>
+		</div>

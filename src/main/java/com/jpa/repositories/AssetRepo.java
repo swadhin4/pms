@@ -21,6 +21,7 @@ public interface AssetRepo extends JpaRepository<Asset, Long>{
 	@Query("from Asset a where a.categoryId=:categoryId")
 	public List<Asset> findByCategoryId(@Param(value="categoryId") Long categoryId);
 	
-	public List<Asset> findBySiteIdIn(List<Long> siteId);
+	@Query("from Asset a where a.siteId in :siteId order by a.assetName")
+	public List<Asset> findBySiteIdIn(@Param("siteId") List<Long> siteId);
 
 }

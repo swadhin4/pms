@@ -48,6 +48,9 @@ public class IncidentReport implements Serializable {
 	@Column(name="asset_name")
 	private String assetName;
 	
+	@Column(name="asset_code")
+	private String assetCode;
+	
 	@Column(name="asset_category")
 	private String assetCategory;
 	
@@ -195,6 +198,16 @@ public String getId() {
 	public void setAssetName(String assetName) {
 		this.assetName = assetName;
 	}
+
+	public String getAssetCode() {
+		return assetCode;
+	}
+
+
+	public void setAssetCode(String assetCode) {
+		this.assetCode = assetCode;
+	}
+
 
 	public String getAssetCategory() {
 		return assetCategory;

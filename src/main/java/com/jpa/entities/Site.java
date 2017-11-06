@@ -66,8 +66,18 @@ public class Site implements Serializable{
 	@Column(name="attachment_path")
 	private String attachmentPath;
 
-	@Column(name="site_address")
-	private String siteAddress;
+	@Column(name="site_address1")
+	private String siteAddress1;
+	
+	@Column(name="site_address2")
+	private String siteAddress2;
+	
+	@Column(name="site_address3")
+	private String siteAddress3;
+	
+	@Column(name="site_address4")
+	private String siteAddress4;
+	
 
 	@Column(name="post_code")
 	private String postCode;
@@ -128,8 +138,8 @@ public class Site implements Serializable{
 
 	@Column(name="modified_by")
 	private String modifiedBy;
-
-
+	
+	
 
 	@Version
 	private int version;
@@ -253,13 +263,6 @@ public class Site implements Serializable{
 		this.areaManagerName = areaManagerName;
 	}
 
-	public String getSiteAddress() {
-		return siteAddress;
-	}
-
-	public void setSiteAddress(final String siteAddress) {
-		this.siteAddress = siteAddress;
-	}
 
 	public String getPostCode() {
 		return postCode;
@@ -379,6 +382,40 @@ public class Site implements Serializable{
 		this.userAccessList = userAccessList;
 	}
 
+	public String getSiteAddress1() {
+		return siteAddress1;
+	}
+
+	public void setSiteAddress1(String siteAddress1) {
+		this.siteAddress1 = siteAddress1;
+	}
+
+	public String getSiteAddress2() {
+		return siteAddress2;
+	}
+
+	public void setSiteAddress2(String siteAddress2) {
+		this.siteAddress2 = siteAddress2;
+	}
+
+	public String getSiteAddress3() {
+		return siteAddress3;
+	}
+
+	public void setSiteAddress3(String siteAddress3) {
+		this.siteAddress3 = siteAddress3;
+	}
+
+	public String getSiteAddress4() {
+		return siteAddress4;
+	}
+
+	public void setSiteAddress4(String siteAddress4) {
+		this.siteAddress4 = siteAddress4;
+	}
+
+	
+
 	public int getVersion() {
 		return version;
 	}
@@ -386,22 +423,5 @@ public class Site implements Serializable{
 	public void setVersion(int version) {
 		this.version = version;
 	}
-
-	@Override
-	public String toString() {
-		return "Site [siteId=" + siteId + ", siteCode=" + siteCode
-				+ ", siteName=" + siteName + ", siteAddress=" + siteAddress
-				+ ", postCode=" + postCode + ", latitude=" + latitude
-				+ ", longitude=" + longitude + ", contactName=" + areaManagerName
-				+ ", primaryContact=" + primaryContact + ", secondaryContact="
-				+ secondaryContact + ", email=" + email + ", electricIdNo="
-				+ electricIdNo + ", siteNumberOne=" + siteNumberOne
-				+ ", siteNumberTwo=" + siteNumberTwo + ", createdDate="
-				+ createdDate + ", createdBy=" + createdBy + ", modifiedDate="
-				+ modifiedDate + ", modifiedBy=" + modifiedBy + "]";
-	}
-
-
-
 
 }

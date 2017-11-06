@@ -137,10 +137,9 @@ $(function() {
   
 </script>
 </head>
-<div id="page-content-wrapper" >
-	<div class="page-content">
+<div class="content-wrapper">
 	<c:set var="contextPath" value="${pageContext.request.contextPath}"></c:set>
-		<div class="container-fluid" ng-controller="incidentController" id="incidentWindow">
+		<div ng-controller="incidentController" id="incidentWindow">
 		<div style="display:none" id="loadingDiv"><div class="loader">Loading...</div></div>
 			<section class="content" style="min-height: 35px; display: none"
 				id="messageWindow">
@@ -171,12 +170,11 @@ $(function() {
 			<section class="content">
 				<div class="row">
 				<div class="col-md-12">
-				<div class="row">
 						<div class="box">
 							<div class="box-header with-border">
 								<h3 class="box-title">List of Tickets</h3>
 								<div class="box-tools pull-right">
-								<sec:authorize access="hasAnyRole('ROLE_SALES_MANAGER', 'ROLE_OPS_MANAGER')">
+								<sec:authorize access="hasAnyRole('ROLE_SALES_MANAGER', 'ROLE_OPS_MANAGER', 'ROLE_SITE_STAFF')">
 									<a 	class="btn btn-success dropdown-toggle pull-right"
 										style="margin-right: 5px;" data-toggle="dropdown">
 										Action<span class="caret"></span>
@@ -197,8 +195,10 @@ $(function() {
 							 <div class="row">
 							 <div class="col-md-12">
 								<div style="overflow-x: hidden;overflow-y:auto; height: 110%">
+								<div class="table-responsive"> 
 										<table id="ticketList" class="table table-bordered table-striped" cellspacing="0">
 										</table>
+									</div>	
 									</div>
 							</div>
 					
@@ -245,21 +245,10 @@ $(function() {
 								</div>
 							</div>
 						</div>
-							</div>
 							
 						</div>
-						
-
-				
-		
 				</div>
 				</section>
-				
-		
 		</div>
 	</div>
-</div>
-</section>
-</div>
-</div>
-</div>
+

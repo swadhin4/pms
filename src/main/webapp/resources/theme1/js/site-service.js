@@ -35,7 +35,11 @@ chrisApp.factory('siteCreationService',  ['$http', '$q',function ($http, $q) {
  					latitude:finalObject.siteData.latitude || null,
  					primaryContact:finalObject.siteData.primaryContact || null,
  					secondaryContact:finalObject.siteData.secondaryContact || null,
- 					address:finalObject.siteData.address || null,
+ 					siteAddress1:finalObject.siteData.siteAddress1 || null,
+ 					siteAddress2:finalObject.siteData.siteAddress2 || null,
+ 					siteAddress3:finalObject.siteData.siteAddress3 || null,
+ 					siteAddress4:finalObject.siteData.siteAddress4 || null,
+ 					zipCode:finalObject.siteData.zipCode || null,
  					
  				//-------------- X -----------------------//	
  					

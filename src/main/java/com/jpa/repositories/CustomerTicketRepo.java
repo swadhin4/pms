@@ -13,7 +13,8 @@ public interface CustomerTicketRepo extends JpaRepository<CustomerTicket, Long> 
 
 	public CustomerTicket findByTicketNumber(String ticketNumber);
 
-	public List<CustomerTicket> findBySiteSiteIdIn(List<Long> siteId); 
+	@Query( "from CustomerTicket ct where ct.site.siteId in :siteId order by ct.createdOn desc" )
+	public List<CustomerTicket> findBySiteSiteIdIn(@Param("siteId") List<Long> siteIds); 
 
 	@Query("from CustomerTicket ct where ct.status=:statusId")
 	public List<CustomerTicket> findOpenTicketsByStatus(@Param(value="statusId") Long statusId);

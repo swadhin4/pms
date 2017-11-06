@@ -13,6 +13,7 @@ public class TicketVO {
 	private String ticketNumber;
 	private Long assetId;
 	private String assetName;
+	private String assetCode;
 	private Long categoryId;
 	private String categoryName;
 	private Long statusId;
@@ -38,6 +39,7 @@ public class TicketVO {
 	private String closedOn;
 	private String modifiedOn;
 	private String modifiedBy;
+	private String serviceRestorationTime;
 	private List<EscalationLevelVO> escalationLevelList=new ArrayList<EscalationLevelVO>();
 	private List<CustomerSPLinkedTicketVO> linkedTickets = new ArrayList<CustomerSPLinkedTicketVO>();
 	private List<TicketEscalationVO> escalatedTicketList = new ArrayList<TicketEscalationVO>();
@@ -295,6 +297,18 @@ public class TicketVO {
 	}
 	public void setCloseNote(String closeNote) {
 		this.closeNote = closeNote;
+	}
+	public String getAssetCode() {
+		return assetCode;
+	}
+	public void setAssetCode(String assetCode) {
+		this.assetCode = assetCode;
+	}
+	public String getServiceRestorationTime() {
+		return serviceRestorationTime;
+	}
+	public void setServiceRestorationTime(String serviceRestorationTime) {
+		this.serviceRestorationTime = serviceRestorationTime;
 	}
 	@Override
 	public String toString() {

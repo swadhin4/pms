@@ -315,6 +315,7 @@ chrisApp.controller('assetController',
 					 $('#assetModalLabel').text("Update Asset");
 						 console.log($scope.selectedAsset);
 						 $scope.equipmentData=angular.copy($scope.selectedAsset);
+						 
 						 	$("#categorySelect option").each(function() {
 								if ($(this).val() == $scope.selectedAsset.categoryId) {
 									$(this).attr('selected', 'selected');

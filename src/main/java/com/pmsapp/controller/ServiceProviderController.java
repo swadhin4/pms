@@ -76,24 +76,16 @@ public class ServiceProviderController extends BaseController {
 		ResponseEntity<RestResponse> responseEntity = new ResponseEntity<RestResponse>(HttpStatus.NO_CONTENT);
 		LoginUser loginUser = getCurrentLoggedinUser(session);
 		if(loginUser!=null){
+			ServiceProviderVO savedServiceProvider =null;
 			try {
 
 				logger.info("Create New ServiceProvider : "+ serviceProviderVO);
-				ServiceProviderVO savedServiceProvider = serviceProviderService.saveServiceProvider(serviceProviderVO,loginUser);
+				savedServiceProvider = serviceProviderService.saveServiceProvider(serviceProviderVO,loginUser);
 				if(savedServiceProvider.getStatus()==200){
 					response.setStatusCode(200);
 					response.setObject(savedServiceProvider);
 					response.setMessage(savedServiceProvider.getMessage());
-					response = emailService.successSaveSPEmail(savedServiceProvider);
-					if(response.getStatusCode()==100){
-						response.setStatusCode(200);
-						response.setMessage("New Service Provider created and email sent successfully.");
-						responseEntity = new ResponseEntity<RestResponse>(response,HttpStatus.OK);
-					}else{
-						response.setStatusCode(200);
-						response.setMessage("New Service Provider created. Email cannot be sent. Please contact PMS Admin.");
-						responseEntity = new ResponseEntity<RestResponse>(response,HttpStatus.OK);
-					}
+					responseEntity = new ResponseEntity<RestResponse>(response,HttpStatus.OK);
 				}else{
 					response.setStatusCode(204);
 					response.setMessage(savedServiceProvider.getMessage());
@@ -104,11 +96,17 @@ public class ServiceProviderController extends BaseController {
 					response.setStatusCode(500);
 					response.setMessage("Error occured while saving service provider ");
 					responseEntity = new ResponseEntity<RestResponse>(response,HttpStatus.NOT_FOUND);
-
+			}
+			if(response.getStatusCode()==200 && savedServiceProvider.getOption().equalsIgnoreCase("CREATED")){
+				try {
+					emailService.successSaveSPEmail(savedServiceProvider);
+				} catch (Exception e) {
+					logger.info("Exception while sending email for service provider upon "+ savedServiceProvider.getOption(), e);
+				}
 			}
 		}
 
-		logger.info("Exit SiteController .. createNewSite");
+		logger.info("Exit SiteController .. createNewServiceProvider");
 		return responseEntity;
 	}
 

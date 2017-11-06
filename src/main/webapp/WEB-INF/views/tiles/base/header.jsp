@@ -8,6 +8,7 @@
 <html >
 <head>
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv='cache-control' content='no-cache'>
 <meta http-equiv='expires' content='0'>
 <meta http-equiv='pragma' content='no-cache'>
@@ -27,7 +28,7 @@
 <%-- <link rel="stylesheet" href='<c:url value="/resources/css/bootstrap-datetimepicker.min.css"></c:url>' /> --%>
 
 
-<link rel="stylesheet"	href='<c:url value="/resources/dist/css/AdminLTE.min.css"></c:url>' />
+<link rel="stylesheet"	href='<c:url value="/resources/dist/css/pms-admintLTE.css"></c:url>' />
 <link rel="stylesheet"	href='<c:url value="/resources/theme1/css/style.css"></c:url>' />
 <link rel="stylesheet"	href='<c:url value="/resources/dist/css/skins/skin-black-light.min.css"></c:url>' />
 
@@ -39,9 +40,9 @@
 
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/tether.min.js"></c:url>'></script>
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/bootstrap.min.js"></c:url>'></script>
+<script type="text/javascript" 	src='<c:url value="/resources/dist/js/adminlte.min.js"></c:url>'></script>
 
-
-<script type="text/javascript" 	src='<c:url value="/resources/theme1/js/transition.js"></c:url>'></script>
+<%-- <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/transition.js"></c:url>'></script>
 <script type="text/javascript" 	src='<c:url value="/resources/dist/js/app.min.js"></c:url>'></script>
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/ripples.min.js"></c:url>'></script>
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/material.min.js"></c:url>'></script>
@@ -51,12 +52,12 @@
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/jquery.inview.min.js"></c:url>'></script>
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/classie.js"></c:url>'></script>
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/jquery.nav.js"></c:url>'></script>
-<%-- <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/smooth-on-scroll.js"></c:url>'></script>
-<script type="text/javascript" 	src='<c:url value="/resources/theme1/js/smooth-scroll.js"></c:url>'></script> --%>
+<script type="text/javascript" 	src='<c:url value="/resources/theme1/js/smooth-on-scroll.js"></c:url>'></script>
+<script type="text/javascript" 	src='<c:url value="/resources/theme1/js/smooth-scroll.js"></c:url>'></script>
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/main.js"></c:url>'></script>
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/mdb.min.js"></c:url>'></script>
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/wow.js"></c:url>'></script>
-
+ --%>
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/angular.min.js"></c:url>'></script>
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/jstorage.js"></c:url>'></script>
 <script type="text/javascript"  src='<c:url value="/resources/theme1/js/angucomplete-alt.js"></c:url>'></script>
@@ -187,16 +188,29 @@ function removeLoader(){
 </head>
 
 <c:set var="contextPath" value="${pageContext.request.contextPath}"></c:set>
-	
-    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-		<div class="container-fluid">
+	 <header class="main-header">
+	 <a href="../../index2.html" class="logo">
+      <!-- mini logo for sidebar mini 50x50 pixels -->
+      <span class="logo-mini"> <img src="${contextPath}/resources/img/logo.png" style="width: 100%;"></span>
+     
+      <span class="logo-lg"><img src="${contextPath}/resources/img/sigma.png" style="width: 100%;
+   		 margin-top: 0px;"></span>
+    </a>
+    <nav class="navbar navbar-static-top">
+	<%-- 	<div class="container-fluid">
 			     	<div class="navbar-header">
-                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-backyard">
+                     <!--    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-backyard">
                             <span class="sr-only">Toggle navigation</span>
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
-                        </button>
+                        </button> -->
+                        <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
                         
                         <div  class="navbar-brand">
                     <a id="menu-toggle" href="#" class="btn-menu toggle" style="font-size: 1.5em;">
@@ -263,10 +277,76 @@ function removeLoader(){
             </ul>
             </div>
                     </div>
-		</div>
+		</div> --%>
+		<a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+
+      <div class="navbar-custom-menu">
+        <ul class="nav navbar-nav">
+          <!-- Messages: style can be found in dropdown.less-->
+          <!-- Notifications: style can be found in dropdown.less -->
+          <li class="dropdown notifications-menu">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <i class="fa fa-bell-o"></i>
+              <span class="label label-warning" id="msgCountElmId">0</span>
+            </a>
+            <ul class="dropdown-menu">
+              <li class="header">You have <span id="msgCountElmId2">0</span> notifications</li>
+              <li>
+                <!-- inner menu: contains the actual data -->
+               <ul class="menu" id="msgDropdown">
+                </ul>
+              </li>
+              <li class="footer"><a href="#">View all</a></li>
+            </ul>
+          </li>
+          <!-- User Account: style can be found in dropdown.less -->
+          <li class="dropdown user user-menu">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <img src="${contextPath}/resources/img/swadhin.jpg" class="user-image" alt="User Image">
+              <span class="hidden-xs">${user.firstName}  ${user.lastName}</span>
+            </a>
+            <ul class="dropdown-menu">
+              <!-- User image -->
+              <li class="user-header">
+                <img src="${contextPath}/resources/img/swadhin.jpg" class="img-circle" alt="User Image">
+                <p style="color: #000">
+                  ${user.firstName}  ${user.lastName}
+                  <small> ${user.company.companyName}</small>
+                  <c:forEach items="${user.userRoles}" var="roles">
+                  <small style="color: #000">${roles.role.description}</small>
+                     </c:forEach>
+                </p>
+              </li>
+              <!-- Menu Body -->
+              <!-- Menu Footer-->
+              <li class="user-footer">
+                <div class="pull-left">
+                  <a href="${contextPath}/user/profile" class="btn btn-default btn-flat">Profile</a>
+                </div>
+                <div class="pull-right">
+                 <sec:authorize access="isAuthenticated()">
+                  <a href="${contextPath}/logout" class="btn btn-default btn-flat">Sign out</a>
+                  </sec:authorize>
+                </div>
+              </li>
+            </ul>
+          </li>
+          <!-- Control Sidebar Toggle Button -->
+          <li>
+            <a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a>
+          </li>
+        </ul>
+      </div>
+    </nav>
 	</nav>
+	</header>
     <!-- Sidebar -->
-    <c:if test="${user.sysPassword eq 'NO'}">
+    <%-- <c:if test="${user.sysPassword eq 'NO'}">
     <div id="wrapper1">
     <div id="sidebar-wrapper" style="background-color:E1DDDD">
     
@@ -303,4 +383,69 @@ function removeLoader(){
   </li>
 </ul>
   </div>
-    </c:if>
+    </c:if> --%>
+    <aside class="main-sidebar">
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar">
+      <!-- Sidebar user panel -->
+      <div class="user-panel">
+        <div class="pull-left image">
+          <img src="${contextPath}/resources/img/swadhin.jpg" class="img-circle" alt="User Image">
+        </div>
+        <div class="pull-left info">
+          <p >${user.firstName}  ${user.lastName}</p>
+         
+        </div>
+      </div>
+     <c:if test="${user.sysPassword eq 'NO'}">
+      <!-- sidebar menu: : style can be found in sidebar.less -->
+      <ul class="sidebar-menu" data-widget="tree">
+        <li class="header">MAIN NAVIGATION</li>
+       
+        <li>
+          <a href="${contextPath}/appdashboard">
+            <i class="fa fa-dashboard"></i> <span>Dashboard</span>
+          </a>
+        </li>
+        <sec:authorize access="hasAnyRole('ROLE_ADMIN')">
+    	 <li>
+          <a href="${contextPath}/user/details">
+            <i class="fa fa-users" aria-hidden="true"></i> <span>User</span>
+          </a>
+        </li>
+        </sec:authorize>
+        <sec:authorize access="hasAnyRole('ROLE_SITE_STAFF','ROLE_SALES_MANAGER','ROLE_OPS_MANAGER')">
+        <li>
+          <a href="${contextPath}/site/details"><i class="fa fa-sitemap" aria-hidden="true"></i>
+             <span>Site</span>
+          </a>
+        </li>
+        
+           <li>
+          <a href="${contextPath}/asset/details">
+            <i class="fa fa-cubes" aria-hidden="true"></i> <span>Asset</span>
+          </a>
+        </li>
+        
+           <li>
+          <a href="${contextPath}/serviceprovider/details">
+            <i class="fa fa-building" aria-hidden="true"></i> <span>Service Provider</span>
+          </a>
+        </li>
+        
+          <li>
+          <a href="${contextPath}/incident/details"><i class="fa fa-ticket" aria-hidden="true"></i> 
+            <span>Incident</span>
+          </a>
+        </li>
+        <li>
+          <a href="${contextPath}/reports/view">
+            <i class="fa fa-newspaper-o" aria-hidden="true"></i> <span>Reports</span>
+          </a>
+        </li>
+       </sec:authorize>
+      </ul>
+      </c:if>
+    </section>
+  </aside>
+

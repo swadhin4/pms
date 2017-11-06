@@ -7,6 +7,7 @@
 <head>
 <title>Home</title>
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv='cache-control' content='no-cache'>
 <meta http-equiv='expires' content='0'>
 <meta http-equiv='pragma' content='no-cache'>
@@ -99,9 +100,8 @@ $(function() {
   
 </script>
 </head>
-<div id="page-content-wrapper">
-	<div class="page-content">
-		<div class="container-fluid" ng-controller="serviceProviderController" id="serviceProviderWindow">
+<div class="content-wrapper">
+		<div  ng-controller="serviceProviderController" id="serviceProviderWindow">
 		<div style="display:none" id="loadingDiv"><div class="loader">Loading...</div></div>
 			<section class="content" style="min-height:17px;display:none" id="messageWindow">
 				<div class="row">
@@ -154,7 +154,7 @@ $(function() {
 									 <div class="col-md-12">
 									 <div style="overflow: auto; height: 350px">
 									   <ul class="products-list product-list-in-box"  style="overflow:auto;height:340px">
-							                <li class="item" ng-repeat="val in allServiceProviders | filter:searchSp" >
+							                <li class="item" ng-repeat="val in allServiceProviders | filter:searchSp | orderBy: 'sp.name'" >
 							                  <div class="product-img" style="margin-top: -12px;">
 							                    <img src="${contextPath}/resources/theme1/img/sp-icon.jpg" alt="Product Image">
 							                        
@@ -277,7 +277,7 @@ $(function() {
                   <tbody>
                   <tr ng-repeat="val in selectedServiceProvider.slaListVOList">
                     <td><a href>{{val.ticketPriority.description}}</a></td>
-                    <td>{{val.duration}} {{val.unit}}</td>
+                    <td>{{val.duration}} <span ng-if="val.unit=='days'">Calendar</span> {{val.unit}}</td>
                   </tr>
 
                   </tbody>
@@ -301,7 +301,7 @@ $(function() {
                   </thead>
                   <tbody>
                   <tr >                    
-                    <td>{{selectedServiceProvider.sladescription}}</td>
+                    <td>{{selectedServiceProvider.slaDescription}}</td>
                   </tr>
 
                   </tbody>
@@ -399,6 +399,7 @@ $(function() {
             <ul class="nav nav-tabs" style="background-color: rgba(60, 141, 188, 0.34);">
               <li class="active"><a href="#spDetailsTab" data-toggle="tab" aria-expanded="true">Service Provider Details</a></li>
               <li class=""><a href="#slaDetailsTab" data-toggle="tab" aria-expanded="false">Service Level Agreement Details</a></li>
+              <li class=""><a href="#escalationTab" data-toggle="tab" aria-expanded="false">Escalation Level Details</a></li>
               <li class="pull-right"><a href="#" class="text-muted"><i class="fa fa-gear"></i></a></li>
             </ul>
             <div class="tab-content">
@@ -488,15 +489,15 @@ $(function() {
               <div class="tab-pane" id="slaDetailsTab">
 			  <div class="row">
 					<div class="box-body">
-               	<div class="col-md-6">
+               	<div class="col-md-8">
 					<div class="form-group">
-						<table class="table table-responsive table-sm"  border="0">
+						<table class="table table-responsive table-sm"  >
 							<thead>
 							  <tr>
 								<th class="col-md-1">Priority</th>
 								<th class="col-md-2">Duration</th>
-								<th class="col-md-2">Unit</th>
-								<th class="col-md-1"></th>
+								<th class="col-md-4">Unit</th>
+								
 							  </tr>
 							</thead>
 							<tbody>
@@ -513,10 +514,10 @@ $(function() {
 									<select name="Unit" class="form-control selectpicker" ng-model="val.unit" required>
 									 <option value="">Select Unit</option>
 									  <option value="hours">Hours</option>
-									  <option value="days">Days</option>
+									  <option value="days">Calendar Days</option>
 									</select>
 								</td>
-								<td></td>
+								
 							  </tr>
 							</tbody>
 						</table>
@@ -528,7 +529,42 @@ $(function() {
 					</div>
 					</div>
 					
-				<div class="col-md-6">
+				<!-- <div class="col-md-6">
+				
+					<div class="form-group">
+						<table class="table table-responsive table-sm"  border="0">
+							<thead>
+							  <tr>
+								<th class="col-md-1">Esc Level</th>
+								<th class="col-md-2">Contact</th>
+								<th class="col-md-3">Email</th>
+							  </tr>
+							</thead>
+							<tbody>
+							  <tr ng-repeat="val in escalationLevels">
+								<td class="reqDiv required">Level {{$index + 1}}<span ng-if="$index==0" class="control-label"></span>
+								<input type="hidden" ng-model="val.escId" name="escId">
+								</td>
+								<td><input name="escalationContact" placeholder="" id="escalationContact{{$index}}" 
+								class="form-control" type="text" ng-model="val.contact" maxlength="50" ng-required='$index==0'></td>
+								
+								<td><input name="escalationEmail" placeholder="" id="escalationEmail{{$index}}"  
+								class="form-control" type="email" ng-model="val.email" maxlength="50" ng-required='$index==0' ></td>
+							  </tr>
+							  
+							</tbody>
+						</table>
+					</div>
+					</div> -->
+              </div>
+             
+            </div>
+          </div>
+         		
+         		<div class="tab-pane" id="escalationTab">
+			  <div class="row">
+					<div class="box-body">               						
+				<div class="col-md-8">
 				
 					<div class="form-group">
 						<table class="table table-responsive table-sm"  border="0">
@@ -559,7 +595,7 @@ $(function() {
              
             </div>
           </div>
-         
+         		
 				</div>
             </div>
 			 </div>
@@ -577,9 +613,3 @@ $(function() {
 				
 		</div>
 	</div>
-</div>
-</div>
-</section>
-</div>
-</div>
-</div>

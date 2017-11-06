@@ -31,9 +31,8 @@
 </style>
 </head>
 
-<div id="page-content-wrapper" style="padding-top: 33px;">
-	<div class="page-content">
-		<div class="container-fluid" ng-controller="profileController" id="profileviewWindow">
+<div class="content-wrapper">
+		<div  ng-controller="profileController" id="profileviewWindow">
 	<div class="row">
 			<div class="col-md-3">
 			 <h3> User Profile</h3>
@@ -204,9 +203,4 @@
 		</div>
 				
 		</div>
-	</div>
-</div>
-</section>
-</div>
-</div>
-</div>
+	</div>	

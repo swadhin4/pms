@@ -140,9 +140,8 @@ $(function() {
 </script>
 </head>
 <c:set var="contextPath" value="${pageContext.request.contextPath}"></c:set>
-<div id="page-content-wrapper" >
-	<div class="page-content">
-	<div class="container-fluid" ng-controller="incidentCreateController" id="incidentCreateWindow">
+<div class="content-wrapper">
+	<div  ng-controller="incidentCreateController" id="incidentCreateWindow">
 	<div style="display:none" id="loadingDiv"><div class="loader">Loading...</div></div>
 	<section class="content" style="min-height:35px;display:none" id="messageWindow">
 				<div class="row">
@@ -171,7 +170,6 @@ $(function() {
 	<section class="content">
 		<div class="row">
 		<div class="col-md-12">
-		<div class="row">
 			<div class="box" >
 				<div class="box-header with-border">
 					<h3 class="box-title"><a href="${contextPath}/incident/details/" title="View All Incidents"><i class="fa fa-th-list" aria-hidden="true"></i></a> Update Incident - {{ticketData.ticketNumber}}</h3>
@@ -686,15 +684,10 @@ $(function() {
 </div> 
 				</div>
 			</div>
-			</div>
 			</div>	
 		</section>	
 							
 					
 	</div>
 	</div>
-</div>
-</section>
-</div>
-</div>
-</div>
+

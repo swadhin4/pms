@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -139,13 +140,39 @@ public class SiteServiceImpl implements SiteService{
 
 
 		if(siteList!=null &&  !siteList.isEmpty()){
+			List<String> fullAddress = new ArrayList<String>();
 			for(Site site:siteList){
 				CreateSiteVO siteVO=new CreateSiteVO();
 				List<SiteLicenceVO> siteLicensesVO =  siteVO.getSiteLicense();
 				siteVO.setSiteId(site.getSiteId());
 				siteVO.setSiteName(site.getSiteName());
-				siteVO.setAddress(site.getSiteAddress());
+				siteVO.setSiteAddress1(site.getSiteAddress1());
+				siteVO.setSiteAddress2(site.getSiteAddress2());
+				siteVO.setSiteAddress3(site.getSiteAddress3());
+				siteVO.setSiteAddress4(site.getSiteAddress4());
+				siteVO.setZipCode(site.getPostCode());
+				
+				if(!StringUtils.isEmpty(siteVO.getSiteAddress1())){
+					fullAddress.add(siteVO.getSiteAddress1());
+				}
+				if(!StringUtils.isEmpty(siteVO.getSiteAddress2())){
+					fullAddress.add(siteVO.getSiteAddress2());
+				}
+				if(!StringUtils.isEmpty(siteVO.getSiteAddress3())){
+					fullAddress.add(siteVO.getSiteAddress3());
+				}
+				if(!StringUtils.isEmpty(siteVO.getSiteAddress4())){
+					fullAddress.add(siteVO.getSiteAddress4());
+				}
+				if(!StringUtils.isEmpty(siteVO.getZipCode())){
+					fullAddress.add(siteVO.getZipCode());
+				}
+				
+				String finalAddress = org.apache.commons.lang3.StringUtils.join(fullAddress,",");
+				siteVO.setFullAddress(finalAddress);
+				
 				siteVO.setOperator(site.getOperator()); 
+				
 				siteVO.setOwner(site.getSiteOwner());
 
 
@@ -259,7 +286,7 @@ public class SiteServiceImpl implements SiteService{
 					}
 				}
 				siteVOList.add(siteVO);
-
+				fullAddress.clear();
 			}
 		}
 		return siteVOList == null?Collections.EMPTY_LIST:siteVOList;
@@ -450,8 +477,6 @@ public class SiteServiceImpl implements SiteService{
 			site.setEmail(siteVO.getEmail());
 		}
 
-
-
 		site.setLatitude(siteVO.getLatitude());
 		site.setLongitude(siteVO.getLongitude());
 
@@ -462,7 +487,12 @@ public class SiteServiceImpl implements SiteService{
 		if(org.apache.commons.lang.StringUtils.isNotBlank(siteVO.getSecondaryContact())){
 			site.setSecondaryContact(Long.parseLong(siteVO.getSecondaryContact()));
 		}
-		site.setSiteAddress(siteVO.getAddress());
+		site.setSiteAddress1(siteVO.getSiteAddress1());
+		site.setSiteAddress2(siteVO.getSiteAddress2());
+		site.setSiteAddress3(siteVO.getSiteAddress3());
+		site.setSiteAddress4(siteVO.getSiteAddress4());
+		site.setPostCode(siteVO.getZipCode());
+		
 		LOGGER.info("Exit SiteServiceImpl - populateSiteContact");
 		return site;
 	}
@@ -719,6 +749,7 @@ public class SiteServiceImpl implements SiteService{
 		Site site = siteRepo.findOne(siteId);
 		CreateSiteVO siteVO = new CreateSiteVO();
 		if(site!=null){
+			List<String> fullAddress = new ArrayList<String>();
 			List<SiteLicenceVO> siteLicensesVO =  siteVO.getSiteLicense();
 			List<SiteLicence> licenseList = licenseRepo.findBySiteSiteId(site.getSiteId());
 			site.setSiteLicences(licenseList);
@@ -728,12 +759,34 @@ public class SiteServiceImpl implements SiteService{
 			site.setSiteDeliveryOpetaionTimes(deliveryOpsList);
 			List<SiteSubMeter> subMeterList = siteSubMeterRepo.findBySiteSiteId(site.getSiteId());
 			site.setSiteSubmeterList(subMeterList);
-
-
-
 			siteVO.setSiteId(site.getSiteId());
 			siteVO.setSiteName(site.getSiteName());
-			siteVO.setAddress(site.getSiteAddress());
+			siteVO.setSiteAddress1(site.getSiteAddress1());
+			siteVO.setSiteAddress2(site.getSiteAddress2());
+			siteVO.setSiteAddress3(site.getSiteAddress3());
+			siteVO.setSiteAddress4(site.getSiteAddress4());
+			siteVO.setZipCode(site.getPostCode());
+			
+			if(!StringUtils.isEmpty(siteVO.getSiteAddress1())){
+				fullAddress.add(siteVO.getSiteAddress1());
+			}
+			if(!StringUtils.isEmpty(siteVO.getSiteAddress2())){
+				fullAddress.add(siteVO.getSiteAddress2());
+			}
+			if(!StringUtils.isEmpty(siteVO.getSiteAddress3())){
+				fullAddress.add(siteVO.getSiteAddress3());
+			}
+			if(!StringUtils.isEmpty(siteVO.getSiteAddress4())){
+				fullAddress.add(siteVO.getSiteAddress4());
+			}
+			if(!StringUtils.isEmpty(siteVO.getZipCode())){
+				fullAddress.add(siteVO.getZipCode());
+			}
+			
+			String finalAddress = org.apache.commons.lang3.StringUtils.join(fullAddress,",");
+			siteVO.setFullAddress(finalAddress);
+			
+		
 			siteVO.setOperator(site.getOperator()); 
 			siteVO.setOwner(site.getSiteOwner());
 

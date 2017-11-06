@@ -196,6 +196,7 @@ public class AssetServiceImpl implements AssetService{
 	}
 
 	@Override
+	@Transactional
 	public AssetVO saveOrUpdateAsset(AssetVO assetVO, LoginUser user) throws Exception {
 		LOGGER.info("Inside AssetServiceImpl .. saveOrUpdateAsset");
 		Asset asset = null;

@@ -90,9 +90,8 @@ $(function() {
   
 </script>
 </head>
-<div id="page-content-wrapper">
-	<div class="page-content">
-		<div class="container-fluid" ng-controller="assetController" id="assetWindow">
+<div class="content-wrapper">
+		<div ng-controller="assetController" id="assetWindow">
 		<div style="display:none" id="loadingDiv"><div class="loader">Loading...</div></div>
 			<section class="content" style="min-height:35px;display:none" id="messageWindow">
 				<div class="row">
@@ -121,12 +120,11 @@ $(function() {
 			<section class="content">
 				<div class="row">
 				<div class="col-md-6">
-				<div class="row">
 						<div class="box" >
 							<div class="box-header with-border">
 								<h3 class="box-title">List of Assets</h3>
 								<div class="box-tools pull-right" style="margin-top: 0px;">
-									<sec:authorize access="hasAnyRole('ROLE_SALES_MANAGER', 'ROLE_OPS_MANAGER')">
+									<sec:authorize access="hasAnyRole('ROLE_SALES_MANAGER', 'ROLE_OPS_MANAGER','ROLE_SITE_STAFF')">
 										<a href class="btn btn-success dropdown-toggle pull-right" data-toggle="dropdown">
 										Add an Asset <span class="caret"></span>
 									  </a>
@@ -138,7 +136,7 @@ $(function() {
 									
 								</div>
 							</div>
-							<div class="box-body" style="height:67%"  >
+							<div class="box-body" style="height:72%"  >
 									<div class="row">
 	 								<div class="col-md-12">
 										<input type="text" class="form-control"	placeholder="Search Asset" ng-model="searchAsset">
@@ -159,7 +157,7 @@ $(function() {
 														</tr>
 													</thead>
 													<tbody>
-														<tr ng-repeat="asset in asset.list | filter: searchAsset"
+														<tr ng-repeat="asset in asset.list | filter: searchAsset | orderBy :'assetName'"
 															ng-class="{currentSelected:$index == selectedRow}" ng-click="getAssetDetails(asset);rowHighilited($index)" >
 															<td><a href > <i
 																	class="fa fa-user" aria-hidden="true"></i>
@@ -208,7 +206,6 @@ $(function() {
 							</div>
 						</div>
 									
-									</div>		
 						</div>	
 						
 								<div class="col-md-6">
@@ -216,7 +213,7 @@ $(function() {
 								<div class="box-header with-border">
 									<h3 class="box-title">Asset Detail</h3>
 									<div class="box-tools pull-right">
-									<sec:authorize access="hasAnyRole('ROLE_SALES_MANAGER', 'ROLE_OPS_MANAGER')">
+									<sec:authorize access="hasAnyRole('ROLE_SALES_MANAGER', 'ROLE_OPS_MANAGER','ROLE_SITE_STAFF')">
 									<div class="btn-group pull-right">
 											<a href ng-click="editAsset()" ng-if="asset.list.length>0"
 										class="btn btn-success"	style="margin-right: 5px;" data-toggle="modal">
@@ -679,9 +676,4 @@ $(function() {
 				</section>
 			</div>
 		</div>
-	</div>
-</div>
-</section>
-</div>
-</div>
-</div>
+	

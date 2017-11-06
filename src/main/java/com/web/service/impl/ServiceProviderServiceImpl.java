@@ -26,6 +26,7 @@ import com.jpa.entities.ServiceProviderSLADetails;
 import com.jpa.entities.TicketPriority;
 import com.jpa.entities.TicketPriorityEnum;
 import com.jpa.entities.UserSiteAccess;
+import com.jpa.repositories.JDBCQueryDAO;
 import com.jpa.repositories.RoleDAO;
 import com.jpa.repositories.SPEscalationLevelRepo;
 import com.jpa.repositories.ServiceProviderRepo;
@@ -67,6 +68,9 @@ public class ServiceProviderServiceImpl implements ServiceProviderService {
 	
 	@Autowired
 	private RoleDAO roleDAO;
+	
+	@Autowired
+	private JDBCQueryDAO jdbcQueryDAO;
 
 	@Override
 	@Transactional
@@ -83,8 +87,9 @@ public class ServiceProviderServiceImpl implements ServiceProviderService {
 				}else{
 					savedServiceProvider = new ServiceProvider();
 					savedServiceProvider.setCreatedBy(loginUser.getUsername());
-					UUID uniqueKey = UUID.randomUUID();
-					savedServiceProvider.setSpUsername("SP-00"+loginUser.getCompany().getCompanyId()+uniqueKey);
+					Integer spUniqueUser = jdbcQueryDAO.getUniqueSPUserId();
+					savedServiceProvider.setSpUsername("SP-00"+loginUser.getCompany().getCompanyId()+spUniqueUser);
+					
 					serviceProviderVO.setStatus(100);
 					StringBuilder spPassword = new StringBuilder();
 					spPassword.append(savedServiceProvider.getName());
@@ -197,24 +202,24 @@ public class ServiceProviderServiceImpl implements ServiceProviderService {
 
 			}
 			savedServiceProvider.setCompany(loginUser.getCompany());
-			
 			savedServiceProvider = serviceProvderRepo.save(savedServiceProvider);
-			
 				if(savedServiceProvider.getServiceProviderId()!=null && savedServiceProvider.getVersion() == 0){
 					serviceProviderVO.setServiceProviderId(savedServiceProvider.getServiceProviderId());
 					serviceProviderVO.setEmail(savedServiceProvider.getHelpDeskEmail());
 					serviceProviderVO.setSpUserName(savedServiceProvider.getSpUsername());
 					serviceProviderVO.setAccessKey(savedServiceProvider.getAccessKey());
 					serviceProviderVO.setStatus(200);
+					serviceProviderVO.setOption("CREATED");
 					serviceProviderVO.setMessage("New Service Provider \""+ savedServiceProvider.getName() +"\" created successfully");
 				}else{
 					serviceProviderVO.setServiceProviderId(savedServiceProvider.getServiceProviderId());
 					serviceProviderVO.setStatus(200);
+					serviceProviderVO.setOption("UPDATED");
 					serviceProviderVO.setMessage("Service Provider \""+ savedServiceProvider.getName() +"\"updated successfully");
 					serviceProviderVO.setSpUserName(savedServiceProvider.getSpUsername());
 					serviceProviderVO.setAccessKey(savedServiceProvider.getAccessKey());
-			}
-		}
+			     }
+		   }
 		logger.info("Exit ServiceProviderServiceImpl -- saveServiceProvider");
 		return serviceProviderVO;
 	}
@@ -330,6 +335,9 @@ public class ServiceProviderServiceImpl implements ServiceProviderService {
 				serviceProviderVO.setEmail(serviceProvider.getEmail());
 				serviceProviderVO.setAdditionalDetails(serviceProvider.getAdditionalDetails());
 				serviceProviderVO.setHelpDeskEmail(serviceProvider.getHelpDeskEmail());
+				if(!StringUtils.isEmpty(serviceProvider.getSlaDescription())){
+					serviceProviderVO.setSlaDescription(serviceProvider.getSlaDescription());
+				}
 				if(!StringUtils.isEmpty(serviceProvider.getHelpDeskNumber())){
 					serviceProviderVO.setHelpDeskNumber(serviceProvider.getHelpDeskNumber().toString());
 				}

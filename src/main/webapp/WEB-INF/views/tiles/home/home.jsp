@@ -10,17 +10,17 @@ var webContextPath="${pageContext.request.contextPath}";
  <script type="text/javascript" src='<c:url value="/resources/theme1/chart/loader.js"></c:url>'></script>
  <script type="text/javascript" src='<c:url value="/resources/theme1/js/dashboard.js?n=${System.currentTimeMillis()  + UUID.randomUUID().toString()}"></c:url>'></script>
  <style>
+ 
  </style>
 <head>
 <title>Home</title>
 </head>
-<div id="page-content-wrapper">
-	<div class="page-content">
-		<div class="container-fluid">
+<div class="content-wrapper">
 			<section class="content">
+			<h3 >Summarized view of Site and Service Providers Incidents</h3>
 			<div class="box" >
 							<div class="box-header with-border">
-								<h3 class="box-title">Summarized view of Site and Service Providers Incidents</h3>
+								
 									<div class="box-tools pull-right" style="margin-top: 0px;">
 										<sec:authorize access="hasAnyRole('ROLE_SITE_STAFF','ROLE_SALES_MANAGER', 'ROLE_OPS_MANAGER')">
 										<!-- <a href class="btn btn-success pull-right" id="syncBtn">
@@ -69,9 +69,3 @@ var webContextPath="${pageContext.request.contextPath}";
 			</section>
 				
 		</div>
-	</div>
-</div>
-</section>
-</div>
-</div>
-</div>

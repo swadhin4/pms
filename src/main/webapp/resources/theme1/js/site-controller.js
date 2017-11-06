@@ -632,6 +632,7 @@ chrisApp.controller('siteController',  ['$rootScope', '$scope', '$filter','siteS
 
   	    
 	    $scope.saveSiteForm=function(formObj){
+	    	console.log($scope.siteData);
 	    	$scope.salesOperations=[];
 	    	$scope.deliveryOperations=[];
 	    	
@@ -853,14 +854,21 @@ chrisApp.controller('siteController',  ['$rootScope', '$scope', '$filter','siteS
 			 siteService.retrieveSiteDetails(siteId)
 	    		.then(function(data) {
 	    			console.log(data)
-	    			var site=angular.copy(data);
+	    			var site=angular.copy(data.object);
 	    			$scope.selectedSite={};
 					$scope.selectedSite=angular.copy(site);
 					$scope.selectedSite.siteName = site.siteName;
 					$scope.selectedSite.siteNumber1 = site.siteNumber1;
 					$scope.selectedSite.siteNumber2 = site.siteNumber2;
-					$scope.selectedSite.siteAddress = site.address;
-				
+					$scope.selectedSite.siteAddress = site.fullAddress;
+					
+					$scope.selectedSite.siteAddress1 = site.siteAddress1;
+					$scope.selectedSite.siteAddress2 = site.siteAddress2;
+					$scope.selectedSite.siteAddress3 = site.siteAddress3;
+					$scope.selectedSite.siteAddress4 = site.siteAddress4;
+					
+					
+					
 					$scope.selectedSite.district = site.district;
 					$scope.selectedSite.area=site.area;
 					$scope.selectedSite.cluster=site.cluster;
@@ -884,7 +892,7 @@ chrisApp.controller('siteController',  ['$rootScope', '$scope', '$filter','siteS
 					
 					$scope.siteSubmeterDetails = $scope.selectedSite.submeterDetails;
 					$scope.siteData.siteId = $scope.selectedSite.siteId;
-	    			
+	    			//$scope.siteData = angular.copy( $scope.selectedSite);
 	    		},function(data){
 	    			console.log(data);
 	    		})
@@ -894,6 +902,11 @@ chrisApp.controller('siteController',  ['$rootScope', '$scope', '$filter','siteS
 			 console.log(selectedSite);
 			 $scope.operation ="EDIT";
 			 $scope.siteData = angular.copy($scope.selectedSite);
+			 
+			    $scope.siteData.siteAddress1 = selectedSite.siteAddress1;
+				$scope.siteData.siteAddress2 = selectedSite.siteAddress2;
+				$scope.siteData.siteAddress3 = selectedSite.siteAddress3;
+				$scope.siteData.siteAddress4 = selectedSite.siteAddress4;
 			 $('#siteModalLabel').text("Update site");
 			 $scope.retrieveAllCountries($scope.sessionUser);
 			 $scope.onedit=false;

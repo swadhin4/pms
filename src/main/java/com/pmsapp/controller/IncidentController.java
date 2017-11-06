@@ -148,7 +148,12 @@ public class IncidentController extends BaseController {
 				 } catch (Exception e) {
 					 logger.info("Exception in sending incident creation mail", e);
 				}
+
 			}/*else if(response.getStatusCode()==200 && savedTicketVO.getMessage().equalsIgnoreCase("UPDATED")){
+
+			}
+			/*else if(response.getStatusCode()==200 && savedTicketVO.getMessage().equalsIgnoreCase("UPDATED")){
+
 				try {
 					 emailResponse = emailService.successTicketCreationSPEmail(savedTicketVO, "UPDATED");
 				 } catch (Exception e) {
@@ -385,11 +390,6 @@ public class IncidentController extends BaseController {
 			logger.info("Exception while escalations", e);
 		}
 		if(response.getStatusCode() == 200){
-			/*try {
-				ServiceProviderVO  serviceProviderVO = serviceProviderService.findServiceProvider(ticketEscalationLevels.getTicketData().getAssignedTo());
-			} catch (Exception e) {
-				e.printStackTrace();
-			}*/
 			List<String> escCCMailList = new ArrayList<String>(0);
 			SPEscalationLevels spEscalationLevel = null;
 			List<EscalationLevelVO> escalationLevelVOs = ticketEscalationLevels.getTicketData().getEscalationLevelList();
@@ -400,11 +400,11 @@ public class IncidentController extends BaseController {
 				logger.info("Escalation Level list : "+  escalationLevelVOs.size());
 				spEscalationLevel = spEscalationRepo.findOne(savedTicketEscalation.getEscId());
 				for(EscalationLevelVO escLevelVO: escalationLevelVOs){
-					if( StringUtils.isNotBlank(escLevelVO.getStatus())){
+					if(StringUtils.isNotBlank(escLevelVO.getStatus())){
 						escCCMailList.add(escLevelVO.getEscalationEmail());
 					}
 				}
-				
+				logger.info("escCCMailList :" + escCCMailList);
 			}
 			
 			if(spEscalationLevel!=null){
@@ -431,7 +431,7 @@ public class IncidentController extends BaseController {
 	}
 	
 	@RequestMapping(value = "/linkedticket/{custticket}/{custticketnumber}/{linkedticket}", method = RequestMethod.GET)
-	public ResponseEntity<RestResponse> escalate(final ModelMap model,final HttpServletRequest request, 
+	public ResponseEntity<RestResponse> linked(final ModelMap model,final HttpServletRequest request, 
 			final HttpSession session, @PathVariable (value="custticket") Long custTicket, @PathVariable (value="custticketnumber") String custTicketNumber,
 			@PathVariable (value="linkedticket") String linkedTicket) {
 		RestResponse response = new RestResponse();
