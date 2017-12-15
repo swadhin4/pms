@@ -12,10 +12,12 @@
 <meta http-equiv='cache-control' content='no-cache'>
 <meta http-equiv='expires' content='0'>
 <meta http-equiv='pragma' content='no-cache'>
-<link rel="stylesheet"	href='<c:url value="/resources/theme1/css/bootstrap.min.css"></c:url>' />
+
+
+<link rel="stylesheet"	href='<c:url value="/resources/theme1/css/bootstrap.min.css"></c:url>' /> 
 <link rel="stylesheet" 	href='<c:url value="/resources/css/ionicons/css/ionicons.min.css"></c:url>'/>
 
-<link rel="stylesheet"	href='<c:url value="/resources/css/jquery-jvectormap-1.2.2.css"></c:url>' />
+<%-- <link rel="stylesheet"	href='<c:url value="/resources/css/jquery-jvectormap-1.2.2.css"></c:url>' /> --%>
 
 <link rel="stylesheet"	href='<c:url value="/resources/theme1/font-awesome-4.7.0/css/font-awesome.min.css"></c:url>' />
 <%-- <link rel="stylesheet"	href='<c:url value="/resources/theme1/css/ripples.min.css"></c:url>' />
@@ -29,21 +31,26 @@
 
 
 <link rel="stylesheet"	href='<c:url value="/resources/dist/css/pms-admintLTE.css"></c:url>' />
-<link rel="stylesheet"	href='<c:url value="/resources/theme1/css/style.css"></c:url>' />
+<%-- <link rel="stylesheet"	href='<c:url value="/resources/theme1/css/style.css"></c:url>' /> --%>
 <link rel="stylesheet"	href='<c:url value="/resources/dist/css/skins/skin-black-light.min.css"></c:url>' />
+<link rel="stylesheet" href='<c:url value="/resources/theme1/css/bootstrap-multiselect.css"></c:url>' />
 
  <script type="text/javascript" src='<c:url value="/resources/theme1/chart/jsapi.js"></c:url>'></script>
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/jquery-2.1.4.min.js"></c:url>'></script>
+<!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script> -->
 <script type="text/javascript"  src='<c:url value="/resources/theme1/js/bootstrap-datepicker.js"></c:url>'></script>
 
 <script type="text/javascript"  src='<c:url value="/resources/theme1/js/jquery-editable-select.js"></c:url>'></script>
 
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/tether.min.js"></c:url>'></script>
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/bootstrap.min.js"></c:url>'></script>
-<script type="text/javascript" 	src='<c:url value="/resources/dist/js/adminlte.min.js"></c:url>'></script>
+<script type="text/javascript" 	src='https://adminlte.io/themes/AdminLTE/bower_components/fastclick/lib/fastclick.js'></script>
+<script type="text/javascript"  src='<c:url value="/resources/theme1/js/bootstrap-multiselect.js"></c:url>'></script>
 
+<script type="text/javascript" 	src='<c:url value="/resources/dist/js/adminlte.min.js"></c:url>'></script>
+<script type="text/javascript" 	src='<c:url value="/resources/dist/js/app.js"></c:url>'></script>
 <%-- <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/transition.js"></c:url>'></script>
-<script type="text/javascript" 	src='<c:url value="/resources/dist/js/app.min.js"></c:url>'></script>
+
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/ripples.min.js"></c:url>'></script>
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/material.min.js"></c:url>'></script>
 
@@ -63,11 +70,13 @@
 <script type="text/javascript"  src='<c:url value="/resources/theme1/js/angucomplete-alt.js"></c:url>'></script>
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/app-main.js"></c:url>'></script>
  <script type="text/javascript" src="<c:url value="/resources/theme1/js/moment.min.js"></c:url>"></script>
-<script type="text/javascript" 	src='<c:url value="/resources/theme1/js/jstorage.js"></c:url>'></script>
 
 <script type="text/javascript" src='<c:url value="/resources/js/sockjs.min.js"></c:url>'></script>
  <script type="text/javascript" src='<c:url value="/resources/js/stomp.min.js"></c:url>'></script>
  <script type="text/javascript" src="<c:url value="/resources/theme1/pms/websocket.js"></c:url>"></script>
+ 
+ 
+
 
 <style>
 	 .alert-success {
@@ -178,6 +187,36 @@
 /* $(window).on('load', function(){
   setTimeout(removeLoader, 2000); //wait for page load PLUS two seconds.
 }); */
+var $ = jQuery.noConflict(); 
+$(function () {
+	 $('i').each(function (i, e) {
+		    var label;
+		    switch ($(e).attr('id')) {
+		        case 'dashboard':
+		            label = 'Dashboard';
+		            break;
+		        case 'user':
+		            label = 'User';
+		            break;
+		        case 'site':
+		            label = 'Site';
+		            break;
+		        case 'asset':
+		            label = 'Asset or Service';
+		            break;
+		        case 'sp':
+		            label = 'Service Provider';
+		            break;
+		        case 'inc':
+		            label = 'Incident';
+		            break;
+		        case 'rep':
+		            label = 'Report';
+		            break;
+		    }
+		    $(e).tooltip({ 'trigger': 'focus', 'title': label });
+		});
+	})
 function removeLoader(){
     $( "#loadingDiv" ).fadeOut(500, function() {
       // fadeOut complete. Remove the loading div
@@ -189,107 +228,34 @@ function removeLoader(){
 
 <c:set var="contextPath" value="${pageContext.request.contextPath}"></c:set>
 	 <header class="main-header">
-	 <a href="../../index2.html" class="logo">
+	 <a href class="logo">
       <!-- mini logo for sidebar mini 50x50 pixels -->
       <span class="logo-mini"> <img src="${contextPath}/resources/img/logo.png" style="width: 100%;"></span>
-     
-      <span class="logo-lg"><img src="${contextPath}/resources/img/sigma.png" style="width: 100%;
-   		 margin-top: 0px;"></span>
+      <span class="logo-lg"><img src="${contextPath}/resources/img/sigma.png" style="width: 100%; margin-top: 0px;"></span>
     </a>
     <nav class="navbar navbar-static-top">
-	<%-- 	<div class="container-fluid">
-			     	<div class="navbar-header">
-                     <!--    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-backyard">
-                            <span class="sr-only">Toggle navigation</span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                        </button> -->
-                        <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </a>
-                        
-                        <div  class="navbar-brand">
-                    <a id="menu-toggle" href="#" class="btn-menu toggle" style="font-size: 1.5em;">
-                        <i class="fa fa-bars"></i>
-                    </a>
-    				<a class="navbar-brand site-name" href="#top">
-    				<img src="${contextPath}/resources/img/sigma.png" style="width: 29%;
-    margin-top: -3px;"></a>
-                </div>
-                    </div>
-                    <div id="navbar-scroll" class="collapse  navbar-collapse navbar-backyard navbar-right">
-                    <div class="navbar-custom-menu">
-                <ul class="nav navbar-nav">
-               <li class="dropdown notifications-menu">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              <i class="fa fa-bell-o fa-2x" style="    font-size: 1.5em;"></i>
-              <span class="label label-danger" id="msgCountElmId">0</span>
-            </a>
-            <ul class="dropdown-menu" style="width: 500px;">
-              <li class="header">You have <span id="msgCountElmId2">0</span> notifications</li>
-              <li>
-                <!-- inner menu: contains the actual data -->
-                <ul class="menu" id="msgDropdown">
-                </ul>
-              </li>
-              <li class="footer"><a href="#">View all</a></li>
-            </ul>
-          </li>
-              <!-- User Account Menu -->
-              <li class="dropdown user user-menu">
-                <!-- Menu Toggle Button -->
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                  <!-- The user image in the navbar-->
-                 <i class="fa fa-user" aria-hidden="true"></i>
-                  <!-- hidden-xs hides the username on small devices so only the image appears. -->
-                  <span class="hidden-xs">${user.firstName}  ${user.lastName}</span>
-                </a>
-                <ul class="dropdown-menu " style="margin-top: 9px;border:0px">
-                 <li class="header" style="margin-left: 10px;">You have following Roles</li>
-                  <ul class="menu">
-                   <c:forEach items="${user.userRoles}" var="roles">
-                  <li>
-                    <a href="#">
-                      <h4>
-                       <i class="fa fa-users text-aqua"> ${roles.role.description}</i>
-                      </h4>
-                    </a>
-                  </li>
-                  </c:forEach>
-                  </ul>
-                               
-                  <li class="user-footer">
-                    <div class="pull-left">
-                      <a href="${contextPath}/user/profile" class="btn btn-default btn-flat">Profile</a>
-                    </div>
-                    <div class="pull-right">
-                    <sec:authorize access="isAuthenticated()">
-                      <a href="${contextPath}/logout" class="btn btn-default btn-flat">Sign out</a>
-                     </sec:authorize> 
-                    </div>
-                  </li>
-                </ul>
-              </li>
-            </ul>
-            </div>
-                    </div>
-		</div> --%>
 		<a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
         <span class="sr-only">Toggle navigation</span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
+            
       </a>
-
+      
+      <div >
+        <ul class="nav navbar-nav">
+        <li class="dropdown notifications-menu">
+        <a><span >For support enquiries contact: info@sigmasurge.com</span></a>
+        </li>
+        </ul>
+        </div>
       <div class="navbar-custom-menu">
         <ul class="nav navbar-nav">
           <!-- Messages: style can be found in dropdown.less-->
           <!-- Notifications: style can be found in dropdown.less -->
+         
           <li class="dropdown notifications-menu">
+          
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
               <i class="fa fa-bell-o"></i>
               <span class="label label-warning" id="msgCountElmId">0</span>
@@ -345,45 +311,6 @@ function removeLoader(){
     </nav>
 	</nav>
 	</header>
-    <!-- Sidebar -->
-    <%-- <c:if test="${user.sysPassword eq 'NO'}">
-    <div id="wrapper1">
-    <div id="sidebar-wrapper" style="background-color:E1DDDD">
-    
-   <ul class="list-group">
-  	<li class="list-group-item">
-  		<a href="${contextPath}/appdashboard"><i class="fa fa-home" aria-hidden="true"></i> <span class="menulink">HOME</span> </a>
-  	</li>
-  	<li class="list-group-item">
-  		<a href="${contextPath}/appdashboard"><i class="fa fa-home" aria-hidden="true"></i> <span class="menulink">PREFERENCES</span></a>
-  	</li>
-  	<li class="list-group-item">
-	  <a  class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-	  <i class="fa fa-cog" arial="hidden"></i> <span class="menulink">MANAGE </span> </a>
-	  <ul  role="menu" style="padding: 24px 12px;
-    margin: -9px 0 0;
-    font-size: 16px;">
-	  	
-	  	<sec:authorize access="hasAnyRole('ROLE_ADMIN')">
-	  	<li class="list-group-item"><a href="${contextPath}/user/details">
-	  	<i class="fa fa-users" aria-hidden="true"></i> <span class="menulink">Users</span></a></li>
-		</sec:authorize>
-		<sec:authorize access="hasAnyRole('ROLE_SITE_STAFF','ROLE_SALES_MANAGER','ROLE_OPS_MANAGER')">
-	    <li class="list-group-item"><a href="${contextPath}/site/details"><i class="fa fa-sitemap" aria-hidden="true"></i> <span class="menulink">Sites <span></a></li>
-	    <li class="list-group-item"><a href="${contextPath}/asset/details"><i class="fa fa-sitemap" aria-hidden="true"></i> <span class="menulink">Assets</a> <span></li>
-	    <li class="list-group-item"><a href="${contextPath}/incident/details"><i class="fa fa-ticket" aria-hidden="true"></i> <span class="menulink">Incidents<span></a></li>
-	    <li class="list-group-item"><a href="${contextPath}/serviceprovider/details"><i class="fa fa-sitemap" aria-hidden="true"></i> <span class="menulink">Service Provider<span></a></li>
-	    <li class="list-group-item"><a href="${contextPath}/reports/view"><i class="fa fa-sitemap" aria-hidden="true"></i> <span class="menulink">Reports<span></a></li>
-	    </sec:authorize>
-	    
-	    <!-- <li class="divider"></li>
-	    	<li><a href="#">Separated link</a></li> -->
-	  </ul>      
-      
-  </li>
-</ul>
-  </div>
-    </c:if> --%>
     <aside class="main-sidebar">
     <!-- sidebar: style can be found in sidebar.less -->
     <section class="sidebar">
@@ -399,48 +326,48 @@ function removeLoader(){
       </div>
      <c:if test="${user.sysPassword eq 'NO'}">
       <!-- sidebar menu: : style can be found in sidebar.less -->
-      <ul class="sidebar-menu" data-widget="tree">
+      <ul class="sidebar-menu" data-widget="tree" id="tooltip-ex">
         <li class="header">MAIN NAVIGATION</li>
        
         <li>
-          <a href="${contextPath}/appdashboard">
-            <i class="fa fa-dashboard"></i> <span>Dashboard</span>
+          <a href="${contextPath}/appdashboard"  >
+            <i class="fa fa-dashboard" data-toggle="tooltip" data-placement="right" data-container="body"  id="dashboard"></i> <span >Dashboard</span>
           </a>
         </li>
         <sec:authorize access="hasAnyRole('ROLE_ADMIN')">
     	 <li>
-          <a href="${contextPath}/user/details">
-            <i class="fa fa-users" aria-hidden="true"></i> <span>User</span>
+          <a href="${contextPath}/user/details" >
+            <i class="fa fa-users" aria-hidden="true" data-toggle="tooltip" data-placement="right"  id="user" ></i> <span>User</span>
           </a>
         </li>
         </sec:authorize>
         <sec:authorize access="hasAnyRole('ROLE_SITE_STAFF','ROLE_SALES_MANAGER','ROLE_OPS_MANAGER')">
         <li>
-          <a href="${contextPath}/site/details"><i class="fa fa-sitemap" aria-hidden="true"></i>
+          <a href="${contextPath}/site/details" ><i class="fa fa-sitemap" aria-hidden="true" data-toggle="tooltip" data-placement="right"  id="site"></i>
              <span>Site</span>
           </a>
         </li>
         
-           <li>
-          <a href="${contextPath}/asset/details">
-            <i class="fa fa-cubes" aria-hidden="true"></i> <span>Asset</span>
+        <li>
+          <a href="${contextPath}/serviceprovider/details" >
+            <i class="fa fa-building" aria-hidden="true" data-toggle="tooltip" data-placement="right"  id="sp" data-container="body"></i> <span>Service Provider</span>
           </a>
         </li>
         
            <li>
-          <a href="${contextPath}/serviceprovider/details">
-            <i class="fa fa-building" aria-hidden="true"></i> <span>Service Provider</span>
+          <a href="${contextPath}/asset/details" >
+            <i class="fa fa-cubes" aria-hidden="true" data-toggle="tooltip" data-placement="right"  id="asset" data-container="body"></i> <span>Asset or Service</span>
           </a>
-        </li>
+        </li>           
         
           <li>
-          <a href="${contextPath}/incident/details"><i class="fa fa-ticket" aria-hidden="true"></i> 
+          <a href="${contextPath}/incident/details" ><i class="fa fa-ticket" aria-hidden="true" data-toggle="tooltip" data-placement="right"  id="inc"></i> 
             <span>Incident</span>
           </a>
         </li>
         <li>
-          <a href="${contextPath}/reports/view">
-            <i class="fa fa-newspaper-o" aria-hidden="true"></i> <span>Reports</span>
+          <a href="${contextPath}/reports/view" >
+            <i class="fa fa-newspaper-o" aria-hidden="true" data-toggle="tooltip" data-placement="right"  id="rep"></i> <span>Reports</span>
           </a>
         </li>
        </sec:authorize>
@@ -448,4 +375,195 @@ function removeLoader(){
       </c:if>
     </section>
   </aside>
+  
+    <aside class="control-sidebar control-sidebar-dark">
+    <!-- Create the tabs -->
+    <ul class="nav nav-tabs nav-justified control-sidebar-tabs">
+      <li><a href="#control-sidebar-home-tab" data-toggle="tab"><i class="fa fa-home"></i></a></li>
+      <li><a href="#control-sidebar-settings-tab" data-toggle="tab"><i class="fa fa-gears"></i></a></li>
+    </ul>
+    <!-- Tab panes -->
+    <div class="tab-content">
+      <!-- Home tab content -->
+      <div class="tab-pane  active" id="control-sidebar-home-tab">
+        <h3 class="control-sidebar-heading">Recent Activity</h3>
+        <ul class="control-sidebar-menu">
+          <li>
+            <a href="javascript:void(0)">
+              <i class="menu-icon fa fa-birthday-cake bg-red"></i>
+
+              <div class="menu-info">
+                <h4 class="control-sidebar-subheading">Langdon's Birthday</h4>
+
+                <p>Will be 23 on April 24th</p>
+              </div>
+            </a>
+          </li>
+          <li>
+            <a href="javascript:void(0)">
+              <i class="menu-icon fa fa-user bg-yellow"></i>
+
+              <div class="menu-info">
+                <h4 class="control-sidebar-subheading">Frodo Updated His Profile</h4>
+
+                <p>New phone +1(800)555-1234</p>
+              </div>
+            </a>
+          </li>
+          <li>
+            <a href="javascript:void(0)">
+              <i class="menu-icon fa fa-envelope-o bg-light-blue"></i>
+
+              <div class="menu-info">
+                <h4 class="control-sidebar-subheading">Nora Joined Mailing List</h4>
+
+                <p>nora@example.com</p>
+              </div>
+            </a>
+          </li>
+          <li>
+            <a href="javascript:void(0)">
+              <i class="menu-icon fa fa-file-code-o bg-green"></i>
+
+              <div class="menu-info">
+                <h4 class="control-sidebar-subheading">Cron Job 254 Executed</h4>
+
+                <p>Execution time 5 seconds</p>
+              </div>
+            </a>
+          </li>
+        </ul>
+        <!-- /.control-sidebar-menu -->
+
+        <h3 class="control-sidebar-heading">Tasks Progress</h3>
+        <ul class="control-sidebar-menu">
+          <li>
+            <a href="javascript:void(0)">
+              <h4 class="control-sidebar-subheading">
+                Custom Template Design
+                <span class="label label-danger pull-right">70%</span>
+              </h4>
+
+              <div class="progress progress-xxs">
+                <div class="progress-bar progress-bar-danger" style="width: 70%"></div>
+              </div>
+            </a>
+          </li>
+          <li>
+            <a href="javascript:void(0)">
+              <h4 class="control-sidebar-subheading">
+                Update Resume
+                <span class="label label-success pull-right">95%</span>
+              </h4>
+
+              <div class="progress progress-xxs">
+                <div class="progress-bar progress-bar-success" style="width: 95%"></div>
+              </div>
+            </a>
+          </li>
+          <li>
+            <a href="javascript:void(0)">
+              <h4 class="control-sidebar-subheading">
+                Laravel Integration
+                <span class="label label-warning pull-right">50%</span>
+              </h4>
+
+              <div class="progress progress-xxs">
+                <div class="progress-bar progress-bar-warning" style="width: 50%"></div>
+              </div>
+            </a>
+          </li>
+          <li>
+            <a href="javascript:void(0)">
+              <h4 class="control-sidebar-subheading">
+                Back End Framework
+                <span class="label label-primary pull-right">68%</span>
+              </h4>
+
+              <div class="progress progress-xxs">
+                <div class="progress-bar progress-bar-primary" style="width: 68%"></div>
+              </div>
+            </a>
+          </li>
+        </ul>
+        <!-- /.control-sidebar-menu -->
+
+      </div>
+      <!-- /.tab-pane -->
+
+      <!-- Settings tab content -->
+      <div class="tab-pane" id="control-sidebar-settings-tab">
+        <form method="post">
+          <h3 class="control-sidebar-heading">General Settings</h3>
+
+          <div class="form-group">
+            <label class="control-sidebar-subheading">
+              Report panel usage
+              <input type="checkbox" class="pull-right" checked>
+            </label>
+
+            <p>
+              Some information about this general settings option
+            </p>
+          </div>
+          <!-- /.form-group -->
+
+          <div class="form-group">
+            <label class="control-sidebar-subheading">
+              Allow mail redirect
+              <input type="checkbox" class="pull-right" checked>
+            </label>
+
+            <p>
+              Other sets of options are available
+            </p>
+          </div>
+          <!-- /.form-group -->
+
+          <div class="form-group">
+            <label class="control-sidebar-subheading">
+              Expose author name in posts
+              <input type="checkbox" class="pull-right" checked>
+            </label>
+
+            <p>
+              Allow the user to show his name in blog posts
+            </p>
+          </div>
+          <!-- /.form-group -->
+
+          <h3 class="control-sidebar-heading">Chat Settings</h3>
+
+          <div class="form-group">
+            <label class="control-sidebar-subheading">
+              Show me as online
+              <input type="checkbox" class="pull-right" checked>
+            </label>
+          </div>
+          <!-- /.form-group -->
+
+          <div class="form-group">
+            <label class="control-sidebar-subheading">
+              Turn off notifications
+              <input type="checkbox" class="pull-right">
+            </label>
+          </div>
+          <!-- /.form-group -->
+
+          <div class="form-group">
+            <label class="control-sidebar-subheading">
+              Delete chat history
+              <a href="javascript:void(0)" class="text-red pull-right"><i class="fa fa-trash-o"></i></a>
+            </label>
+          </div>
+          <!-- /.form-group -->
+        </form>
+      </div>
+      <!-- /.tab-pane -->
+    </div>
+  </aside>
+  <!-- /.control-sidebar -->
+  <!-- Add the sidebar's background. This div must be placed
+       immediately after the control sidebar -->
+  <div class="control-sidebar-bg"></div>
 

@@ -52,7 +52,7 @@ background-color: rgba(60, 141, 188, 0.58) !important;
 }
 #errorMessageDiv, #successMessageDiv, #infoMessageDiv{
     top: 0%;
-    left: 50%;
+    left: 37%;
    /*  width: 45em; */
     height: 3em;
     margin-top: 4em;
@@ -140,9 +140,8 @@ $(function() {
 </script>
 </head>
 <c:set var="contextPath" value="${pageContext.request.contextPath}"></c:set>
-<div id="page-content-wrapper" >
-	<div class="page-content">
-	<div class="container-fluid" ng-controller="spIncidentUpdateController" id="spIncidentUpdateWindow">
+<div class="content-wrapper">
+	<div ng-controller="spIncidentUpdateController" id="spIncidentUpdateWindow">
 	<div style="display:none" id="loadingDiv"><div class="loader">Loading...</div></div>
 	<section class="content" style="min-height:35px;display:none" id="messageWindow">
 				<div class="row">
@@ -166,22 +165,26 @@ $(function() {
 	<section class="content">
 		<div class="row">
 		<div class="col-md-12">
-		<div class="row">
 			<div class="box" >
 				<div class="box-header with-border">
-					<h3 class="box-title"><a href="${contextPath}/sp/incident/details/" title="View All Incidents"><i class="fa fa-th-list" aria-hidden="true"></i></a> Update Incident - {{ticketData.ticketNumber}}</h3>
+					<h3 class="box-title"><a href="${contextPath}/sp/incident/details/" title="View All Incidents"><i class="fa fa-th-list" aria-hidden="true"></i></a> 
+					Update Incident - {{ticketData.ticketNumber}}</h3>
 					<div class="box-tools pull-right" style="margin-top: 0px;">
 						<input type="hidden" id="mode" value="${mode}">
+						  <a  href ng-click="openChatBox();" >
+        	<img src="${contextPath}/resources/img/chatbot.png" style="width: 12%;" 
+        	class="pull-right" data-toggle="tooltip" data-original-title="Incident work notes">
+        </a>
 					</div>
 				</div>
 				<div class="box-body">
 				<div class="row">
-				<div class="col-md-9">
+				<div class="col-md-12">
 				<div class="nav-tabs-custom">
 		            <ul class="nav nav-tabs">
-		              <li class="active"><a href="#primaryinfo" data-toggle="tab">Primary Details</a></li>              
-		              <li><a href="#escalate" data-toggle="tab" onclick="initializeEscalateTicket()">Escalation</a></li>
-		              <li><a href="#linkedticket" data-toggle="tab" >Linked Tickets</a></li>              
+		              <li class="active"><a href="#primaryinfo" data-toggle="tab">Primary Details</a></li>		              
+		              <li><a href="#linkedticket" data-toggle="tab" >External Ticket of Service provider</a></li>
+		              <li><a href="#escalate" data-toggle="tab" onclick="initializeEscalateTicket()">Escalation</a></li>              
 		              <li><a href="#tickethistory" data-toggle="tab" onclick="getTicketHistory()">Ticket History</a></li>
 		            </ul>
 	             <div class="tab-content">
@@ -302,9 +305,12 @@ $(function() {
 					               </div>
 					               <div class="col-xs-4 reqDiv required">
 					                <label class="control-label" >Status</label>
-					                <input type="text"  class="form-control"  
-					                  name="priority" ng-model="ticketData.status"  required readonly> 
-					             </div>
+					                  <select name="statusSelect" id="statusSelect" class="form-control" required
+								onchange="ticketStatusChange('statusSelect')">
+									
+								</select>
+								<input type="hidden" ng-model="selectedTicketStatus.selected">
+					                </div>
 					                
 								</div>
 																
@@ -316,29 +322,35 @@ $(function() {
             </div>
 				
             </div>
-            <div class="col-xs-8">
-					                <label for="fileInput">Attach File</label>
-					                  <input type="file" class="form-control" name="inputfilepath" ng-model="ticketData.fileObject">
-					                </div>
+           <div class="col-xs-4">
+            		<label class="control-label">Attachments</label>
+					      <label class="form-control">Please click <a href data-toggle="modal" ng-click="openFileAttachModal()"><b>Here</b></a> to View/Update File.</label>
+					  </div>
+					                
+		                <div class="col-xs-4">
+		             	  <label class="control-label">Files Attached</label><br>
+		                 <a href class="btn btn-warning" style="width:100%">Count <span class="badge">{{incidentImages.length}}</span> 
+		                 Size <span class="badge">{{totalIncidentImageSize}} KB</span></a>
+		                </div>
 
 							</div>
 														
 							<div class="row" id="ticketCloseDiv">
 							<div class="col-xs-4 reqDiv required">
-					                <label class="control-label" >Close Code</label>
+					                <label class="control-label" >Has issue been fixed permanently ?</label>
 					                 <select name="closeCodeSelect" id="closeCodeSelect" class="form-control" >
 									</select> 
 									<%-- <input type="text" id="closeCode" ng-model="ticketData.codeClosed" class="form-control"> --%>
 								<input type="hidden" ng-model="selectedCloseCode.selected">
 					                </div>
 					        <div class="col-xs-4 reqDiv required">
-					                <label class="control-label">Closed By</label>
+					                <label class="control-label">Restoration confirmed by</label>
 					                  <input type="text" class="form-control" 
 					                  name="closedBy" id="closedBy" ng-model="ticketData.closedBy"  disabled="disabled" >
 					                </div>
 							<div class="col-md-4 reqDiv required">
 							  	
-							 <label class="control-label" >Close Note</label>
+							 <label class="control-label" >Restoration notes</label>
 								  <textarea class="form-control" style="width: 100%;
    				 height: 70px;" rows="3" placeholder="Enter ticket close note" name="closeNote" id="closeNote" 
    				 ng-model="ticketData.closeNote"></textarea>	
@@ -347,6 +359,10 @@ $(function() {
 							<div class="row" >
 							
 							<div class="col-md-12">
+							<div class="pull-right">
+							<button type="submit" id="btnSavePrimary" class="btn btn-success " >Save changes</button>
+							<!-- <button type="reset" id="reseCreateTicketForm" class="btn btn-success ">RESET</button> -->
+							</div>
 							 </div>
 							</div>
 							</form>
@@ -410,10 +426,13 @@ $(function() {
 								ng-model="linkedTicket.ticketNumber">
 						</div>
 						<div class="col-sm-2">
-							<a  class="btn btn-success" ng-click="LinkNewTicket()"><i class="fa fa-link" aria-hidden="true"></i> Link ticket</a>
+							<a  class="btn btn-success" ng-click="LinkNewTicket()"><i class="fa fa-link" aria-hidden="true"></i>Raise and save ticket</a>
 						</div>
 					</div>
-					</br>
+					<!-- <div class="row""> -->							
+							<label style="color:red">if you don't have linked ticket Number please enter 'NA' .</label>							
+						<!-- </div> -->
+					
 					</br>
 
 					<div class="form-group" ng-if="ticketData.linkedTickets.length>0">
@@ -456,7 +475,7 @@ $(function() {
 											<td></td>
 											<td></td>
 											<td>
-												<button type="button" id="closedBtn"	class="btn btn-success pull-right"	ng-click="closeLinkedTicketConfirmation()">Close ticket</button>
+												<button type="button" id="closedBtn"	class="btn btn-success pull-right"	ng-click="closeLinkedTicketConfirmation()">Close and save ticket</button>
 											</td>
 										</tr>
 									</tbody>
@@ -515,14 +534,63 @@ $(function() {
 	              </div>
 	            </div>
 				</div>
-					<div class="col-md-3" style="background-color:#E2E0DF">
+				
+				 <div class="col-md-6" id="chatWindow" style="display:none">
+          <div class="box" >
+          	<div style="width:30%;position:fixed;bottom:13px;right:0px;margin:0;background-color:#283e34">
+            <div class="box-header with-border">
+              <h3 class="box-title" style="color:#fff">Work Notes</h3>
+             	 <div class="box-tools pull-right">
+                    <a href="javascript:void(0);"  class="badge bg-yellow" data-toggle="tooltip" ng-click="closeWindow();">
+                   		 <i class="fa fa-minus" aria-hidden="true"></i>
+	                </a>
+                </div>
+            </div>
+            <div class="box-body">
+              <div class="row">
+	   			 <div class="col-md-12">			 
+                  <div class="direct-chat-messages" style="height: 430px;" id="messageWindow">
+                  <div ng-repeat="ticket in ticketComments" id="messagebox">
+                    <div class="direct-chat-msg"  >
+                      <div class="direct-chat-info clearfix">
+                        <span class="direct-chat-name pull-left" style="color:#fff">{{ticket.createdBy}}</span>
+                        <span class="direct-chat-timestamp pull-right" style="color:#fff">{{ticket.createdDate}}</span>
+                      </div>
+                      <img class="direct-chat-img" src="${contextPath}/resources/img/swadhin.jpg" alt="message user image">
+                     	 
+                      <div class="direct-chat-text" id="audioMessage">
+                       {{ticket.comment}}
+                      </div>
+                      
+                    </div>
+
+					</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="box-footer">
+              <div class="row">
+                <div class="col-sm-12">
+                      <input type="text" name="ticketMessage" id="ticketMessage" ng-model="ticketComment.comment"
+                      placeholder="Type Message ..." class="form-control" ng-enter="addNewComment()">
+                </div>
+              </div>
+            </div>
+            </div>
+          </div>
+          
+        </div>
+       
+			
+			<!-- 		<div class="col-md-3" style="background-color:#E2E0DF">
 					<div class="box box-warning direct-chat direct-chat-warning">
                 <div class="box-header with-border">
                   <h3 class="box-title">Work Notes</h3>                  
                 </div>
                 <div class="box-body">
                   <div class="direct-chat-messages" style="height:475px" >
-                    <!-- Message. Default to the left -->
+                    Message. Default to the left
                     <div class="direct-chat-msg" ng-repeat="ticket in ticketComments">
                       <div class="direct-chat-info clearfix">
                         <span class="direct-chat-name pull-left">{{ticket.createdBy}}</span>
@@ -549,9 +617,10 @@ $(function() {
                   
                 </div>
               </div>
-					</div>
+					</div> -->
 				</div>
-				<div class="modal fade" id="confirmUnlink" role="dialog" aria-labelledby="confirmDeleteLabel" aria-hidden="true"> 
+					
+				<div class="modal fade" id="confirmUnlink" role="dialog" aria-labelledby="confirmDeleteLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static"> 
   <div class="modal-dialog"> 
     <div class="modal-content"> 
       <div class="modal-header"> 
@@ -569,25 +638,156 @@ $(function() {
   </div>  
 </div>
 
-	<div class="modal fade" id="confirmClose" role="dialog" aria-labelledby="confirmDeleteLabel" aria-hidden="true"> 
+	<div class="modal fade" id="confirmStatusChange" role="dialog" aria-labelledby="confirmDeleteLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static"> 
   <div class="modal-dialog"> 
     <div class="modal-content"> 
-      <div class="modal-header"> 
+      <div class="modal-header label-warning" > 
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>  
-        <h4 class="modal-title">Close Linked ticket</h4> 
+        <h4 class="modal-title">Status warning</h4> 
       </div> 
       <div class="modal-body"> 
-        <p>Are you sure you want to close the linked ticket ?</p>  
+        <p>Please select status as 'Logged' or 'Service Provider WIP' or 'Pending Review' .</p>  
       </div> 
     <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">No</button>  
-        <button type="button" class="btn btn-danger" id="confirm" ng-click="closeLinkedTicket()">Yes</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>  
+        <!-- <button type="button" class="btn btn-danger" id="confirm" ng-click="closeLinkedTicket()">Yes</button> -->
       </div>  
     </div>  
   </div>  
 </div> 
-				</div>
+
+<div class="modal fade" id="confirmLoggedStatusChange" role="dialog" aria-labelledby="confirmDeleteLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static"> 
+  <div class="modal-dialog"> 
+    <div class="modal-content"> 
+      <div class="modal-header label-warning" > 
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>  
+        <h4 class="modal-title">Status warning</h4> 
+      </div> 
+      <div class="modal-body"> 
+        <p>Please make sure that you have entered a reference ticket number in 'External Ticket of Service Provider'  Tab .</p>  
+      </div> 
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>  
+        <!-- <button type="button" class="btn btn-danger" id="confirm" ng-click="closeLinkedTicket()">Yes</button> -->
+      </div>  
+    </div>  
+  </div>  
+</div>
+
+<div class="modal fade" id="confirmLoggedUnlinkChange" role="dialog" aria-labelledby="confirmDeleteLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static"> 
+  <div class="modal-dialog"> 
+    <div class="modal-content"> 
+      <div class="modal-header label-warning" > 
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>  
+        <h4 class="modal-title">Unlink warning</h4> 
+      </div> 
+      <div class="modal-body"> 
+        <p>There should be minimum one reference ticket if status of Parent ticket is 'Logged'.</p>  
+      </div> 
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>  
+        <!-- <button type="button" class="btn btn-danger" id="confirm" ng-click="closeLinkedTicket()">Yes</button> -->
+      </div>  
+    </div>  
+  </div>  
+</div> 
+				
+				<div class="modal" id="fileAttachModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="false">
+      <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h4 class="modal-title" id="upload-avatar-title">View / Upload files</h4>
+          <div class="alert alert-danger alert-dismissable" id="incidentImageModalMessageDiv"
+				style="display: none;  height: 34px;white-space: nowrap;">
+				<strong>Error! </strong> {{incidentImageModalErrorMessage}} 
+				<a href><span class="messageClose" ng-click="closeMessageWindow()">X</span></a>
 			</div>
+        </div>
+        <div class="modal-body">
+        <div class="nav-tabs-custom">
+        	<ul class="nav nav-tabs" style="background-color: rgba(60, 141, 188, 0.34);">
+            
+							<li class="active">
+				       		 <a  href="#attachmentViewTab" data-toggle="tab" aria-expanded="true" id="siteViewLink"><b>View Attachment</b></a>
+							</li>
+							<li><a href="#addAttachmentTab" data-toggle="tab" aria-expanded="true" id="siteContactLink"><b>Add New Files</b></a>
+							</li>
+							
+            </ul>
+        	<div class="tab-content">
+               <div class="tab-pane active" id="attachmentViewTab">
+                	<div class="box-body">
+								
+              		<div class="table-responsive">
+                <table class="table no-margin">
+                  <thead>
+                  <tr>
+                    <th>File Name</th>
+                    <th>Download</th>
+                    <th></th>
+                    
+                  </tr>
+                  </thead>
+                 <tbody ng-repeat="file in ticketData.files">
+					<tr>
+						<td>{{file.fileName}}</td>
+						<td><a href="${contextPath}/selected/file/download?keyname={{file.filePath}}" download><i class="fa fa-cloud-download fa-2x" aria-hidden="true"></i></a></td>
+						<td>  </td>
+					</tr>
+				</tbody>
+                </table>
+              </div>
+              
+            </div>
+                
+                </div>
+                
+                <div class="tab-pane" id="addAttachmentTab">
+                	<p>Please choose a file to upload. image/*,.doc, .docx,.pdf only.</p>
+          <form role="form">
+          <div class="controls">                       
+              <div class="entry input-group col-xs-12">
+                <input type="button" class="btn btn-success addnew" style="margin-right: 5px;" onclick="" ng-click="addNewImage()" value="Add New">
+                <div  style="overflow-y:auto;height:250px">
+                <table id="example2" class="table  table-hover table-condensed">
+                 <tbody>
+                <tr ng-repeat="incidentImage in incidentImageList">
+                  <td>
+                  <input type="file" id="incidentImage{{$index}}" class="form-control" 
+                  name="incidentImage[{{$index}}]" accept="image/*,.doc, .docx,.pdf" 
+                  onchange="angular.element(this).scope().getIndexedName(this, event)" style="width:80%">
+                   <a class="btn btn-danger" href  ng-click="removeImage($index)" >
+                               <i class="fa fa-trash-o" aria-hidden="true" style="font-size: 1.4em;"></i>
+                  </a>
+                  </td>
+                </tr>
+                <tr>
+                	<td colspan="2">Total Size : {{totalIncidentImageSize}} KB</td>
+                </tr>
+                </tbody>
+                </table>
+                </div>
+              </div>
+              
+           
+          </div>            
+            </br>
+            <button type="button" class="btn btn-default" id="btnUploadCancel" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-success" ng-click="uploadFiles()" value="Upload">Upload</button>
+          </form>
+                </div>
+                
+            </div>
+        </div>
+          
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+<!-- </div> -->
+
+</div>
+				</div>
 			</div>
 			</div>	
 		</section>	
@@ -595,8 +795,4 @@ $(function() {
 					
 	</div>
 	</div>
-</div>
-</section>
-</div>
-</div>
-</div>
+

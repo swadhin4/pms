@@ -10,6 +10,10 @@ chrisApp.controller('assetController',
 			 $scope.serviceData ={};
 			 $scope.selectedRow =0;
 			 $scope.selectedAsset={};
+			 $scope.operation = {};
+			 //$scope.equipmentData.sites = [];
+			 //$scope.serviceData.sites = [];
+			 
 			 $scope.asset={
 					 selected:{},
 					 list:[]
@@ -35,7 +39,8 @@ chrisApp.controller('assetController',
 			 $scope.rowHighilited=function(row)
 			    {
 			      $scope.selectedRow = row;    
-			    }	
+			    }
+			 $scope.selectedSites = [];
 			 
 			 angular.element(document).ready(function () {
 				 $scope.getLoggedInUserAccess();
@@ -104,22 +109,94 @@ chrisApp.controller('assetController',
 					 })
 					 
 					  
-					
-					$('#commission').change(function(){
-						
-						
-				 
-					});
 					 
 					 $("#decommission").datepicker({ todayHighlight:'TRUE',
 						    autoclose: true,format:"dd-mm-yyyy"
 			         });
-					 
-					$('#decommission').change(function(){
-						
-					});
 					
 			 });
+			 
+			 $scope.getImageFile=function(assetId, e){
+				var ext = $('#inputImgfilepath').val().split(".").pop().toLowerCase();
+				$scope.fileSize1 = null;
+				$scope.fileExtension1 = ext;
+				if ($.inArray(ext, [ "jpg", "jpeg", "JPEG",	"JPG", "png", "PNG" ]) == -1) {
+					$('#equipmentModalMessageDiv').show();
+					$('#equipmentModalMessageDiv').alert();
+					$scope.equipmentModalErrorMessage = "";
+					 $('#fileerrorasset').text("Supported file types to upload are jpg and png");
+					$scope.isfileselected = false;
+					$('#inputImgfilepath').val('');
+					 e.target.files=undefined;
+					return false;
+				} else if (e.target.files != undefined) {
+					$('#equipmentModalMessageDiv').hide();
+					$scope.isfileselected = true;
+					file = $('#inputImgfilepath').prop('files');
+					$scope.fileSize1 = file[0].size / 1024;
+					if($scope.fileSize1 > 100){
+			        	 $scope.equipmentModalErrorMessage="";
+			        	 $('#fileerrorasset').text("File size exceeds 100KB");
+				    	 $('#equipmentModalMessageDiv').show();
+				    	 e.target.files=undefined;
+						
+			         }else{
+						var reader = new FileReader();
+						reader.onload = $scope.onImageFileUploadReader;
+						reader.readAsDataURL(file[0]);
+			         }
+				}else{
+					 $('#fileerrorasset').text("Invalid file format");
+			    	 $('#equipmentModalMessageDiv').show();
+			    	 $('#inputImgfilepath').val('');
+				}
+			 }
+			 
+			 $scope.getDocumentFile=function(serviceId, e, errorDiv, msgDiv){
+				 var documentId = serviceId.id
+				 var ext = $('#' + documentId).val().split(".")	.pop().toLowerCase();
+				$scope.fileSize2 = null;
+				$scope.fileExtension2 = ext;
+				if ($.inArray(ext, [ "PDF", "pdf"]) == -1) {
+					$('#'+msgDiv).text("Supported file types to upload is pdf");
+					$('#'+errorDiv).show();
+					$('#'+errorDiv).alert();
+					$scope.serviceModalErrorMessage = "";
+					$scope.isfileselected = false;
+					$('#' + documentId).val('');
+					 e.target.files=undefined;
+					return false;
+				} else if (e.target.files != undefined) {
+					$('#'+errorDiv).hide();
+					$scope.isfileselected = true;
+					file = $('#' + documentId).prop('files');
+					$scope.fileSize2 = file[0].size / 1024;
+					if($scope.fileSize2 > 100){
+			        	 $scope.serviceModalErrorMessage="";
+			        	 $('#'+msgDiv).text("File size exceeds 100KB");
+				    	 $('#'+errorDiv).show();
+				    	 e.target.files=undefined;
+			         }else{
+						var reader = new FileReader();
+						reader.onload = $scope.onFileDocUploadReader;
+						reader.readAsDataURL(file[0]);
+			         }
+				}else{
+					 $('#fileerrorservice').text("Invalid file format");
+					 $('#'+msgDiv).show();
+			    	 $('#' + documentId).val('');
+				}
+			 }
+			 
+			 $scope.onImageFileUploadReader=function(e){
+					var fileUrl = e.target.result;
+					$scope.assetImageFile=e.target.result;
+				}
+			 
+			 $scope.onFileDocUploadReader=function(e){
+					var fileUrl = e.target.result;
+					$scope.assetDocFile=e.target.result;
+				}
 			 
 			 $scope.getLoggedInUserAccess =function(){
 					authService.loggedinUserAccess()
@@ -141,21 +218,31 @@ chrisApp.controller('assetController',
 		    		.then(function(data) {
 		    			console.log(data)
 		    			if(data.statusCode == 200){
-		    				$scope.equipmentData ={};
 		    				$scope.sessionUser=angular.copy(data.object);
 		    				$scope.equipmentData.company=$scope.sessionUser.company;
-		    				$scope.getAllAsset();
-		    				$scope.getServiceProviders($scope.equipmentData.company);
-		    				$scope.retrieveAssetCategories();
-		    				$scope.getAssetLocations();
-		    				//$scope.testSaveAssetObject();
-		    				$scope.getUserSiteAccess();
+		    				var siteId = $('#siteId').val();
+		    				if(siteId==""){
+		    					$scope.getAllAsset();
+		    				}else{
+		    					
+		    					$scope.getSelectedSiteAssets(siteId);
+		    				}
+		    				$scope.getModalPopUpData();
 		    			}
 		            },
 		            function(data) {
 		                console.log('No User available')
 		            });
 				}
+			 
+			 $scope.getModalPopUpData=function(){
+				 var company = $scope.sessionUser.company;
+				 $scope.getServiceProviders(company);
+ 				$scope.retrieveAssetCategories();
+ 				$scope.getAssetLocations();
+ 				//$scope.testSaveAssetObject();
+ 				$scope.getUserSiteAccess();
+			 }
 			 
 			 $scope.getAllAsset=function(){
 				 $('#loadingDiv').show();
@@ -165,24 +252,41 @@ chrisApp.controller('assetController',
 		    				if(data.length>0){
 		    				$scope.asset.list=[];
 			    			$.each(data,function(key,val){
-			    			/*	var asset={
-			    						assetId:val.assetId,
-			    						assetName:val.assetName,
-			    						assetCode:val.assetCode,
-			    						categoryId:val.categoryId,
-			    						assetCategory:val.assetCategoryName,
-			    						locationId:val.locationId,
-			    						assetLocation:val.locationName,
-			    						assetType:val.assetType,
-			    						modelNumber:val.modelNumber,
-			    						dateofcommissioning:val.commisionedDate,
-			    						dateofdecommissioning:val.deCommissionedDate,
-			    						serviceProviderId:val.serviceProviderId,
-			    						serviceprovider:val.serviceProviderName,
-			    						
-			    				};*/
 			    				$scope.asset.list.push(val);
-			    				//$scope.asset.selected=$scope.asset.list[0];
+			    				$scope.getAssetDetails($scope.asset.list[0]);
+			    				$('#messageWindow').hide();
+			    				$('#infoMessageDiv').hide();
+			    				$('#loadingDiv').hide();
+			    			})
+		    			 
+		    			  }else{
+		    				  $scope.InfoMessage="No assets available for the user"
+									$('#messageWindow').show();
+				    				$('#infoMessageDiv').show();
+				    				$('#infoMessageDiv').alert();
+				    				$('#loadingDiv').hide();
+		    			  	}
+		    				
+			            },
+			            function(data) {
+			                console.log('Unable to get asset list')
+			                	$scope.InfoMessage="No assets available for the user"
+								$('#messageWindow').show();
+			    				$('#infoMessageDiv').show();
+			    				$('#infoMessageDiv').alert();
+			    				$('#loadingDiv').hide();
+			            });
+				 }
+			 
+			 $scope.getSelectedSiteAssets=function(selectedSite){
+				 $('#loadingDiv').show();
+				 assetService.getAssetBySite(selectedSite)
+						.then(function(data) {
+		    			console.log(data);
+		    				if(data.length>0){
+		    				$scope.asset.list=[];
+			    			$.each(data,function(key,val){
+			    				$scope.asset.list.push(val);
 			    				$scope.getAssetDetails($scope.asset.list[0]);
 			    				$('#messageWindow').hide();
 			    				$('#infoMessageDiv').hide();
@@ -216,12 +320,16 @@ chrisApp.controller('assetController',
 			}
 			 
 			 $scope.addEquipment=function(){
+				 $scope.operation = 'ADD';
+				 $('#equipmentModalMessageDiv').hide();
 				 $scope.equipmentData={};
+				 $scope.equipmentData.sites=[];
+				 $scope.getModalPopUpData();
 				 $('#resetAssetForm').click();
 				 $("#categorySelect option").each(function() {
 						if ($(this).val() == "") {
 							$(this).attr('selected', 'selected');
-							 $scope.assetCategory.selected=null;
+							 $scope.assetCategory.selected.assetCategoryId=null;
 							return false;
 						}
 				 	});
@@ -229,7 +337,7 @@ chrisApp.controller('assetController',
 			 	$("#locationSelect option").each(function() {
 					if ($(this).val() == "") {
 						$(this).attr('selected', 'selected');
-						 $scope.assetLocation.selected=null;
+						 $scope.assetLocation.selected.locationId=null;
 						return false;
 					}
 				});
@@ -237,7 +345,7 @@ chrisApp.controller('assetController',
 			 	$("#spSelect option").each(function() {
 					if ($(this).val() == "") {
 						$(this).attr('selected', 'selected');
-						 $scope.serviceProvider.selected=null;
+						 $scope.serviceProvider.selected.serviceProvderId=null;
 						return false;
 					}
 				});
@@ -245,7 +353,7 @@ chrisApp.controller('assetController',
 				 $("#siteSelect option").each(function(){
 				 		if($(this).val() == ""){
 				 			$(this).attr('selected', 'selected');
-				 			 $scope.accessSite.selected=null;
+				 			 $scope.accessSite.selected.siteId=null;
 							return false;
 				 		}
 				 	});
@@ -269,12 +377,16 @@ chrisApp.controller('assetController',
 			 }
 			 
 			 $scope.addService=function(){
+				 $scope.operation = 'ADD';
+				 $('#serviceModalMessageDiv').hide();
 				 $scope.serviceData={};
+				 $scope.serviceData.sites=[];
+				 $scope.getModalPopUpData();
 				 $('#resetServiceAssetForm').click();
 					$("#categorySelect option").each(function() {
 						if ($(this).val() == "") {
 							$(this).attr('selected', 'selected');
-							 $scope.assetCategory.selected=null;
+							 $scope.assetCategory.selected.assetCategoryId=null;
 							return false;
 						}
 				 	});
@@ -282,7 +394,7 @@ chrisApp.controller('assetController',
 			 	$("#locationSelect option").each(function() {
 					if ($(this).val() == "") {
 						$(this).attr('selected', 'selected');
-						 $scope.assetLocation.selected=null;
+						 $scope.assetLocation.selected.locationId=null;
 						return false;
 					}
 				});
@@ -290,7 +402,7 @@ chrisApp.controller('assetController',
 			 	$("#spSelect option").each(function() {
 					if ($(this).val() == "") {
 						$(this).attr('selected', 'selected');
-						 $scope.serviceProvider.selected=null;
+						 $scope.serviceProvider.selected.serviceProviderId=null;
 						return false;
 					}
 				});
@@ -300,7 +412,7 @@ chrisApp.controller('assetController',
 			 	$("#siteSelect option").each(function(){
 			 		if($(this).val() == ""){
 			 			$(this).attr('selected', 'selected');
-			 			 $scope.accessSite.selected=null;
+			 			 $scope.accessSite.selected.siteId=null;
 						return false;
 			 		}
 			 	});
@@ -310,83 +422,187 @@ chrisApp.controller('assetController',
 			 
 			 
 			 $scope.editAsset=function(){
+				 $scope.operation ="EDIT";
 				 if($scope.selectedAsset.assetType == 'E'){
+					
 					 $('#equipmentModal').modal('show');
 					 $('#assetModalLabel').text("Update Asset");
 						 console.log($scope.selectedAsset);
 						 $scope.equipmentData=angular.copy($scope.selectedAsset);
-						 
-						 	$("#categorySelect option").each(function() {
+						// $scope.getModalPopUpData();
+						 if($scope.selectedAsset.categoryId!=null){
+							 $("#categorySelect").empty();
+							 var options = $("#categorySelect");
+		    					options.append($("<option />").val("").text(
+								"Select Category"));
+		    					$.each($scope.assetCategory.equipmentList,function() {
+									options.append($("<option />").val(	this.assetCategoryId).text(	this.assetCategoryName));
+								});
+							 $("#categorySelect option").each(function() {
 								if ($(this).val() == $scope.selectedAsset.categoryId) {
 									$(this).attr('selected', 'selected');
-									$scope.assetCategory.selected.assetCategoryId = $scope.selectedAsset.categoryId;
+									$scope.assetCategory.selected.assetCategoryId=$scope.selectedAsset.categoryId;
 									return false;
 								}
 						 	});
+						 }
+						 
+						 
+						 if($scope.selectedAsset.locationId!=null){
+							 $("#locationSelect").empty();
+							 var options = $("#locationSelect");
+		    					options.append($("<option />").val("").text(
+								"Select Location"));
+		    					$.each($scope.assetLocation.list,function() {
+									options.append($("<option />").val(	this.locationId).text(	this.locationName));
+								});
+							 $("#locationSelect option").each(function() {
+								if ($(this).val() == $scope.selectedAsset.locationId) {
+									$(this).attr('selected', 'selected');
+									$scope.assetLocation.selected.locationId= $scope.selectedAsset.locationId;
+									return false;
+								}
+							});
+						 }
 					 	
-					 	$("#locationSelect option").each(function() {
-							if ($(this).val() == $scope.selectedAsset.locationId) {
-								$(this).attr('selected', 'selected');
-								$scope.assetLocation.selected.locationId = $scope.selectedAsset.locationId;
-								return false;
-							}
-						});
+						 if($scope.selectedAsset.serviceProviderId!=null){
+							 $("#spSelect").empty();
+							 var options = $("#spSelect");
+		    					options.append($("<option />").val("").text(
+								"Select Service Provider"));
+		    					$.each($scope.serviceProvider.list,function() {
+									options.append($("<option />").val(	this.serviceProviderId).text(this.name));
+								});
+						 	$("#spSelect option").each(function() {
+								if ($(this).val() == $scope.selectedAsset.serviceProviderId) {
+									$(this).attr('selected', 'selected');
+									$.each($scope.serviceProvider.list,function(key,val){
+										if(val.serviceProviderId ==  $scope.selectedAsset.serviceProviderId){
+											$scope.serviceProvider.selected.serviceProviderId = $scope.selectedAsset.serviceProviderId;
+											return false;
+										}
+									});
+									
+									
+								}
+							});
+						 }
 					 	
-					 	$("#spSelect option").each(function() {
-							if ($(this).val() == $scope.selectedAsset.serviceProviderId) {
-								$(this).attr('selected', 'selected');
-								$scope.serviceProvider.selected.serviceProviderId = $scope.selectedAsset.serviceProviderId;
-								return false;
-							}
-						});
+						/* 	$("#drpIsAsset option").each(function(){
+						 		if($(this).val() == $scope.selectedAsset.isAssetElectrical){
+						 			$(this).attr('selected', 'selected');
+						 			$scope.equipmentData.isAssetElectrical=$scope.selectedAsset.isAssetElectrical;
+									return false;
+						 		}
+						 	});
 					 	
-					 	$("#drpIsAsset option").each(function(){
-					 		if($(this).val() == $scope.selectedAsset.isAssetElectrical){
-					 			$(this).attr('selected', 'selected');
-					 			$scope.equipmentData.isAssetElectrical=$scope.selectedAsset.isAssetElectrical;
-								return false;
-					 		}
-					 	});
+						 	$("#drpIsPowersensor option").each(function(){
+						 		if($(this).val() == $scope.selectedAsset.isPWSensorAttached){
+						 			$(this).attr('selected', 'selected');
+						 			$scope.equipmentData.isPWSensorAttached=$scope.selectedAsset.isPWSensorAttached;
+									return false;
+						 		}
+						 	});
+						 	*/
+						 	
+					 	if($scope.selectedAsset.siteId!=null){
+					 		$("#siteSelect").empty();
+					 		var options = $("#siteSelect");
+	    					options.append($("<option />").val("").text("Select Site"));
+	    					$.each($scope.accessSite.list,function() {
+								options.append($("<option />").val(	this.siteId).text(this.siteName));
+							});
+						 	$("#siteSelect option").each(function(){
+						 		if($(this).val() == $scope.selectedAsset.siteId){
+						 			$(this).attr('selected', 'selected');
+						 			$scope.accessSite.selected.siteId = $scope.selectedAsset.siteId;
+									return false;
+						 		}
+						 	});
+						 	 $('#siteSelect').removeAttr("multiple");
+							 $('#siteSelect').attr("disable", true);
+					 	}
 					 	
-					 	$("#drpIsPowersensor option").each(function(){
-					 		if($(this).val() == $scope.selectedAsset.isPWSensorAttached){
-					 			$(this).attr('selected', 'selected');
-					 			$scope.equipmentData.isPWSensorAttached=$scope.selectedAsset.isPWSensorAttached;
-								return false;
-					 		}
-					 	});
-					 	
-					 	$("#siteSelect option").each(function(){
-					 		if($(this).val() == $scope.selectedAsset.siteId){
-					 			$(this).attr('selected', 'selected');
-					 			$scope.accessSite.selected.siteId = $scope.selectedAsset.siteId;
-								return false;
-					 		}
-					 	});
+					 	if($scope.selectedAsset.isAssetElectrical=="YES" && $scope.selectedAsset.isPWSensorAttached=="NO"){
+					 		$('#txtSensorNumber').prop('disabled', true);
+					 		$("#txtSensorNumber").attr('required', false);
+					 		$("#drpIsAsset").val("YES");
+					 		$("#drpIsPowersensor").val("NO");
+					 		$scope.equipmentData.isAssetElectrical=$scope.selectedAsset.isAssetElectrical;
+					 		$scope.equipmentData.isPWSensorAttached=$scope.selectedAsset.isPWSensorAttached;
+					 		
+					 	}
+					 	else if($scope.selectedAsset.isAssetElectrical=="NO" && $scope.selectedAsset.isPWSensorAttached=="YES"){
+					 		$('#txtSensorNumber').prop('disabled', false);
+					 		$("#txtSensorNumber").attr('required', true);
+					 		$("#drpIsAsset").val("NO");
+					 		$("#drpIsPowersensor").val("YES");
+					 		$scope.equipmentData.isAssetElectrical=$scope.selectedAsset.isAssetElectrical;
+					 		$scope.equipmentData.isPWSensorAttached=$scope.selectedAsset.isPWSensorAttached;
+					 		
+					 	}
+					 	else if($scope.selectedAsset.isAssetElectrical=="NO" && $scope.selectedAsset.isPWSensorAttached=="NO"){
+					 		$('#txtSensorNumber').prop('disabled', true);
+					 		$("#txtSensorNumber").attr('required', false);
+					 		$("#drpIsAsset").val("NO");
+					 		$("#drpIsPowersensor").val("NO");
+					 		$scope.equipmentData.isAssetElectrical=$scope.selectedAsset.isAssetElectrical;
+					 		$scope.equipmentData.isPWSensorAttached=$scope.selectedAsset.isPWSensorAttached;
+					 		
+					 	}else{
+					 		$('#txtSensorNumber').prop('disabled',false);
+					 		$("#txtSensorNumber").attr('required', true);
+					 		$("#drpIsAsset").val($scope.selectedAsset.isAssetElectrical);
+					 		$("#drpIsPowersensor").val($scope.selectedAsset.isPWSensorAttached);
+					 		$scope.equipmentData.isAssetElectrical=$scope.selectedAsset.isAssetElectrical;
+					 		$scope.equipmentData.isPWSensorAttached=$scope.selectedAsset.isPWSensorAttached;
+					 	}
 					 
 					 }
 				 
 				 else if($scope.selectedAsset.assetType == 'S'){
-					 $('#serviceModal').modal('show');
 					 $('#assetServiceModalLabel').text("Update Asset");
 						 console.log($scope.selectedAsset);
 						 $scope.serviceData=angular.copy($scope.selectedAsset);
-						 	$("#serviceCategorySelect option").each(function() {
-								if ($(this).val() == $scope.selectedAsset.categoryId) {
+						 if($scope.selectedAsset.categoryId!=null){
+							 $("#serviceCategorySelect").empty();
+							 var options = $("#serviceCategorySelect");
+		    					options.append($("<option />").val("").text(
+								"Select Category"));
+		    					$.each($scope.assetCategory.serviceList,function() {
+									options.append($("<option />").val(	this.assetCategoryId).text(	this.assetCategoryName));
+								});
+							 	$("#serviceCategorySelect option").each(function() {
+									if ($(this).val() == $scope.selectedAsset.categoryId) {
+										$(this).attr('selected', 'selected');
+										$scope.assetCategory.selected.assetCategoryId = $scope.selectedAsset.categoryId;
+									return false;
+								}
+						 	});
+						 }
+						 if($scope.selectedAsset.locationId!=null){
+							 $("#serviceLocationSelect").empty();
+							 var options = $("#serviceLocationSelect");
+		    					options.append($("<option />").val("").text(
+								"Select Location"));
+		    					$.each($scope.assetLocation.list,function() {
+									options.append($("<option />").val(	this.locationId).text(	this.locationName));
+								});
+						 	$("#serviceLocationSelect option").each(function() {
+								if ($(this).val() == $scope.selectedAsset.locationId) {
 									$(this).attr('selected', 'selected');
-									$scope.assetCategory.selected.assetCategoryId = $scope.selectedAsset.categoryId;
-								return false;
-							}
-						});
-					 	
-					 	$("#serviceLocationSelect option").each(function() {
-							if ($(this).val() == $scope.selectedAsset.locationId) {
-								$(this).attr('selected', 'selected');
-								$scope.assetLocation.selected.locationId= $scope.selectedAsset.locationId;
-								return false;
-							}
-						});
+									$scope.assetLocation.selected.locationId= $scope.selectedAsset.locationId;
+									return false;
+								}
+							});
+						 }
 					 	if($scope.selectedAsset.serviceProviderId !=  null){
+					 		$("#serviceSPSelect").empty();
+					 		var options = $("#serviceSPSelect");
+	    					options.append($("<option />").val("").text("Select Service Provider"));
+	    					$.each($scope.serviceProvider.list,function() {
+								options.append($("<option />").val(	this.serviceProviderId).text(this.name));
+							});
 						 	$("#serviceSPSelect option").each(function() {
 								if ($(this).val() == $scope.selectedAsset.serviceProviderId) {
 									$(this).attr('selected', 'selected');
@@ -397,6 +613,12 @@ chrisApp.controller('assetController',
 					 	}
 					 	
 					 	if($scope.selectedAsset.siteId !=  null){
+					 		 $("#serviceSiteSelect").empty();
+					 		var options = $("#serviceSiteSelect");
+	    					options.append($("<option />").val("").text("Select Site"));
+	    					$.each($scope.accessSite.list,function() {
+								options.append($("<option />").val(	this.siteId).text(this.siteName));
+							});
 						 	$("#serviceSiteSelect option").each(function(){
 						 		if($(this).val() == $scope.selectedAsset.siteId){
 						 			$(this).attr('selected', 'selected');
@@ -405,6 +627,7 @@ chrisApp.controller('assetController',
 						 		}
 						 	});
 					 	}
+					 	$('#serviceModal').modal('show');
 					 }
 			 	}
 			 $scope.getUserSiteAccess=function(){
@@ -504,7 +727,7 @@ chrisApp.controller('assetController',
 		            });
 				}
 			 
-			 $scope.retrieveAssetCategories=function(){
+			 $scope.retrieveAssetCategories=function(mode){
 				 $('#loadingDiv').show();
 				 assetService.retrieveAssetCategories()
 				 .then(function(data) {
@@ -531,6 +754,7 @@ chrisApp.controller('assetController',
 							options.append($("<option />").val(	this.assetCategoryId).text(	this.assetCategoryName));
 						});
     					
+    					
     					var options = $("#serviceCategorySelect");
     					options.append($("<option />").val("").text(
 						"Select Category"));
@@ -546,7 +770,7 @@ chrisApp.controller('assetController',
 			 }
 				
 			 
-			 $scope.getAssetLocations=function(){
+			 $scope.getAssetLocations=function(mode){
 				 $('#loadingDiv').show();
 				 assetService.getAssetLocations()
 				 .then(function(data) {
@@ -615,40 +839,106 @@ chrisApp.controller('assetController',
 			 }*/
 			 
 			 $scope.saveAssetEquipment=function(){				 	          
-		          
+				 if($scope.operation=="ADD"){
+					 $scope.equipmentData.sites = [];
+					 for (var i = 0; i < $scope.accessSite.selected.length; i++) {
+						 $scope.equipmentData.sites.push($scope.accessSite.selected[i].siteId)
+					 }
+					 
+				 } else if($scope.operation=="EDIT"){
+					 $scope.equipmentData.sites=[];
+					 $scope.equipmentData.sites.push($scope.selectedAsset.siteId);
+				 }
 		          if($scope.IsValidDate($scope.equipmentData.deCommissionedDate,$scope.equipmentData.commisionedDate)){
-		        	  $('#modalMessageDiv').hide();
+		        	  $('#equipmentModalMessageDiv').hide();
 		        	  $scope.equipmentData.categoryId=$scope.assetCategory.selected.assetCategoryId;
 						 $scope.equipmentData.locationId=$scope.assetLocation.selected.locationId;
-						 $scope.equipmentData.siteId=$scope.accessSite.selected.siteId;
+						 
+						 //$scope.equipmentData.siteId=$scope.accessSite.selected.siteId;
 						 if($scope.serviceProvider.selected!=null){
 							 $scope.equipmentData.serviceProviderId=$scope.serviceProvider.selected.serviceProviderId;
 						 }
 						 console.log($scope.equipmentData);
-						 
-						$scope.saveAssetInfo($scope.equipmentData);
+						 var assetImage={
+									fileName:$scope.equipmentData.assetName,
+									base64ImageString:$scope.assetImageFile,
+									fileExtension: $scope.fileExtension1,
+									size:$scope.fileSize1 || 0
+								}
+						 $scope.equipmentData.assetImage=assetImage;
+						 var assetDoc={
+									fileName:$scope.equipmentData.assetName,
+									base64ImageString:$scope.assetDocFile,
+									fileExtension: $scope.fileExtension2,
+									size:$scope.fileSize2 || 0
+									
+								}
+						 $scope.equipmentData.assetDoc = assetDoc;
+						 if( $scope.equipmentData.assetImage.size > 100){
+							 $scope.equipmentModalErrorMessage="File size exceeds Max limit (100KB).";
+			            	 $('#equipmentModalMessageDiv').show();
+			            	 $('#equipmentModalMessageDiv').alert();
+			                  $scope.isfileselected=false;
+			                  return false;
+			             }
+						 if( $scope.equipmentData.assetDoc.size > 100){
+							 $scope.equipmentModalErrorMessage="File size exceeds Max limit (100KB).";
+			            	 $('#equipmentModalMessageDiv').show();
+			            	 $('#equipmentModalMessageDiv').alert();
+			                  $scope.isfileselected=false;
+			                  return false;
+			             }else{
+			            	 $scope.saveAssetInfo($scope.equipmentData);
+			             }
+	   				
 	    				
 		          }
 		          else{
-		        	  $scope.modalErrorMessage = "Decommission date should be after Commission date";
-		                $('#modalMessageDiv').show();
-	    				$('#modalMessageDiv').alert();							
+		        	  $scope.equipmentModalErrorMessage = "Decommission date should be after Commission date";
+		                $('#equipmentModalMessageDiv').show();
+	    				$('#equipmentModalMessageDiv').alert();							
 		          }		          
 				 
 			 }
 			 
 			 $scope.saveAssetService =function(){
-				 
+				 if($scope.operation=="ADD"){
+				 	$scope.serviceData.sites = [];
+					 for (var i = 0; i < $scope.accessSite.selected.length; i++) {
+						 $scope.serviceData.sites.push($scope.accessSite.selected[i].siteId)
+					 }
+					 } else if($scope.operation=="EDIT"){
+						 $scope.serviceData.sites.push($scope.selectedAsset.siteId);
+					 }
+				
 				 if($scope.IsValidDate($scope.serviceData.deCommissionedDate,$scope.serviceData.commisionedDate)){
 		        	  $('#serviceModalMessageDiv').hide();
 		        	  $scope.serviceData.categoryId=$scope.assetCategory.selected.assetCategoryId;
 						 $scope.serviceData.locationId=$scope.assetLocation.selected.locationId;
-						 $scope.serviceData.siteId=$scope.accessSite.selected.siteId;
+						 
+						 //$scope.serviceData.siteId=$scope.accessSite.selected.siteId;
 						 if($scope.serviceProvider.selected!=null){
 						 $scope.serviceData.serviceProviderId=$scope.serviceProvider.selected.serviceProviderId;
 						 }
-						 $scope.saveAssetInfo($scope.serviceData);
-	    				
+						 
+						 var serviceDoc={
+									fileName:$scope.serviceData.assetName,
+									base64ImageString:$scope.assetDocFile,
+									fileExtension: $scope.fileExtension2,
+									size:$scope.fileSize2 || 0
+								}
+						 $scope.serviceData.assetDoc = serviceDoc;
+						 
+						 if($scope.serviceData.assetDoc.size > 100){
+			            	 $scope.serviceModalErrorMessage="File size exceeds Max limit (100KB).";
+			            	 $('#serviceModalMessageDiv').show();
+			            	 $('#serviceModalMessageDiv').alert();
+			                  $scope.isfileselected=false;
+			                  return false;
+			             }else{
+			            	 $scope.saveAssetInfo($scope.serviceData);
+			             }
+	    				//console.log($scope.serviceData);
 		          }
 		          else{
 		        	  $scope.modalErrorMessage = "Decommission date should be after Commission date";
@@ -657,6 +947,71 @@ chrisApp.controller('assetController',
 		          }		     
 				
 			 }
+			 
+			 $scope.isDelete=function(event,state){
+				 //console.log(event);
+				 $scope.equipmentData.isDelete = 0;
+				 console.log(state.target.checked);
+				 if(state.target.checked){
+					 
+					 $('#confirmDelete').appendTo("body").modal('show');
+				 }
+				 else{
+					 if($scope.selectedAsset.assetType == 'E'){
+						 $scope.equipmentData.isDelete = 0;
+					 }
+					 else if($scope.selectedAsset.assetType == 'S'){
+						 $scope.serviceData.isDelete = 0;
+					 }
+					 $('#confirmDelete').appendTo("body").modal('hide');
+				 }
+				 
+			 }
+			 
+			 $scope.confirmDelete=function(){
+				 if($scope.selectedAsset.assetType == 'E'){
+					 $scope.equipmentData.isDelete = 1;
+				 }
+				 else if($scope.selectedAsset.assetType == 'S'){
+					 $scope.serviceData.isDelete = 1;
+				 }
+				 
+				 $('#confirmDelete').appendTo("body").modal('hide');
+			 }
+			 
+			 $scope.resetDelete=function(){
+				 
+				 if($scope.selectedAsset.assetType == 'E'){
+					 
+					 $scope.equipmentData.isDelete = 0;
+					 $( '#toggledelete' ).parent().addClass('off');
+				 }
+				 else if($scope.selectedAsset.assetType == 'S'){
+					 
+					 $scope.serviceData.isDelete = 0;
+					 $( '#toggledeleteService' ).parent().addClass('off');
+				 }
+				 
+				 //$("#toggledelete").prop("checked", false);
+			 }
+			 
+			/* $scope.isServiceDelete=function(event,state){
+				 //console.log(event);
+				 $scope.serviceData.isDelete = 0;
+				 console.log(state.target.checked);
+				 if(state.target.checked){
+					 
+					 $('#confirmDelete').appendTo("body").modal('show');
+				 }
+				 else{
+					 $scope.serviceData.isDelete = 0;
+					 $('#confirmDelete').appendTo("body").modal('hide');
+				 }
+				 
+			 }*/
+			 
+			
+			 
 			 $scope.saveAssetInfo=function(assetData){
 				 $('#loadingDiv').show();
 				 assetService.saveAssetObject(assetData)
@@ -670,6 +1025,7 @@ chrisApp.controller('assetController',
 		    				$('#infoMessageDiv').hide();
 		    				if(assetData.assetType == 'E'){
 		    					$('#assetModalCloseBtn').click();
+		    					
 		    				}
 		    				else if(assetData.assetType == 'S'){
 		    					$('#serviceModalCloseBtn').click();
@@ -679,19 +1035,21 @@ chrisApp.controller('assetController',
 		    			}
 		            },
 		            function(data) {
-		                console.log('Error while saving asset data')
-		                $scope.modalErrorMessage = data.message;
-		                $('#modalMessageDiv').show();
-	    				$('#modalMessageDiv').alert();
-	    				if(assetData.assetType == 'E'){
-	    					$('#modalMessageDiv').show();
-		    				$('#modalMessageDiv').alert();
-	    				}
-	    				else if(assetData.assetType == 'S'){
-	    					$('#serviceModalMessageDiv').show();
-		    				$('#serviceModalMessageDiv').alert();
-	    				}
-	    				$('#loadingDiv').hide();
+		            	 console.log('Error while saving asset data')
+			              
+			              //  $('#equipmentModalMessageDiv').show();
+		 				//$('#equipmentModalMessageDiv').alert();
+		 				if(assetData.assetType == 'E'){
+		 					  $scope.equipmentModalErrorMessage = data.message;
+		 					$('#equipmentModalMessageDiv').show();
+			    				$('#equipmentModalMessageDiv').alert();
+		 				}
+		 				else if(assetData.assetType == 'S'){
+		 					$scope.serviceModalErrorMessage = data.message;
+		 					$('#serviceModalMessageDiv').show();
+			    				$('#serviceModalMessageDiv').alert();
+		 				}
+		 				$('#loadingDiv').hide();
 		            });
 			 }
 			 
@@ -699,6 +1057,8 @@ chrisApp.controller('assetController',
 			 $scope.closeMessageWindow=function(){
 				 $('#messageWindow').hide();
 				 $('#modalMessageDiv').hide();
+				 $('#serviceModalMessageDiv').hide();
+ 				 $('#equipmentModalMessageDiv').hide();
 			 }
 			 
 			
@@ -732,11 +1092,26 @@ function validateDropdownValues(dropDownId, assetType){
 					 scope.serviceProvider.selected = serviceProvider;
 				 }
 				 if(dropDownId.toUpperCase() == "SITESELECT"){
-					 var site={
-							 siteId:parseInt($("#siteSelect").val()),
-					 		 siteName:$("#siteSelect option:selected").text()
-					 }
-					 scope.accessSite.selected =site;
+					 var sites = $('#siteSelect option:selected');
+					 
+					 var selectedSitesId = $('#siteSelect').val();					 
+					scope.selectedSites = [];
+					 for (var i = 0; i < selectedSitesId.length; i++) {
+						 if(selectedSitesId[i] != ""){
+							 var Id = parseInt(selectedSitesId[i]);
+							 var txt = $("#siteSelect option[value='"+Id+"']").text();
+							 scope.selectedSites.push({
+						            'siteId': Id,
+						            'siteName': txt
+						        });
+						 }
+						 
+					    }
+				 
+					 
+					 //console.log(scope.selectedSites);
+					 scope.accessSite.selected =scope.selectedSites;
+					 console.log(scope.accessSite.selected);
 				 }
 				 scope.equipmentData.assetType=assetType;
 		 }else if(assetType == 'S'){
@@ -763,13 +1138,33 @@ function validateDropdownValues(dropDownId, assetType){
 				 scope.serviceProvider.selected = serviceProvider;
 			 }
 			 if(dropDownId.toUpperCase() == "SERVICESITESELECT"){
-				 var site={
+				/* var site={
 						 siteId:parseInt($("#serviceSiteSelect").val()),
 				 		 siteName:$("#siteSelect option:selected").text()
 				 }
-				 scope.accessSite.selected =site;
+				 scope.accessSite.selected =site;*/
+				 var sites = $('#serviceSiteSelect option:selected');
+				 
+				 var selectedSitesId = $('#serviceSiteSelect').val();					 
+				scope.selectedSites = [];
+				 for (var i = 0; i < selectedSitesId.length; i++) {
+					 if(selectedSitesId[i] != ""){
+						 var Id = parseInt(selectedSitesId[i]);
+						 var txt = $("#serviceSiteSelect option[value='"+Id+"']").text();
+						 scope.selectedSites.push({
+					            'siteId': Id,
+					            'siteName': txt
+					        });
+					 }
+					 
+				    }					 
+				 
+				 //console.log(scope.selectedSites);
+				 scope.accessSite.selected =scope.selectedSites;
+				 console.log(scope.accessSite.selected);
 			 }
 			 scope.serviceData.assetType=assetType;
 		 }
 	 }
 }
+

@@ -16,8 +16,8 @@
 		http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa-1.1.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd">
-	<context:component-scan base-package="com.jpa" />
-	<jpa:repositories base-package="com.jpa.repositories"/>
+	<context:component-scan base-package="com.pms.jpa" />
+	<jpa:repositories base-package="com.pms.jpa.repositories"/>
 	<bean id="entityManagerFactory"
 		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
 		<property name="dataSource" ref="dataSource" />
@@ -26,7 +26,7 @@
 		<property name="persistenceUnitPostProcessors">
 			<list>
 				<bean class="org.springframework.data.jpa.support.ClasspathScanningPersistenceUnitPostProcessor">
-					<constructor-arg value="com.jpa.entities" />
+					<constructor-arg value="com.pms.jpa.entities" />
 				</bean>
 			</list>
   		</property>

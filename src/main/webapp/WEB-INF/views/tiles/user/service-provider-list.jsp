@@ -290,7 +290,7 @@ $(function() {
 									   <div class="col-md-12">
 									   <div class="box">
 							<div class="box-header with-border">
-								<h3 class="box-title">SLA Description</h3>
+								<h3 class="box-title">Further SLA details and comments</h3>
 								</div>
 						 <div class="table-responsive">
                 <table class="table no-margin">
@@ -494,7 +494,7 @@ $(function() {
 						<table class="table table-responsive table-sm"  >
 							<thead>
 							  <tr>
-								<th class="col-md-1">Priority</th>
+								<th class="col-md-6">Priority</th>
 								<th class="col-md-2">Duration</th>
 								<th class="col-md-4">Unit</th>
 								
@@ -502,7 +502,10 @@ $(function() {
 							</thead>
 							<tbody>
 							  <tr ng-repeat="val in priorities">
-								<td class="reqDiv required">{{$index + 1}}-{{val.priority}}<span class="control-label"></span></td>
+								<td class="reqDiv required">
+								{{$index + 1}}-{{val.priority}}
+								[{{val.description}}]<span class="control-label"></span>
+								</td>
 								<td>
 								<input name="slaId" placeholder="" class="form-control" type="hidden" 
 								id="slaId{{$index}}"  ng-model="val.slaId">
@@ -523,7 +526,7 @@ $(function() {
 						</table>
 					</div>
 					<div class="form-group">
-						<label for ="description">SLA Description</label>
+						<label for ="description">Further SLA details and comments</label>
 						<textarea class="form-control" id="slaDescription" name="slaDescription" placeholder="SLA Description"
 						ng-model="serviceProvider.slaDescription"></textarea>
 					</div>
@@ -571,7 +574,7 @@ $(function() {
 							<thead>
 							  <tr>
 								<th class="col-md-1">Esc Level</th>
-								<th class="col-md-2">Contact</th>
+								<th class="col-md-2">Contact Name</th>
 								<th class="col-md-3">Email</th>
 							  </tr>
 							</thead>

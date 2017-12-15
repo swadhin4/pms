@@ -34,6 +34,7 @@
 <div class="content-wrapper">
 		<div  ng-controller="profileController" id="profileviewWindow">
 	<div class="row">
+	<div class="col-md-12">
 			<div class="col-md-3">
 			 <h3> User Profile</h3>
 			</div>
@@ -45,7 +46,7 @@
 					</div>
 				<div class="alert alert-danger alert-dismissable" id="profile-error-alert"
 						style="display: none;  height: 34px;white-space: nowrap;">
-						<strong>Error! </strong> {{successMessage}}
+						<strong>Error! </strong> {{errorMessage}}
 						<a href ng-click="closeMessageWindow()">	<span class="messageClose">X</span></a>
 					</div>	
 			</div>
@@ -83,26 +84,37 @@
             </ul>
             <div class="tab-content">
               <div class="active tab-pane" id="activity">
-                <form class="form-horizontal" ng-submit="updateProfile()">
+                <form class="form-horizontal" name="profileForm" ng-submit="updateProfile()">
                   <div class="form-group reqDiv required">
                     <label  class="col-sm-2 control-label">First Name</label>
 
                     <div class="col-sm-10">
-                      <input type="text" class="form-control" id="inputName" ng-model="loggedInUserDetail.firstName" placeholder="Enter First Name" required>
+                      <input type="text" class="form-control" id="inputName" 
+                      ng-model="loggedInUserDetail.firstName" placeholder="Enter First Name" required>
                     </div>
                   </div>
                   <div class="form-group reqDiv required">
                     <label for="inputName" class="col-sm-2 control-label">Last Name</label>
 
                     <div class="col-sm-10">
-                      <input type="text" class="form-control" id="inputName" ng-model="loggedInUserDetail.lastName" placeholder="Enter Last Name" required>
+                      <input type="text" class="form-control" id="inputName" 
+                      ng-model="loggedInUserDetail.lastName" placeholder="Enter Last Name" required>
+                    </div>
+                  </div>
+                  <div class="form-group reqDiv required">
+                    <label for="inputName" class="col-sm-2 control-label">Phone / Mobile</label>
+
+                    <div class="col-sm-10">
+                      <input type="text" class="form-control" ng-pattern="onlyNumbers" ng-keypress="filterValue($event)"  maxlength="11" 
+                      id="inputName" ng-model="loggedInUserDetail.phoneNo" placeholder="Enter Phone Number" required>
                     </div>
                   </div>
                   <div class="form-group">
                     <label for="inputEmail" class="col-sm-2 control-label">Email</label>
 
                     <div class="col-sm-10">
-                      <input type="email" class="form-control" id="inputEmail" ng-model="loggedInUserDetail.email" disabled="disabled">
+                      <input type="email" class="form-control" id="inputEmail" 
+                      ng-model="loggedInUserDetail.email" disabled="disabled">
                     </div>
                   </div>
                   
@@ -111,13 +123,14 @@
                     <label for="inputSkills" class="col-sm-2 control-label">Role</label>
 
                     <div class="col-sm-10">
-                      <input type="text" class="form-control" id="inputrole" ng-model="loggedInUserDetail.role.description" disabled="disabled">
+                      <input type="text" class="form-control" id="inputrole" 
+                      ng-model="loggedInUserDetail.role.description" disabled="disabled">
                     </div>
                   </div>
                   
                   <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
-                      <button type="submit" class="btn btn-danger">Update Profile</button>
+                      <button type="submit" class="btn btn-danger" ng-disabled="profileForm.$invalid">Update Profile</button>
                      
                     </div>
                   </div>
@@ -204,3 +217,4 @@
 				
 		</div>
 	</div>	
+	</div>

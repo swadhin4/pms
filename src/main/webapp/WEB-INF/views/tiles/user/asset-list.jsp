@@ -10,11 +10,16 @@
 <meta http-equiv='cache-control' content='no-cache'>
 <meta http-equiv='expires' content='0'>
 <meta http-equiv='pragma' content='no-cache'>
+
 <link rel="stylesheet"	href='<c:url value="/resources/theme1/css/bootstrap-toggle.min.css"></c:url>' />
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/bootstrap-toggle.min.js"></c:url>'></script>
 <link rel="stylesheet"	href='<c:url value="/resources/theme1/css/select2.min.css"></c:url>' />
+
+
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/select2.full.min.js"></c:url>'></script>
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/moment.min.js"></c:url>'></script>
+
+
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/asset-controller.js?n=${System.currentTimeMillis()  + UUID.randomUUID().toString()}"></c:url>'></script>
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/service-provider-service.js?n=${System.currentTimeMillis()  + UUID.randomUUID().toString()}"></c:url>'></script>
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/asset-service.js?n=${System.currentTimeMillis()  + UUID.randomUUID().toString()}"></c:url>'></script>
@@ -47,9 +52,9 @@ color:#fff
     background-color: #fff;
     position: fixed;
 }
- #modalMessageDiv{
+ #modalMessageDiv, #serviceModalMessageDiv, #equipmentModalMessageDiv{
    top: -7%;
-    left: 47%;
+    left: 60%;
     /* width: 45em; */
     height: 3em;
     margin-top: 4em;
@@ -75,10 +80,18 @@ color:#fff
   color:red;
 }
 
+.col-xs-6.required .control-label:after {
+  content:"*";
+  color:red;
+}
+
 </style>
 
 <script>
-$(function() {
+
+
+$(document).ready(function()  {
+	
 	 $('.toggle-on').removeAttr('style');
 	 $('.toggle-off').removeAttr('style');
 	 
@@ -86,6 +99,10 @@ $(function() {
 	 $(".dt1").datepicker({
          format:"dd-mm-yyyy"
      })
+     
+	$('siteSelect').multiselect();
+	 $('serviceSiteSelect').multiselect(); 	 
+	
   })
   
 </script>
@@ -122,11 +139,11 @@ $(function() {
 				<div class="col-md-6">
 						<div class="box" >
 							<div class="box-header with-border">
-								<h3 class="box-title">List of Assets</h3>
+								<h3 class="box-title">List of Assets and Services</h3>
 								<div class="box-tools pull-right" style="margin-top: 0px;">
 									<sec:authorize access="hasAnyRole('ROLE_SALES_MANAGER', 'ROLE_OPS_MANAGER','ROLE_SITE_STAFF')">
 										<a href class="btn btn-success dropdown-toggle pull-right" data-toggle="dropdown">
-										Add an Asset <span class="caret"></span>
+										Add Asset or Service <span class="caret"></span>
 									  </a>
 								  	<ul class="dropdown-menu" role="menu">
 										<li><a href data-toggle="modal" ng-click="addEquipment()">Add an Equipment</a></li>
@@ -140,6 +157,7 @@ $(function() {
 									<div class="row">
 	 								<div class="col-md-12">
 										<input type="text" class="form-control"	placeholder="Search Asset" ng-model="searchAsset">
+										<input type="hidden" class="form-control" id="siteId" value="${siteId}">
 									 </div>
 									 </div>
 									 <div class="row">
@@ -153,12 +171,13 @@ $(function() {
 														<tr>
 															<th>Name</th>
 															<th>Category</th>
-															<th>Location</th>
+															<th>Site</th>
 														</tr>
 													</thead>
 													<tbody>
 														<tr ng-repeat="asset in asset.list | filter: searchAsset | orderBy :'assetName'"
-															ng-class="{currentSelected:$index == selectedRow}" ng-click="getAssetDetails(asset);rowHighilited($index)" >
+															ng-class="{currentSelected:$index == selectedRow}" 
+															ng-click="getAssetDetails(asset);rowHighilited($index)" >
 															<td><a href > <i
 																	class="fa fa-user" aria-hidden="true"></i>
 																	{{asset.assetName}}
@@ -166,7 +185,7 @@ $(function() {
 															<td><i class="fa fa-mobile" aria-hidden="true"></i>
 																{{asset.assetCategoryName}}</td>
 															<td><i class="fa fa-mobile" aria-hidden="true"></i>
-																{{asset.locationName}}</td>
+																{{asset.siteName}}</td>
 														</tr>
 													</tbody>
 												</table>
@@ -211,7 +230,7 @@ $(function() {
 								<div class="col-md-6">
 							<div class="box">
 								<div class="box-header with-border">
-									<h3 class="box-title">Asset Detail</h3>
+									<h3 class="box-title">Asset / Service Detail</h3>
 									<div class="box-tools pull-right">
 									<sec:authorize access="hasAnyRole('ROLE_SALES_MANAGER', 'ROLE_OPS_MANAGER','ROLE_SITE_STAFF')">
 									<div class="btn-group pull-right">
@@ -231,15 +250,19 @@ $(function() {
 											<thead>
 											<tr><td style="width:50%">Name</td><td align="right">{{selectedAsset.assetName}}</td>
 											</tr>
-											<tr><td style="width:50%">Code</td><td align="right">{{selectedAsset.assetCode}}</td>
+											<tr><td style="width:50%">
+											<span >Asset Code</span>
+											</td>
+											<td align="right">{{selectedAsset.assetCode}}</td>
+											</tr>
 											</thead>
 											<tbody>
 											<tr><td>Model</td><td align="right">{{selectedAsset.modelNumber}}</td></tr>
 											<tr><td>Category</td><td align="right">{{selectedAsset.assetCategoryName}}</td></tr>
 											<tr><td>Service Provider</td><td align="right">{{selectedAsset.serviceProviderName}}</td></tr>
 											<tr><td>Location</td><td align="right">{{selectedAsset.locationName}}</td></tr>
-											<tr><td>Comission Date</td><td align="right">{{selectedAsset.commisionedDate}}</td></tr>
-											<tr><td>DeComission Date</td><td align="right">{{selectedAsset.deCommissionedDate}}</td></tr>
+											<tr><td>Date of Commission</td><td align="right">{{selectedAsset.commisionedDate}}</td></tr>
+											<tr><td>Date of DeCommission</td><td align="right">{{selectedAsset.deCommissionedDate}}</td></tr>
 											<tr><td>Site</td><td align="right">{{selectedAsset.siteName}}</td></tr>
 											<tr><td>Content</td><td align="right">{{selectedAsset.content}}</td></tr>
 											
@@ -261,6 +284,18 @@ $(function() {
 											<td>Sensor Number</td><td align="right">
 												{{selectedAsset.pwSensorNumber}}
 											</td></tr>
+											<tr>
+											<td>Attached Picture</td>
+											<td align="right" ng-if="selectedAsset.imagePath!=null">
+												
+												<a href="${contextPath}/selected/file/download?keyname={{selectedAsset.imagePath}}" download>
+												<i class="fa fa-picture-o fa-2x" aria-hidden="true"></i></a>
+											</td></tr>
+											<tr>
+											<td>Attached Additional Document</td>
+											<td align="right" ng-if="selectedAsset.documentPath!=null">
+												<a href="${contextPath}/selected/file/download?keyname={{selectedAsset.documentPath}}" download><i class="fa fa-file-text fa-2x" aria-hidden="true"></i></a>
+											</td></tr>
 											</tbody>
 										</table>
 										
@@ -268,15 +303,20 @@ $(function() {
 											<thead>
 											<tr><td style="width:40%">Name</td><td align="right">{{selectedAsset.assetName}}</td>
 											</tr>
-											<tr><td style="width:40%">Code</td><td align="right">{{selectedAsset.assetCode}}</td>
+											<tr><td style="width:40%">Service Code</td><td align="right">{{selectedAsset.assetCode}}</td>
 											</tr>
 											</thead>
 											<tbody>
 											<tr><td>Location</td><td align="right">{{selectedAsset.locationName}}</td></tr>
 											<tr><td>Service Provider</td><td align="right">{{selectedAsset.serviceProviderName}}</td></tr>
-											<tr><td>Comission Date</td><td align="right">{{selectedAsset.commisionedDate}}</td></tr>
-											<tr><td>DeComission Date</td><td align="right">{{selectedAsset.deCommissionedDate}}</td></tr>
+											<tr><td>Service contract start date</td><td align="right">{{selectedAsset.commisionedDate}}</td></tr>
+											<tr><td>Service contract end date</td><td align="right">{{selectedAsset.deCommissionedDate}}</td></tr>
 											<tr><td>Site</td><td align="right">{{selectedAsset.siteName}}</td></tr>
+											<tr>
+											<td>Attached Additional Document</td>
+											<td align="right" ng-if="selectedAsset.documentPath!=null">
+												<a href="${contextPath}/selected/file/download?keyname={{selectedAsset.documentPath}}" download><i class="fa fa-file-text fa-2x" aria-hidden="true"></i></a>
+											</td></tr>
 											</tbody>
 										</table>
 										</div>
@@ -302,8 +342,8 @@ $(function() {
 								<div class="row">
 									<div class="col-sm-3 col-xs-6">
 										<div class="description-block border-right">
-											<a href class="btn btn-success" ng-if="selectedAsset.assetType == 'S' ">Asset Type <span class="badge">SERVICE</span></a>
-											<a href class="btn btn-success" ng-if="selectedAsset.assetType == 'E' ">Asset Type <span class="badge">EQUIPMENT</span></a>
+											<a href class="btn btn-success" ng-if="selectedAsset.assetType == 'S' ">Asset or Service type <span class="badge">SERVICE</span></a>
+											<a href class="btn btn-success" ng-if="selectedAsset.assetType == 'E' ">Asset or Service type <span class="badge">EQUIPMENT</span></a>
 										</div>
 										<!-- /.description-block -->
 									</div>
@@ -332,25 +372,49 @@ $(function() {
 							</div>
 						</div>
 					</div>
-	 <div class="modal fade" id="equipmentModal">
+					
+	 <div class="modal fade" style="position: absolute" id="confirmDelete" data-dismiss="modal" data-keyboard="false" data-backdrop="static" data-toggle="modal" role="dialog" aria-labelledby="confirmDeleteLabel" aria-hidden="true"> 
+  <div class="modal-dialog"> 
+    <div class="modal-content"> 
+      <div class="modal-header"> 
+        <!-- <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>  --> 
+        <h4 class="modal-title">Delete Asset / Service</h4> 
+      </div> 
+      <div class="modal-body"> 
+        <p>Are you sure you want to delete the asset ?</p>  
+      </div> 
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="resetDelete()">No</button>  
+        <button type="button" class="btn btn-danger" id="confirm" ng-click="confirmDelete()">Yes</button>
+      </div>  
+    </div>  
+  </div>  
+</div>
+	 <div class="modal fade" id="equipmentModal" data-keyboard="false" data-backdrop="static">
 		<div class="modal-dialog" style="width: 80%;">
 			<div class="modal-content">
 			 <form name="createassetform" ng-submit="saveAssetEquipment()" >
 				<div class="modal-header">
 			<button type="button" class="close" data-dismiss="modal"
 				aria-label="Close">
-				<span aria-hidden="true">&times;</span>
+				<span aria-hidden="true">&times;</span>				
 			</button>
-			<h4 class="modal-title"><span id="assetModalLabel">Add new Asset</span>   |  <a class="btn btn-info">Asset Type 
-			<span class="badge">Equipment</span></a></h4>
-			<div class="alert alert-danger alert-dismissable" id="modalMessageDiv"
+			<h4 class="modal-title"><span id="assetModalLabel">Add new Asset</span>   |  <a class="btn btn-info">Asset or Service type 
+			<span class="badge">Equipment</span> 
+			</a>
+			<span class="pull-right" ng-show="operation == 'EDIT'"><small><b>Mark for deletion&nbsp;&nbsp;</b></small><input id="toggledelete" type="checkbox" class="toggleYesNo form-control" 
+										data-width="70" 
+										data-toggle="toggle" data-size="small"
+										data-off="Active" data-on="Delete" data-onstyle="danger" data-offstyle="success"
+										onchange="angular.element(this).scope().isDelete(this, event )"></span>
+			</h4>
+			<div class="alert alert-danger " id="equipmentModalMessageDiv"
 				style="display: none;  height: 34px;white-space: nowrap;">
-				<strong>Error! </strong> {{modalErrorMessage}} 
+				<strong>Error! </strong> {{equipmentModalErrorMessage}} <span id="fileerrorasset"></span>
 				<a href><span class="messageClose" ng-click="closeMessageWindow()">X</span></a>
 			</div>
 
 		</div>
-
 
 			 <div class="modal-body" style="background-color: #eee">
 			 	<div class="row">
@@ -367,12 +431,13 @@ $(function() {
 								name="modalInput" type="text" class="form-control"
 								maxlength="50" name="sitename" ng-model="equipmentData.assetName"
 								placeholder="Enter equipment name" required tabindex="1">
+								<span class="slider round"></span>
 						</div>
 						<div class="col-xs-3 required">
-							<label class="control-label">Asset Code</label> <input
+							<label class="control-label">Asset code</label> <input
 								name="modalInput" type="text" class="form-control"
 								maxlength="20" name="assetcode" ng-model="equipmentData.assetCode"
-								placeholder="Enter asset code" required tabindex="2">
+								placeholder="Enter Asset or Service code" required tabindex="2">
 						</div>
 						<div class="col-xs-3">
 							<label for="exampleInputEmail1">Model</label> <input
@@ -405,21 +470,26 @@ $(function() {
 								</select>
 								<input type="hidden" ng-model="assetLocation.selected" required>
 						</div>
-						<div class="col-xs-3">
-							<label for="exampleInputEmail1">Picture</label> <input
-								type="file" class="form-control" name="inputfilepath"
-								ng-model="equipmentData.imagePath">
+						<div class="col-xs-3" ng-if="equipmentData.assetId!=null">
+							<label for="exampleInputEmail1">Picture (Max Size 100KB)</label> <input
+								type="file" class="form-control" id="inputImgfilepath" 
+								name="inputImgfilepath" ng-model="equipmentData.imagePath"  accept="image/*"
+								onchange="angular.element(this).scope().getImageFile(this, event )">
 						</div>
-						<div class="col-xs-3">
+						<div class="col-xs-3" ng-if="equipmentData.assetId!=null">
 							<label for="exampleInputEmail1">Additional
-								document</label> <input type="file" class="form-control"
-								name="inputfilepath" ng-model="equipmentData.documentPath">
+								document (Max Size 100KB)</label> <input type="file" class="form-control"
+								id="inputDocfilepath" name="inputDocfilepath" ng-model="equipmentData.documentPath" 
+								accept=".doc, .docx,.pdf" 
+								onchange="angular.element(this).scope().getDocumentFile(this, event, 'equipmentModalMessageDiv','fileerrorasset' )">
 						</div>
 
 					</div>
 
 					<div class="row">
-						<div class="col-xs-3">
+					<div class="col-md-9 col-sm-9">
+						<div class="row">
+						<div class="col-xs-4">
 							<label class="control-label">Service Provider</label> <!-- <select
 							ng-options="val as val.name for val in serviceProvider.list"
 								class="form-control" ng-model="serviceProvider.selected" required>
@@ -429,8 +499,8 @@ $(function() {
 							</select> 
 							<input type="hidden" ng-model="serviceProvider.selected">
 						</div>
-						<div class="col-xs-3 required">
-							<label class="control-label">Date of
+						<div class="col-xs-4 required">
+							<label class="control-label">Date of Asset
 								commission</label>
 							<div class="input-group date">
 								<div class="input-group-addon">
@@ -440,9 +510,8 @@ $(function() {
 									id="commission" ng-model="equipmentData.commisionedDate" required>
 							</div>
 						</div>
-						<div class="col-xs-3 ">
-							<label class="control-label">Date of
-								decommission</label>
+						<div class="col-xs-4 ">
+							<label class="control-label">Date of Asset decommission</label>
 							<div class="input-group date">
 								<div class="input-group-addon">
 									<i class="fa fa-calendar"></i>
@@ -451,15 +520,9 @@ $(function() {
 									id="decommission" ng-model="equipmentData.deCommissionedDate" >
 							</div>
 						</div>
-						<div class="col-xs-3">
-							<label for="exampleInputEmail1">Comments</label> <input
-								type="text" maxlength="50" class="form-control"
-								placeholder="Enter comment" name="comment" ng-model="equipmentData.assetDescription">
 						</div>
-
-					</div>
-					<div class="row">
-						<div class="col-xs-3 required">
+						<div class="row">
+						<div class="col-xs-4 required">
 							<label class="control-label">Is Asset
 								Electrical</label> <select id="drpIsAsset"  required
 								class="form-control" >
@@ -468,7 +531,7 @@ $(function() {
 								<option value="NO">NO</option>
 							</select>
 						</div>
-						<div class="col-xs-3">
+						<div class="col-xs-4">
 							<label for="exampleInputEmail1">Is a power sensor
 								attached</label> <select id="drpIsPowersensor"
 								class="form-control" >
@@ -478,25 +541,46 @@ $(function() {
 							</select>
 						</div>
 
-						<div class="col-xs-3">
+						<div class="col-xs-4">
 							<label for="exampleInputEmail1">Sensor Number</label> <input
 								type="text" maxlength="20" id="txtSensorNumber"
 								class="form-control" placeholder="Enter sensor Number"
 								name="comment" ng-model="equipmentData.pwSensorNumber">
 						</div>
-
-						<div class="col-xs-3 required">
+						</div>
+						</div>
+						<div  class="col-xs-3 required">
+							<div class="col-md-12">
 							<label class="control-label">Site</label> <!-- <select
 							   ng-options="val as val.siteName for val in accessSite.list"
 								class="form-control" ng-model="accessSite.selected" required>
 							</select> -->
-							
-							<select class="form-control" id="siteSelect" name="siteSelect" required
+							<label class="form-control" ng-show="operation == 'EDIT'">{{selectedAsset.siteName}}</label>
+																
+							<Select  ng-show="operation == 'ADD'" class="form-control" id="siteSelect" name="siteSelect" multiple="multiple" required
 							onchange="validateDropdownValues('siteSelect','E')">
-							</select>
+							</Select>
 							<input type="hidden" ng-model="accessSite.selected">
+							</div>
 						</div>
-
+					</div>
+					<div class="row">
+						 <div class="col-xs-9">
+							<label for="exampleInputEmail1">Comments</label> <!-- <input
+								type="text" maxlength="500" class="form-control"
+								placeholder="Enter comment" name="comment" ng-model="equipmentData.assetDescription"> -->
+								<textarea class="form-control" maxlength="1000" style="width: 100%;
+   				 height: 70px;" rows="3" placeholder="Enter comment" name="comment" ng-model="equipmentData.assetDescription"></textarea>
+						</div>
+						
+						<!-- <div class="col-xs-3" ng-show="operation == 'EDIT'">
+						<label for="exampleInputEmail1">&nbsp;&nbsp;</label></br></br>
+						<input id="toggledelete" type="checkbox" class="toggleYesNo form-control" 
+										data-width="70" 
+										data-toggle="toggle" data-size="small"
+										data-off="Active" data-on="Delete" data-onstyle="danger" data-offstyle="primary"
+										onchange="angular.element(this).scope().isDelete(this, event )">&nbsp;<b>Mark for deletion</b>
+						</div> -->
 					</div>
 					</div>
 						</div>
@@ -525,11 +609,18 @@ $(function() {
 				aria-label="Close">
 				<span aria-hidden="true">&times;</span>
 			</button>
-			<h4 class="modal-title"><span id="assetServiceModalLabel">Add new Asset</span>   |  <a class="btn btn-info">Asset Type 
-			<span class="badge">Service</span></a></h4>
+			<h4 class="modal-title"><span id="assetServiceModalLabel">Add new Asset</span>   |  <a class="btn btn-info">Asset or Service type 
+			<span class="badge">Service</span>			
+			</a><span class="pull-right" ng-show="operation == 'EDIT'"><small><b>Mark for deletion&nbsp;&nbsp;</b></small><input id="toggledeleteService" type="checkbox" class="toggleYesNo form-control" 
+										data-width="70" 
+										data-toggle="toggle" data-size="small"
+										data-off="Active" data-on="Delete" data-onstyle="danger" data-offstyle="success"
+										onchange="angular.element(this).scope().isDelete(this, event )"></span>
+			</h4>
 			<div class="alert alert-danger alert-dismissable" id="serviceModalMessageDiv"
 				style="display: none;  height: 34px;white-space: nowrap;">
-				<strong>Error! </strong> {{modalErrorMessage}} <span class="messageClose" ng-click="closeMessageWindow()">X</span>
+				<strong>Error! </strong> {{serviceModalErrorMessage}} <span id="fileerrorservice"></span> 
+				<a href><span class="messageClose" ng-click="closeMessageWindow()">X</span></a>
 			</div>
 
 		</div>
@@ -552,10 +643,10 @@ $(function() {
 								placeholder="Enter service name" required>
 						</div>
 						<div class="col-xs-4 required">
-							<label class="control-label">Asset Code</label> <input
+							<label class="control-label">Service code</label> <input
 								name="modalInput" type="text" class="form-control"
 								maxlength="20" name="serviceCode" ng-model="serviceData.assetCode"
-								placeholder="Enter service code" required>
+								placeholder="Enter Asset or Service code" required>
 						</div>
 						
 						<div class="col-xs-4 required">
@@ -574,8 +665,9 @@ $(function() {
 					</div>
 
 					<div class="row">
-						
-						<div class="col-xs-4  required">
+						<div class="col-md-8 col-sm-9">
+						<div class="row">
+						<div class="col-xs-6  required">
 								<label class="control-label">Location</label> <!-- <select
 								ng-options="val as val.locationName for val in assetLocation.list"
 									class="form-control" ng-model=" assetLocation.selected" required>
@@ -587,22 +679,7 @@ $(function() {
 								</select>
 								<input type="hidden" ng-model="assetLocation.selected">
 						</div>
-						
-						<div class="col-xs-4">
-							<label for="exampleInputEmail1">Additional
-								document</label> <input type="file" class="form-control"
-								name="inputfilepath" ng-model="serviceData.documentPath">
-						</div>
-						<div class="col-xs-4">
-							<label for="exampleInputEmail1">Comments</label> <input
-								type="text" maxlength="50" class="form-control"
-								placeholder="Enter comment" name="comment" ng-model="serviceData.assetDescription">
-						</div>
-
-					</div>
-
-					<div class="row">
-						<div class="col-xs-4">
+						<div class="col-xs-6">
 							<label class="control-label">Service Provider</label> <!-- <select
 							ng-options="val as val.name for val in serviceProvider.list"
 								class="form-control" ng-model="serviceProvider.selected" required>
@@ -612,9 +689,12 @@ $(function() {
 							</select> 
 							<input type="hidden" ng-model="serviceProvider.selected">
 						</div>
-						<div class="col-xs-4 required">
-							<label class="control-label">Date of
-								commission</label>
+											
+						
+						</div>
+						<div class="row">
+						  <div class="col-xs-6 required">
+							<label class="control-label">Service contract start date</label>
 							<div class="input-group date">
 								<div class="input-group-addon">
 									<i class="fa fa-calendar"></i>
@@ -623,9 +703,8 @@ $(function() {
 									id="commissionDate" ng-model="serviceData.commisionedDate" required>
 							</div>
 						</div>
-						<div class="col-xs-4 ">
-							<label class="control-label">Date of
-								decommission</label>
+						<div class="col-xs-6 ">
+							<label class="control-label">Service contract end date</label>
 							<div class="input-group date">
 								<div class="input-group-addon">
 									<i class="fa fa-calendar"></i>
@@ -634,30 +713,65 @@ $(function() {
 									id="decommissionDate" ng-model="serviceData.deCommissionedDate" >
 							</div>
 						</div>
+						</div>
 						
-
-					</div>
-					<div class="row">
+						</div>
 						
-
-						
-						<div class="col-xs-4 required">
+						<div  class="col-xs-4 required">
+							<div class="col-md-12">
+								
 							<label class="control-label">Site</label> <!-- <select
 							   ng-options="val as val.siteName for val in accessSite.list"
 								class="form-control" ng-model="accessSite.selected" required>
 							</select> -->
+							<label class="form-control" ng-show="operation == 'EDIT'">{{selectedAsset.siteName}}</label>
 							
-							<select class="form-control" id="serviceSiteSelect" name="serviceSiteSelect" required
+							<select class="form-control" ng-show="operation == 'ADD'" id="serviceSiteSelect" name="serviceSiteSelect" multiple="multiple" required
 							onchange="validateDropdownValues('serviceSiteSelect','S')">
 							</select>
 							<input type="hidden" ng-model="accessSite.selected">
+						
+					         </div>
+						</div>
+					</div>
+					<div class="row">
+						
+						 <div class="col-xs-8">
+							<label for="exampleInputEmail1">Comments</label> 
+							<!-- <input type="text" maxlength="50" class="form-control"
+								placeholder="Enter comment" name="comment" ng-model="serviceData.assetDescription"> -->
+								
+								<textarea class="form-control" maxlength="1000" style="width: 100%;
+   				 height: 70px;" rows="3" placeholder="Enter comment" name="comment" ng-model="serviceData.assetDescription"></textarea>
+						</div> 
+						
+						<div class="col-xs-4" ng-if="serviceData.assetId!=null">
+							<label for="exampleInputEmail1">Additional
+								document (Max Size 100KB)</label> <input type="file" class="form-control" 
+								id="inputServiceDocfilepath" accept=".doc, .docx,.pdf"
+								name="inputServiceDocfilepath" ng-model="serviceData.documentPath" 
+								onchange="angular.element(this).scope().getDocumentFile(this, event, 'serviceModalMessageDiv','fileerrorservice' )">								
+												
 						</div>
 
 					</div>
+					<!-- <div class="row" ng-show="operation == 'EDIT'">
+					
+					<div class="col-xs-4 pull-right">
+						
+						<input id="toggledeleteService" type="checkbox" class="toggleYesNo form-control" 
+										data-width="70" 
+										data-toggle="toggle" data-size="small"
+										data-off="Active" data-on="Delete" data-onstyle="danger" data-offstyle="primary"
+										onchange="angular.element(this).scope().isDelete(this, event )">&nbsp;<b>Mark for deletion</b>
+						</div>
+					</div> -->
+					
+						
+						</div>
+						</div>
+						</div>
 					</div>
-						</div>
-						</div>
-						</div>
 					</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default pull-left"	id="serviceModalCloseBtn" data-dismiss="modal">Close</button>

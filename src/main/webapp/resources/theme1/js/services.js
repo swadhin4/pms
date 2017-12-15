@@ -11,10 +11,26 @@ chrisApp.factory("userService", ['$http', '$q',function ($http, $q) {
 	            getUserSiteAccess:getUserSiteAccess,
 	            getUsersBySiteAccess:getUsersBySiteAccess,
 	            changePassword:changePassword,
-	            enableOrDisableUser:enableOrDisableUser
+	            enableOrDisableUser:enableOrDisableUser,
+	            updateProfile:updateProfile
 	        };
 	 	
 	 	return UserService;
+	 	
+	 	 // implementation
+        function updateProfile(userDetails) {
+            var def = $q.defer();
+            $http.post(hostLocation+"/user/profile/update", userDetails )
+                .success(function(data) {
+                	console.log(data)
+                    def.resolve(data);
+                })
+                .error(function(data) {
+                	console.log(data)
+                    def.reject(data);
+                });
+            return def.promise;
+        }
 	 	
 	 	 // implementation
         function registerUser(customer) {
@@ -156,10 +172,26 @@ chrisApp.factory("siteService", ['$http', '$q',function ($http, $q) {
            retrieveSiteDetails:retrieveSiteDetails,
            // saveSite:saveSite,
             assignSiteAccess:assignSiteAccess,
-            removeSiteAccess:removeSiteAccess
+            removeSiteAccess:removeSiteAccess,
+            siteFileDownload:siteFileDownload
         };
 		
 	 	return SiteService;
+	 	
+	 	function siteFileDownload(keyname) {
+            var def = $q.defer();
+            $http.post(hostLocation+"/site/selected/file?keyname="+keyname)
+                .success(function(data) {
+                     console.log(data)
+                     SiteService.site=data;
+                    def.resolve(data);
+                })
+                .error(function(data) {
+                     console.log(data)
+                    def.reject(data);
+                });
+            return def.promise;
+        }
 	 	
 	    function retrieveSiteDetails(siteId) {
             var def = $q.defer();
@@ -610,10 +642,26 @@ chrisApp.factory("ticketService", ['$http', '$q',function ($http, $q) {
         changeLinkedTicketStatus:changeLinkedTicketStatus,
         getTicketHistory:getTicketHistory,
         saveComment:saveComment,
-        listComment:listComment
+        listComment:listComment,
+        deleteFileAttached:deleteFileAttached
         
     };
  	return TicketService;
+ 	
+ 	 // implementation
+    function deleteFileAttached(feature,fileList) {
+        var def = $q.defer();
+        $http.get(hostLocation+"/file/attachement/delete/"+feature+"/"+fileList)
+            .success(function(data) {
+            	console.log(data)
+                def.resolve(data);
+            })
+            .error(function(data) {
+            	console.log(data)
+                def.reject(data);
+            });
+        return def.promise;
+    }
  	
  	 // implementation
     function listComment(ticketId) {
@@ -813,9 +861,15 @@ chrisApp.factory("ticketService", ['$http', '$q',function ($http, $q) {
  	    
  	
     // implementation
-    function saveTicket(customerTicket) {
+    function saveTicket(customerTicket, mode) {
         var def = $q.defer();
-        $http.post(hostLocation+"/incident/create",customerTicket)
+        var url=""
+	        if(mode!=undefined && mode.toUpperCase()=="SP"){
+	        	url=hostLocation+"/sp/incident/update";
+	        }else{
+	        	url=hostLocation+"/incident/create";
+	        }
+        $http.post(url,customerTicket)
             .success(function(data) {
             	console.log(data)
                 def.resolve(data);

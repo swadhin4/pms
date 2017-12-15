@@ -28,6 +28,8 @@ chrisApp.controller('spIncidentUpdateController',  ['$rootScope', '$scope', '$fi
 		$scope.sessionUser={};
 		$scope.slaPercent = '60';
 		$scope.ticketComments=[];
+		$scope.errorMessage="Logged, Service Provider WIP, Pending Review options are allowed to select ";
+		$scope.files = [];
 		
 		
 		$scope.statusList=[];
@@ -74,12 +76,15 @@ chrisApp.controller('spIncidentUpdateController',  ['$rootScope', '$scope', '$fi
 		$scope.siteAssignedUserList=[];
 		$scope.siteUnAssignedUserList=[];
 		
-		
+		$scope.incidentImages=[];
+		$scope.totalIncidentImageSize = 0;
 		var viewMode = null
 		angular.element(document).ready(function(){
 			console.log("loaded");
 			$scope.initalizeCloseDiv();			
 			$scope.selectedTicket={};
+			$scope.getStatus();
+			$scope.getSelectedStatus();
 			viewMode = $('#mode').val();
 			if(viewMode.toUpperCase() == 'EDIT'){
 				$scope.getIncidentSelected();
@@ -90,6 +95,19 @@ chrisApp.controller('spIncidentUpdateController',  ['$rootScope', '$scope', '$fi
 			
 		});
 		
+		
+		$scope.getSelectedStatus=function(){
+			/*var selectedStatusId = $('#statusSelect').text();
+			console.log("IBM status");
+			console.log(selectedStatusId);
+			//parseInt($("#"+dropDownId).val());
+*/		
+			var selectedStatusId=parseInt($('#statusSelect').val());
+			 $scope.ticketData.status=$('#statusSelect option:selected').text();
+			 console.log("IBM status");
+				console.log(selectedStatusId);
+				console.log($scope.ticketData.status);
+		}
 		
 		$scope.getIncidentSelected=function(){
 			ticketService.getSelectedTicketFromSession()
@@ -124,6 +142,19 @@ chrisApp.controller('spIncidentUpdateController',  ['$rootScope', '$scope', '$fi
 						 })
 						 
 					}
+					
+					if($scope.ticketData.attachments.length>0){
+						$scope.ticketData.files=[];
+						$.each($scope.ticketData.attachments,function(key,val){
+							var  fileInfo={
+									fileName: val.substring(val.lastIndexOf("/")+1),
+									filePath: val
+							}
+							$scope.ticketData.files.push(fileInfo);
+						});
+					}
+					
+					
 				}
 			},function(data){
 				console.log(data)
@@ -261,12 +292,12 @@ chrisApp.controller('spIncidentUpdateController',  ['$rootScope', '$scope', '$fi
 		}
 		
 		$scope.getStatus=function(){
-			if(viewMode.toUpperCase()=='NEW'){
+			/*if(viewMode.toUpperCase()=='NEW'){
 				$("#statusSelect").empty();
 				var options = $("#statusSelect");
 				options.append($("<option />").val("").text("Select status"));
 				options.append($("<option />").val(1).text("RAISED"));
-			}else if(viewMode.toUpperCase()=='EDIT'){
+			}else if(viewMode.toUpperCase()=='EDIT'){*/
 				statusService.retrieveAllStatus()
                 .then(function(data){
                 	$("#statusSelect").empty();
@@ -285,7 +316,7 @@ chrisApp.controller('spIncidentUpdateController',  ['$rootScope', '$scope', '$fi
                 },function(data){
                 	console.log(data);
                 });
-			}
+			//}
 		}
 		
 		$scope.getCloseCode=function(){
@@ -301,7 +332,7 @@ chrisApp.controller('spIncidentUpdateController',  ['$rootScope', '$scope', '$fi
 			$("#closeCodeSelect").empty();
 			
 			var options = $("#closeCodeSelect");
-			options.append($("<option />").val("0").text("Select close code"));
+			options.append($("<option />").val("0").text("Select option"));
 			$.each($scope.closeCodeList,function() {
 				options.append($("<option />").val(	this.id).text(	this.code));
 			});
@@ -557,7 +588,7 @@ chrisApp.controller('spIncidentUpdateController',  ['$rootScope', '$scope', '$fi
 		 }
 		 $scope.persistTicket=function(ticketData){
 			 $('#loadingDiv').show();
-			 ticketService.saveTicket(ticketData)
+			 ticketService.saveTicket(ticketData,"sp")
 			 .then(function(data){
 				 console.log(data);
 				 if(data.statusCode == 200){
@@ -658,6 +689,18 @@ chrisApp.controller('spIncidentUpdateController',  ['$rootScope', '$scope', '$fi
 			 $("#linkedTicket").val("");
 			 if(data.object.linkedTickets.length>0){
 				 $scope.ticketData.linkedTickets = data.object.linkedTickets;
+				 var valueId = parseInt($("#statusSelect").val());
+				 //Enable save button if status is Logged and linked ticket is available.
+				 if(valueId == 2){
+					 $("#btnSavePrimary").prop("disabled", false);
+				 }
+			 }
+			 else if(data.object.linkedTickets.length == 0){
+				 var valueId = parseInt($("#statusSelect").val());
+				 //Enable save button if status is Logged and linked ticket is available.
+				 if(valueId == 2){
+					 $("#btnSavePrimary").prop("disabled", true);
+				 }
 			 }
 			 
 			}
@@ -681,9 +724,18 @@ chrisApp.controller('spIncidentUpdateController',  ['$rootScope', '$scope', '$fi
 	}
 	
 	$scope.unlinkTicketConfirmation=function(index, linkedTicket){
-		$('#confirmUnlink').modal('show');
-		$scope.unlinkTicketIndex = index;
-		$scope.unlinkTktObject = angular.copy(linkedTicket);
+		var valueId = parseInt($("#statusSelect").val());
+		if($scope.ticketData.linkedTickets.length == 1 && valueId == 2){			 
+			 //provide warning message and donot allow to unlink.
+			$('#confirmLoggedUnlinkChange').modal('show');
+		 }
+		else{
+			$('#confirmUnlink').modal('show');
+			$scope.unlinkTicketIndex = index;
+			$scope.unlinkTktObject = angular.copy(linkedTicket);
+		}
+		
+		
 		
 	}
 	
@@ -785,6 +837,94 @@ chrisApp.controller('spIncidentUpdateController',  ['$rootScope', '$scope', '$fi
 		
 	}
 	
+	$scope.openFileAttachModal=function(){
+		$scope.incidentImageList=[{
+			id:0,
+			attachment:""
+		}];
+		$('#incidentImage0').val('');
+		$('#fileAttachModal').modal('show');
+		$('#fileAttachModal').removeData();
+		
+	}
+	
+	$scope.addNewImage=function(){
+		var length=$scope.incidentImageList.length;
+		var imageComponent={
+				id:length,
+				attachment:""	
+		}
+		$scope.incidentImageList.push(imageComponent);
+	};
+	
+	$scope.removeImage=function(indexPos){
+		$scope.incidentImageList.splice(indexPos,1);
+		  $.each($scope.incidentImages,function(key,val){
+			 if(val.incidentImgPos==indexPos) {
+					$scope.incidentImages.splice(indexPos,1);					
+					return false;
+			 }
+		  });
+		//console.log($scope.incidentImageList);
+		console.log($scope.incidentImages);
+	}
+	
+    $scope.getIndexedName = function (val, e) {
+    	console.log(val.id);
+		var incidentImageId=val.id;
+		$scope.incidentImageId=incidentImageId;
+		 var ext=$("input#"+incidentImageId).val().split(".").pop().toLowerCase();
+		 var fileSize = Math.round((val.files[0].size / 1024)) ;
+		 $scope.totalIncidentImageSize = $scope.totalIncidentImageSize + fileSize ;
+		 console.log($('#'+incidentImageId).val());
+	     $scope.fileExtension = ext;
+	     $scope.indexPos=incidentImageId.charAt(incidentImageId.length-1);
+	     if($.inArray(ext, ["jpg","jpeg","JPEG", "JPG","PDF","pdf","doc","docx","DOC","DOCX","png","PNG"]) == -1) {
+	    	 $scope.incidentImageModalErrorMessage="Supported file types to upload are jpg, docx, png and pdf";
+        	 $('#incidentImageModalMessageDiv').show();
+        	 $('#incidentImageModalMessageDiv').alert();
+        	 $('#fileerrorincident').text('Supported file types to upload are jpg, docx, png and pdf');
+              $scope.isfileselected=false;	    	 
+	         return false;
+	     }else if($scope.totalIncidentImageSize > 500){
+	    	 $scope.incidentImageModalErrorMessage="File size exceeds Max limit (500KB).";
+	    	 $('#fileerrorincident').text('File size exceeds Max limit (500KB)');
+        	 $('#incidentImageModalMessageDiv').show();
+        	 $('#incidentImageModalMessageDiv').alert();
+              $scope.isfileselected=false;
+         }
+	     else if (e.target.files != undefined) {
+	    	// console.log(URL.createObjectURL(e.target.files[0]));
+	         $scope.isfileselected=true;
+	         file = $('#'+incidentImageId).prop('files');
+	      	 var reader = new FileReader();
+	     	 reader.onload = $scope.onFileUploadReader;
+	     	 reader.readAsDataURL(file[0]);
+	       }
+    };
+    $scope.onFileUploadReader=function(e){
+    	var fileUrl = e.target.result;
+		console.log(fileUrl);
+		var incidentImage={
+					fileName:$scope.ticketData.ticketNumber,
+					incidentImgId:$scope.incidentImageId,
+					incidentImgPos:$scope.indexPos,
+					base64ImageString:e.target.result,
+					fileExtension: $scope.fileExtension
+				}
+		
+		$scope.incidentImages.push(incidentImage);
+		console.log($scope.incidentImages);
+	}
+    
+   
+    // NOW UPLOAD THE FILES.
+    $scope.uploadFiles = function () {
+    	if($scope.incidentImages.length>0){
+			 $scope.ticketData.incidentImageList=$scope.incidentImages;
+			 $('#btnUploadCancel').click();
+		 }
+    }
 
 	$scope.openAssetModal=function(){
 		 var selectedSite = $('#siteSelect').val();
@@ -1156,6 +1296,13 @@ chrisApp.controller('spIncidentUpdateController',  ['$rootScope', '$scope', '$fi
 		 });
 	 }
 
+		$scope.openChatBox=function(){
+				$('#chatWindow').fadeIn();
+				$scope.chatBoxView="ON";
+		}
+		$scope.closeWindow=function(){
+			$('#chatWindow').fadeOut();
+		}
 			 
 }]);
 
@@ -1221,19 +1368,20 @@ function ticketStatusChange(dropDownId){
 	console.log("status change");
 	var valueId = parseInt($("#"+dropDownId).val());
 	//scope.selectedSite = valueId;
-	if(valueId == 6){
-		scope.getCloseCode();
+	if( valueId == 1 || valueId == 5 || valueId == 6 || valueId == 7){
 		
-		$('#ticketCloseDiv').show();
-		$("#closeCodeSelect").attr('required', true);
-		$("#raisedOn").attr('required', true);
-		$("#closeNote").attr('required', true);
+		$("#btnSavePrimary").prop("disabled", true);	
+		$('#confirmStatusChange').modal('show');
+		
+	}
+	else if(valueId == 2 && scope.ticketData.linkedTickets.length == 0 ){
+		$("#btnSavePrimary").prop("disabled", true);	
+		$('#confirmLoggedStatusChange').modal('show');
 	}
 	else{
-		$('#ticketCloseDiv').hide();
-		$("#closeCodeSelect").attr('required', false);
-		$("#raisedOn").attr('required', false);
-		$("#closeNote").attr('required', false);
+		//$('#errorMessageDiv').hide();
+		$("#btnSavePrimary").prop("disabled", false);
+		
 	}
 	
 	if(dropDownId.toUpperCase() == "STATUSSELECT"){

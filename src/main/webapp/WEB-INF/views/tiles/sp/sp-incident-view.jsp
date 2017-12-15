@@ -114,9 +114,8 @@ $(function() {
 </script>
 </head>
 <c:set var="contextPath" value="${pageContext.request.contextPath}"></c:set>
-<div id="page-content-wrapper" >
-	<div class="page-content">
-	<div class="container-fluid" ng-controller="spIncidentUpdateController" id="spIncidentUpdateWindow">
+<div class="content-wrapper">
+	<div  ng-controller="spIncidentUpdateController" id="spIncidentUpdateWindow">
 	<div style="display:none" id="loadingDiv"><div class="loader">Loading...</div></div>
 	<section class="content" style="min-height:35px;display:none" id="messageWindow">
 				<div class="row">
@@ -151,11 +150,15 @@ $(function() {
 					<h3 class="box-title"><a href="${contextPath}/sp/incident/details/" title="View All Incidents"><i class="fa fa-th-list" aria-hidden="true"></i></a> Incident - {{ticketData.ticketNumber}}</h3>
 					<div class="box-tools pull-right" style="margin-top: 0px;">
 						<input type="hidden" id="mode" value="${mode}">
+						<a  href ng-click="openChatBox();" >
+        	<img src="${contextPath}/resources/img/chatbot.png" style="width: 12%;" 
+        	class="pull-right" data-toggle="tooltip" data-original-title="Incident work notes">
+        </a>
 					</div>
 				</div>
 				<div class="box-body">
 				<div class="row">
-				<div class="col-md-9">
+				<div class="col-md-12">
 				<div class="nav-tabs-custom">
 		          <!--   <ul class="nav nav-tabs">
 		              <li class="active"><a href="#primaryinfo" data-toggle="tab">Primary Details</a></li>              
@@ -163,73 +166,165 @@ $(function() {
 		              <li><a href="#linkedticket" data-toggle="tab" >Linked Tickets</a></li>              
 		              <li><a href="#tickethistory" data-toggle="tab" onclick="getTicketHistory()">Ticket History</a></li>
 		            </ul> -->
-	             <div class="tab-content">
+	             <div class="tab-content" style="background-color: #eee;">
 	              <div class="active tab-pane" id="primaryinfo">
-	              
 			        <div class="row">
-		        	 <div class="col-md-12">
-		        	 	<div class="post">
-	                  <div class="user-block">
-	                 	 <img class="img-circle img-bordered-sm" src="${contextPath}/resources/img/incident.png" alt="user image">
-	                     <span class="username">
-	                       <a href="#">{{ticketData.ticketTitle}}</a>
-	                       <a href="#" class="pull-right btn-box-tool">Priority: {{ticketData.priorityDescription}}</a>
-	                     </span>
-	                    
+		        	 <div class="col-md-12 col-sm-12">
+	                  	<div class="box">
+				        <div class="box-body">
+				        <img class="img-circle img-bordered-sm" src="${contextPath}/resources/img/incident.png" alt="user image" style="    width: 6%;">  
+				        <a  class="link-black text-sm"><i class="glyphicon glyphicon-time"></i> <b>{{ticketData.ticketTitle}}</b></a>
+				        <div style="pull-right">
+				        	<i class="fa fa-share margin-r-5"></i> <b>Status : </b>{{ticketData.status}}
+				         	<a class="pull-right btn-box-tool">Priority: {{ticketData.priorityDescription}} </a>
+				         </div>
+				       
+				        </div>
+				        
+				      </div>
 	                  </div>
-	                  <ul class="list-inline">
-	                   <li><a  class="link-black text-sm"><i class="glyphicon glyphicon-time"></i> <b>Created Date : </b>{{ticketData.raisedOn}}</a></li>
-	                   <li><a href="#" class="link-black text-sm"><i class="glyphicon glyphicon-time"></i><b> SLA Due Date : </b>{{ ticketData.sla}}</a>
-	                    </li>	                    
-	                  </ul>
-	                  <ul class="list-inline">
-	                   <li><a href="#" class="link-black text-sm"><i class="fa fa-sitemap"></i> <b>Site Name : </b>{{ticketData.siteName}}</a></li>
-	                   <li><a href="#" class="link-black text-sm"><i class="fa fa-sitemap"></i> <b>Asset Name : </b>{{ ticketData.assetName}}</a>
-	                    </li>	                    
-	                  </ul>
-	                  
-	                  <ul class="list-inline">
-	                   <li><a href="#" class="link-black text-sm"><i class="glyphicon glyphicon-user"></i> <b>Raised By : </b>{{ticketData.raisedBy}}</a></li>
-	                   <li><a href="#" class="link-black text-sm"><i class="glyphicon glyphicon-user"></i> <b>Assigned To : </b>{{ticketData.assignedSP}}</a>
-	                    </li>	                    
-	                  </ul>
-	                  
-	                  <!-- <div class="user-block">	                  
-	                  <span class="description glyphicon glyphicon-time" style="float: left;margin:0 20px 0 0;">Created Date : {{ticketData.raisedOn}}</span> 
-	                    <span class="description glyphicon glyphicon-time">SLA Due Date : {{ ticketData.sla}}</span>  
-	                  </div> -->
-	                  
-	                  <!-- <div class="user-block">	                  
-	                  <span class="description fa fa-sitemap" style="float: left;margin:0 20px 0 0;">Site Name : {{ticketData.siteName}}</span> 
-	                    <span class="description fa fa-sitemap">Asset Name : {{ ticketData.assetName}}</span> 
-	                  </div> -->
-	                  
-	                  <!-- <div class="user-block">
-	                  <span class="description glyphicon glyphicon-user" style="float: left;margin:0 20px 0 0;">Raised By : {{ticketData.raisedBy}}</span> 
-	                    <span class="description glyphicon glyphicon-user">Assigned To : {{ticketData.assignedSP}}</span> 
-	                  </div> -->
-	                  <p>
-	                     {{ticketData.description}}
-	                  </p>
-	                  <ul class="list-inline">
-	                   <li><a href="#" class="link-black text-sm"><i class="fa fa-share margin-r-5"></i> <b>Status : </b>{{ticketData.status}}</a></li>
-	                   <li><a href="#" class="link-black text-sm"><i class="fa fa-thumbs-o-up margin-r-5"></i><b> Issue Start Time : </b>{{ticketData.ticketStartTime}}</a>
-	                    </li>
+	                  </div>
+	                  <div class="row">
+                    	<div class="col-md-12 col-sm-12">
+                  		<div class="box">
+				        <div class="box-body">
+				         <a  class="link-black text-sm"><i class="glyphicon glyphicon-time"></i> <b>Ticket Description</b></a>
+				        </div>
+				        <div class="box-footer">
+				          {{ticketData.description}}
+				        </div>
+				      </div>
+				      </div>
+				      </div>
+	                  <div class="row">
+                    	<div class="col-md-4 col-sm-4">
+                  		<div class="box">
+				        <div class="box-body">
+				         <a  class="link-black text-sm"><i class="glyphicon glyphicon-time"></i> <b>Created Date</b></a>
+				        </div>
+				        <!-- /.box-body -->
+				        <div class="box-footer">
+				          {{ticketData.raisedOn}}
+				        </div>
+				      </div>
+				      </div>
+				      <div class="col-md-4 col-sm-4">
+                  		<div class="box">
+				        <div class="box-body">
+				         <a  class="link-black text-sm"><i class="glyphicon glyphicon-time"></i> <b>SLA Due Date</b></a>
+				        </div>
+				        <!-- /.box-body -->
+				        <div class="box-footer">
+				         {{ ticketData.sla}}
+				        </div>
+				      </div>
+				      </div>
+				      	<div class="col-md-4 col-sm-4">
+                  		<div class="box">
+				        <div class="box-body">
+				         <a href="#" class="link-black text-sm"><i class="glyphicon glyphicon-time"></i> <b>Issue Start Time </b></a>
+				        </div>
+				        <!-- /.box-body -->
+				        <div class="box-footer">
+			{{ticketData.ticketStartTime}}
+				        </div>
+				      </div>
+				      </div>
+					  </div>
+					  <div class="row">
+                    	<div class="col-md-4 col-sm-4">
+                  		<div class="box">
+				        <div class="box-body">
+				         <a href="#" class="link-black text-sm"><i class="fa fa-sitemap"></i> <b>Site Name </b></a>
+				        </div>
+				        <!-- /.box-body -->
+				        <div class="box-footer">
+			{{ticketData.siteName}}
+				        </div>
+				      </div>
+				      </div>
+				      <div class="col-md-4 col-sm-4">
+                  		<div class="box">
+				        <div class="box-body">
+				        <a href="#" class="link-black text-sm"><i class="fa fa-sitemap"></i> <b>Asset Name </b></a>
+				        </div>
+				        <!-- /.box-body -->
+				        <div class="box-footer">
+				         {{ ticketData.assetName}}
+				        </div>
+				      </div>
+				      </div>
+				      <div class="col-md-4 col-sm-4">
+                  		<div class="box">
+				        <div class="box-body">
+				         <a   class="link-black text-sm"><i class="glyphicon glyphicon-user"></i> <b>Assigned to Service Provider</b></a>
+				        </div>
+				        <!-- /.box-body -->
+				        <div class="box-footer">
+				         {{ticketData.assignedSP}}
+				        </div>
+				      </div>
+				      </div>
+					  </div>
+					  <div class="row">
+                    	<div class="col-md-4 col-sm-4">
+                  		<div class="box">
+				        <div class="box-body">
+				        <a   class="link-black text-sm"><i class="glyphicon glyphicon-user"></i> <b>Raised By </b></a>
+				        </div>
+				        <!-- /.box-body -->
+				        <div class="box-footer">
+			{{ticketData.raisedBy}}
+				        </div>
+				      </div>
+				      </div>
+				      <div class="col-md-4 col-sm-4">
+                  		<div class="box">
+				        <div class="box-body">
+				        <a  class="link-black text-sm"><i class="glyphicon glyphicon-time"></i> <b>Closed Date </b></a>
+				        </div>
+				        <!-- /.box-body -->
+				        <div class="box-footer">
+						{{ticketData.closedOn}}
+				        </div>
+				      </div>
+				      </div>
+				      <div class="col-md-4 col-sm-4">
+                  		<div class="box">
+				        <div class="box-body">
+				        <a  class="link-black text-sm"><i class="glyphicon glyphicon-user"></i> <b>Closed Code </b></a>
+				        </div>
+				        <div class="box-footer">
+						{{ ticketData.codeClosed}}
+				        </div>
+				      </div>
+				      </div>
+				      
+					  </div>
+					   <div class="row">
+                    	<div class="col-md-12 col-sm-12">
+                  		<div class="box">
+				        <div class="box-body">
+				        <a   class="link-black text-sm"><i class="glyphicon glyphicon-user"></i> <b>Ticket Close Note </b></a>
+				        
+				         <ul class="list-inline">
 	                    <li class="pull-right">
-	                      <a href="#" class="link-black text-sm"><i class="fa fa-comments-o margin-r-5"></i> Comments
+	                      <a href ng-click="openChatBox();" class="link-black text-sm"><i class="fa fa-comments-o margin-r-5"></i> Comments
 	                        ({{ticketComments.length}})</a></li>
 	                  </ul>
+				        </div>
+				        <!-- /.box-body -->
+				        <div class="box-footer">
+						{{ticketData.closeNote}}
+				        </div>
+				      </div>
+				      </div>
+				      </div>
 	
-	                </div>
-	                
-	                
-	                </div>
-	                
-                  </div>
-                  
-                  
 			        <div class="row">
-			        <div class="col-md-12">
+			        <div class="col-md-12 col-sm-12">
+                  		<div class="box">
+				        <div class="box-body">
 			         SLA {{ticketData.slaPercent}} %
 					 <dl class="dl-horizontal">
 			             <div class="progress">
@@ -239,53 +334,7 @@ $(function() {
 			             </div>                                           
 			    	 </dl>
 			    	 </div>
-			    	 
-	        	</div>
-	        	
-	        	<!-- <div class="row">
-				      <div class="col-lg-3 col-xs-6">
-			          <div class="small-box bg-yellow">
-			            <div class="inner glyphicon glyphicon-user">
-			              Raised BY
-			            </div>
-			            <a href="#" class="small-box-footer">
-			             {{ticketData.raisedBy}}
-			            </a>
-			          </div>
-			        </div>
-			         <div class="col-lg-3 col-xs-6">
-			          <div class="small-box bg-yellow">
-			            <div class="inner glyphicon glyphicon-user">
-			              Assigned To
-			            </div>
-			            <a href="#" class="small-box-footer">
-			             {{ticketData.assignedSP}}
-			            </a>
-			          </div>
-			        </div>
-			        <div class="col-lg-3 col-xs-6">
-			          <div class="small-box bg-yellow">
-			            <div class="inner glyphicon glyphicon-time">
-			              Raised On
-			            </div>
-			            <a href="#" class="small-box-footer">
-			            {{ticketData.raisedOn}}
-			            </a>
-			          </div>
-			        </div>
-			         <div class="col-lg-3 col-xs-6">
-			          <div class="small-box bg-yellow">
-			            <div class="inner fa fa-sitemap">
-			              Asset
-			            </div>
-			            <a href="#" class="small-box-footer">
-			            {{ticketData.assetName}}
-			            </a>
-			          </div>
-			        </div>
-			        </div> -->
-	        		
-	              <div class="tab-pane" id="escalate">
+	              	<div class="tab-pane" id="escalate">
 						<table id="example2"
 							class="table table-hover table-condensed">
 							<thead>
@@ -324,7 +373,8 @@ $(function() {
 
 							</tbody>
 						</table>
-					</div>
+						</div>
+	        		
 					<div class="tab-pane table-responsive" id="linkedticket">
 					<div class="form-group" >
 						<div class="box box-success">
@@ -370,6 +420,47 @@ $(function() {
 						</div>
 					</div>
 					</div>
+					
+					<div class="tab-pane table-responsive" id="attachmentticket">
+					<div class="form-group" >
+						<div class="box box-success">
+							<div class="box-header with-border">
+								<h3 class="box-title">Attachment Details</h3>
+							</div>
+							
+							<div class="box-body" >
+								<table id="example2"
+									class="table table-hover table-condensed">
+									<thead>
+										<tr ng-if="ticketData.files.length > 0">
+											<th><b>FileName</b></th>
+											<th><b>Download</b></th>
+											<th><b></b></th>
+										</tr>
+									</thead>
+								 <tbody ng-repeat="file in ticketData.files">
+					<tr>
+						<td>{{file.fileName}}</td>
+						<td><a href="${contextPath}/selected/file/download?keyname={{file.filePath}}" download><i class="fa fa-cloud-download fa-2x" aria-hidden="true"></i></a></td>
+						<td>  </td>
+					</tr>
+				</tbody>
+									<tbody ng-if="ticketData.files.length == 0">
+										<tr >
+											<td>
+												There are no attachment available.
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							
+								
+							<!-- /.box-body -->
+						</div>
+					</div>
+					</div>
+					
 						<div class="tab-pane table-responsive" id="tickethistory">
 							<div class="box">
 								<div class="box-header with-border">
@@ -380,7 +471,9 @@ $(function() {
 									<div class="table-responsive">
 										<div class="row">
 											<div class="col-md-12">
-										<ul class="timeline">
+												<!-- The time line -->
+										<ul class="timeline timeline-inverse">
+											<!-- timeline time label -->
 											<li class="time-label" ng-if="ticketHistoryDetail.history.length > 0">
 											<span class="bg-red" ng-show="ticketHistoryDetail.ticketCloseDate != null ">
 													{{ticketHistoryDetail.ticketCloseDate}} </span>
@@ -390,8 +483,7 @@ $(function() {
 													</li>
 											<li class="time-label" ng-if="ticketHistoryDetail.history.length == 0"><span class="bg-aqua">
 													Ticket is not yet updated since the creation date. </span></li>		
-											<li
-												ng-repeat="tktHistory in ticketHistoryDetail.history">
+											<li	ng-repeat="tktHistory in ticketHistoryDetail.history">
 												<i class="fa fa-user bg-aqua"></i>
 
 												<div class="timeline-item">
@@ -418,19 +510,70 @@ $(function() {
 					</div>
 				</div>
 	              </div>
+	              </div>
+	              </div>
 	            </div>
 				</div>
 				</div>
-					<div class="col-md-3" style="background-color:#E2E0DF">
+				</div>
+				
+				<div class="col-md-6" id="chatWindow" style="display:none">
+          <div class="box" >
+          	<div style="width:30%;position:fixed;bottom:13px;right:0px;margin:0;background-color:#283e34">
+            <div class="box-header with-border">
+              <h3 class="box-title" style="color:#fff">Work Notes</h3>
+             	 <div class="box-tools pull-right">
+                    <a href="javascript:void(0);"  class="badge bg-yellow" data-toggle="tooltip" ng-click="closeWindow();">
+                   		 <i class="fa fa-minus" aria-hidden="true"></i>
+	                </a>
+                </div>
+            </div>
+            <div class="box-body">
+              <div class="row">
+	   			 <div class="col-md-12">			 
+                  <div class="direct-chat-messages" style="height: 430px;" id="messageWindow">
+                  <div ng-repeat="ticket in ticketComments" id="messagebox">
+                    <div class="direct-chat-msg"  >
+                      <div class="direct-chat-info clearfix">
+                        <span class="direct-chat-name pull-left" style="color:#fff">{{ticket.createdBy}}</span>
+                        <span class="direct-chat-timestamp pull-right" style="color:#fff">{{ticket.createdDate}}</span>
+                      </div>
+                      <img class="direct-chat-img" src="${contextPath}/resources/img/swadhin.jpg" alt="message user image">
+                     	 
+                      <div class="direct-chat-text" id="audioMessage">
+                       {{ticket.comment}}
+                      </div>
+                      
+                    </div>
+
+					</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="box-footer">
+              <div class="row">
+                <div class="col-sm-12">
+                      <input type="text" name="ticketMessage" id="ticketMessage" ng-model="ticketComment.comment"
+                      placeholder="Type Message ..." class="form-control" ng-enter="addNewComment()">
+                </div>
+              </div>
+            </div>
+            </div>
+          </div>
+          
+        </div>
+				
+					<!-- <div class="col-md-3" style="background-color:#E2E0DF">
 					<div class="box box-warning direct-chat direct-chat-warning">
                 <div class="box-header with-border">
                   <h3 class="box-title">Work Notes</h3>                  
                 </div>
-                <!-- /.box-header -->
+                /.box-header
                 <div class="box-body">
-                  <!-- Conversations are loaded here -->
+                  Conversations are loaded here
                   <div class="direct-chat-messages" style="height:475px" >
-                    <!-- Message. Default to the left -->
+                    Message. Default to the left
                     <div class="direct-chat-msg" ng-repeat="ticket in ticketComments">
                       <div class="direct-chat-info clearfix">
                         <span class="direct-chat-name pull-left">{{ticket.createdBy}}</span>
@@ -455,19 +598,12 @@ $(function() {
                     </div>
                 </div>
               </div>
-					</div>
-				</div>
-				</div>
+				</div> -->
 			</div>
 			</div>
 			</div>	
-		</section>	
+		</section>
 							
 					
 	</div>
 	</div>
-</div>
-</section>
-</div>
-</div>
-</div>

@@ -41,6 +41,14 @@
 .table tbody tr.currentSelected {
 background-color: rgba(60, 141, 188, 0.58) !important;
 }
+
+/* .table thead tr {
+background-color:#000
+} */
+.table thead tr th {
+font-size:10px;
+color:#000
+}
 .currentSelected{
 	background:rgba(60, 141, 188, 0.58);
     color:#fff;
@@ -102,7 +110,6 @@ $(function() {
 			<section class="content">
 				<div class="row">
 				<div class="col-md-12">
-				<div class="row">
 						<div class="box">
 							<div class="box-header with-border">
 								<h3 class="box-title">Incident Reports</h3>
@@ -144,7 +151,6 @@ $(function() {
 						</div>
 							</div>
 							
-						</div>
 				</div>
 				</section>
 				

@@ -119,13 +119,16 @@ chrisApp.controller('serviceProviderController',  ['$rootScope', '$scope', '$fil
 			$scope.priorities =[];
 			$scope.priorityValues =[];
 			var priorityList=['Critical', 'High', 'Medium', 'Low'];
+			var description=['Operation is completely down','Operation is partially interrupted', 'Performance degraded','General service request'];
 			for(var i=1;i<=4;i++){
 				var priority={
 						slaId:null,
 						pId:i,
 						priority:priorityList[i-1],
+						description:description[i-1],
 						duration:null,
-						unit:null
+						unit:null,
+						
 				}
 				$scope.priorities.push(priority);
 			}
@@ -264,16 +267,22 @@ chrisApp.controller('serviceProviderController',  ['$rootScope', '$scope', '$fil
 			$scope.getRegionList('EDIT');
 			//$scope.priorities = $scope.selectedServiceProvider.slaListVOList;
 			$scope.priorities =[];
+			var priorityList=['Critical', 'High', 'Medium', 'Low'];
+			var description=['Operation is completely down','Operation is partially interrupted', 'Performance degraded','General service request'];
+			//$scope.getPriorities();
+			var i = 1;
 			$.each($scope.selectedServiceProvider.slaListVOList,function(key,val){
+				
 				var slaPriorities={
 						slaId:val.slaId,
-						ticketPriority:val.ticketPriority,
-						priority:val.ticketPriority.description,
+						priority:priorityList[i-1],
+						description:description[i-1],
 						duration:val.duration,
 						unit:val.unit
 						
 				}
 				$scope.priorities.push(slaPriorities);
+				i=i+1
 			});
 			$scope.escalationLevels = [];
 			$.each($scope.selectedServiceProvider.escalationLevelList,function(key,val){

@@ -152,11 +152,15 @@ $(function() {
 					<h3 class="box-title"><a href="${contextPath}/incident/details/" title="View All Incidents"><i class="fa fa-th-list" aria-hidden="true"></i></a> Incident - {{ticketData.ticketNumber}}</h3>
 					<div class="box-tools pull-right" style="margin-top: 0px;">
 						<input type="hidden" id="mode" value="${mode}">
+					<a  href ng-click="openChatBox();" >
+			        	<img src="${contextPath}/resources/img/chatbot.png" style="width: 12%;" 
+			        	class="pull-right" data-toggle="tooltip" data-original-title="Incident work notes">
+        			</a>
 					</div>
 				</div>
 				<div class="box-body">
 				<div class="row">
-				<div class="col-md-9">
+				<div class="col-md-12">
 				<div class="nav-tabs-custom">
 		          <!--   <ul class="nav nav-tabs">
 		              <li class="active"><a href="#primaryinfo" data-toggle="tab">Primary Details</a></li>              
@@ -418,6 +422,50 @@ $(function() {
 						</div>
 					</div>
 					</div>
+					
+					<div class="tab-pane table-responsive" id="attachmentticket">
+					<div class="form-group" >
+						<div class="box box-success">
+							<div class="box-header with-border">
+								<h3 class="box-title">Attachment Details</h3>
+							</div>
+							
+							<div class="box-body" >
+								<table id="example2"
+									class="table table-hover table-condensed">
+									<thead>
+										<tr ng-if="ticketData.files.length > 0">
+											<th><b>FileName</b></th>
+											<th><b>Created On</b></th>
+											<th><b>Download</b></th>
+											
+										</tr>
+									</thead>
+								 <tbody ng-repeat="file in ticketData.files">
+					<tr>
+						<td>{{file.fileName}}</td>
+						<td>{{file.createdOn}}</td>
+						<td><a href="${contextPath}/selected/file/download?keyname={{file.filePath}}" download>
+						<i class="fa fa-cloud-download fa-2x" aria-hidden="true"></i></a></td>
+						<td>  </td>
+					</tr>
+				</tbody>
+									<tbody ng-if="ticketData.files.length == 0">
+										<tr >
+											<td>
+												There are no attachment available.
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							
+								
+							<!-- /.box-body -->
+						</div>
+					</div>
+					</div>
+					
 						<div class="tab-pane table-responsive" id="tickethistory">
 							<div class="box">
 								<div class="box-header with-border">
@@ -474,16 +522,16 @@ $(function() {
 				</div>
 				</div>
 				
-					<div class="col-md-3" >
+				<!-- 	<div class="col-md-3" style="background-color:#E2E0DF">
 					<div class="box box-warning direct-chat direct-chat-warning">
                 <div class="box-header with-border">
                   <h3 class="box-title">Work Notes</h3>                  
                 </div>
-                <!-- /.box-header -->
+                /.box-header
                 <div class="box-body">
-                  <!-- Conversations are loaded here -->
+                  Conversations are loaded here
                   <div class="direct-chat-messages" style="height:475px" >
-                    <!-- Message. Default to the left -->
+                    Message. Default to the left
                     <div class="direct-chat-msg" ng-repeat="ticket in ticketComments">
                       <div class="direct-chat-info clearfix">
                         <span class="direct-chat-name pull-left">{{ticket.createdBy}}</span>
@@ -508,7 +556,54 @@ $(function() {
                     </div>
                 </div>
               </div>
-				</div>
+				</div> -->
+				
+					 <div class="col-md-6" id="chatWindow" style="display:none">
+          <div class="box" >
+          	<div style="width:30%;position:fixed;bottom:13px;right:0px;margin:0;background-color:#283e34">
+            <div class="box-header with-border">
+              <h3 class="box-title" style="color:#fff">Work Notes</h3>
+             	 <div class="box-tools pull-right">
+                    <a href="javascript:void(0);"  class="badge bg-yellow" data-toggle="tooltip" ng-click="closeWindow();">
+                   		 <i class="fa fa-minus" aria-hidden="true"></i>
+	                </a>
+                </div>
+            </div>
+            <div class="box-body">
+              <div class="row">
+	   			 <div class="col-md-12">			 
+                  <div class="direct-chat-messages" style="height: 430px;" id="messageWindow">
+                  <div ng-repeat="ticket in ticketComments" id="messagebox">
+                    <div class="direct-chat-msg"  >
+                      <div class="direct-chat-info clearfix">
+                        <span class="direct-chat-name pull-left" style="color:#fff">{{ticket.createdBy}}</span>
+                        <span class="direct-chat-timestamp pull-right" style="color:#fff">{{ticket.createdDate}}</span>
+                      </div>
+                      <img class="direct-chat-img" src="${contextPath}/resources/img/swadhin.jpg" alt="message user image">
+                     	 
+                      <div class="direct-chat-text" id="audioMessage">
+                       {{ticket.comment}}
+                      </div>
+                      
+                    </div>
+
+					</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="box-footer">
+              <div class="row">
+                <div class="col-sm-12">
+                      <input type="text" name="ticketMessage" id="ticketMessage" ng-model="ticketComment.comment"
+                      placeholder="Type Message ..." class="form-control" ng-enter="addNewComment()">
+                </div>
+              </div>
+            </div>
+            </div>
+          </div>
+          
+        </div>
 			</div>
 			</div>
 			</div>	

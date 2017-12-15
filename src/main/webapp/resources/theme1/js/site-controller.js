@@ -2,10 +2,10 @@
 
 chrisApp.controller('siteController',  ['$rootScope', '$scope', '$filter','siteService','authService',
                                         'siteCreationService','companyService','userService','districtService',
-                                        'areaService','clusterService','countryService',
+                                        'areaService','clusterService','countryService','assetService','serviceProviderService',
                               function  ($rootScope, $scope , $filter,siteService, authService,
                                         siteCreationService,companyService,userService,districtService,
-                                        areaService,clusterService,countryService) {
+                                        areaService,clusterService,countryService,assetService,serviceProviderService) {
 		
 		$scope.siteData={};
 		$scope.sessionUser={};
@@ -34,11 +34,36 @@ chrisApp.controller('siteController',  ['$rootScope', '$scope', '$filter','siteS
 				fromlist:[],
 				toList:[]
 		}
+		
+		$scope.accessSite={
+				 selected:{},
+				 list:[]
+		 }
+		
+		$scope.serviceProvider={
+				 selected:{},
+				 list:[]
+		 }
+		$scope.assetCategory={
+				 selected:{},
+				 equipmentList:[],
+				 serviceList:[]
+				 
+		 }
+		 $scope.assetLocation={
+				 selected:{},
+				 list:[]
+		 }
+		
 		$scope.siteAssignedUserList=[];
 		$scope.siteUnAssignedUserList=[];
 		$scope.fileExtension="";
+		$scope.licenseAttachments=[];
+		$scope.licenseDetails = [];
+		               	      
 		angular.element(document).ready(function(){
 			
+			$scope.enableDisableIsAssetPowersensor();
 			$scope.getLoggedInUserAccess();
 			 $(".licensedate").datepicker({
 				 format:'dd-mm-yyyy',
@@ -80,32 +105,653 @@ chrisApp.controller('siteController',  ['$rootScope', '$scope', '$filter','siteS
 				$scope.getOperationDetails();
 			
 				
-				/* $('#siteInputFile').change( function(e) {
+				 $('#siteInputFile').change( function(e) {
 		             var ext=$('input#siteInputFile').val().split(".").pop().toLowerCase();
+		             var fileSize = Math.round((this.files[0].size / 1024)) ;
+		             $scope.siteFileSize=null;
 		             $scope.fileExtension = ext;
-		             if($.inArray(ext, ["jpg","jpeg","JPEG", "JPG","PDF","pdf","doc","docx","DOC","DOCX","png","PNG"]) == -1) {
-		            	 $('#messageWindow').show();
-		            	 $('#errorMessageDiv').show();
-		 				 $scope.errorMessage="Supported file types to upload are jpg, docx and png";
-		                  $scope.isfileselected=false;
+		             if($.inArray(ext, ["jpg","jpeg","JPEG", "JPG","PDF","pdf","png","PNG"]) == -1) {
+		            	 $scope.modalErrorMessage="";
+				    	 $('#fileerror').text("Supported File types are jpg, png and pdf");
+				    	 $('#modalSiteMessageDiv').show();
+				          $scope.isfileselected=false;
+				          $('#siteInputFile').val('');
+				          e.target.files=undefined;
 		                 return false;
-		             }else if (e.target.files != undefined) {
-		                 $scope.isfileselected=true;
-		                 file = $('#siteInputFile').prop('files');
-	                  	 var reader = new FileReader();
-	                 	 reader.onload = $scope.onFileUploadReader;
-	                 	 reader.readAsDataURL(file[0]);
-		               }
-				 });*/
+		             }
+		             else {
+		            	 if (e.target.files != undefined) {
+		                  	 $('#modalSiteMessageDiv').hide();
+			                 $scope.isfileselected=true;
+			                 file = $('#siteInputFile').prop('files');
+			                 $scope.siteFileSize = file[0].size / 1024;
+						         if($scope.siteFileSize > 100){
+						        	 $scope.modalErrorMessage="";
+						        	 $('#fileerror').text("File size exceeds 100KB");
+							    	 $('#modalSiteMessageDiv').show();
+							          e.target.files=undefined;
+									
+						         }else{
+				                  	 var reader = new FileReader();
+				                 	 reader.onload = $scope.onSiteFileUploadReader;
+				                 	 reader.readAsDataURL(file[0]);
+						         }
+			              }
+		             }
+		             
+				 });
+				 
+				
 		});
-	/*	
-		$scope.onFileUploadReader=function(event){
-			  var uploadedData=event.target.result;
-			  console.log( $scope.fileExtension);
-			//  console.log(uploadedData);
-			  $scope.uploadedFile=uploadedData;
-		}*/
+	
+		$scope.onSiteFileUploadReader=function(e){
+			var fileUrl = e.target.result;
+			console.log(fileUrl);
+			$scope.uploadedFile=e.target.result;
+		}
 		
+		 $scope.onImageFileUploadReader=function(e){
+				var fileUrl = e.target.result;
+				$scope.assetImageFile=e.target.result;
+			}
+		 
+		 
+		 $scope.onFileDocUploadReader=function(e){
+				var fileUrl = e.target.result;
+				$scope.assetDocFile=e.target.result;
+			}
+		
+		 
+		 $scope.getImageFile=function(assetId, e){
+				var ext = $('#inputImgfilepath').val().split(".").pop().toLowerCase();
+				$scope.fileSize1 = null;
+				$scope.fileExtension1 = ext;
+				if ($.inArray(ext, [ "jpg", "jpeg", "JPEG",	"JPG", "png", "PNG" ]) == -1) {
+					$('#equipmentModalMessageDiv').show();
+					$('#equipmentModalMessageDiv').alert();
+					$scope.equipmentModalErrorMessage = "";
+					 $('#fileerrorasset').text("Supported File types are jpg and png");
+					$scope.isfileselected = false;
+					$('#inputImgfilepath').val('');
+					return false;
+				} else if (e.target.files != undefined) {
+					$('#equipmentModalMessageDiv').hide();
+					$scope.isfileselected = true;
+					file = $('#inputImgfilepath').prop('files');
+					$scope.fileSize1 = file[0].size / 1024;
+					if($scope.fileSize1 > 100){
+			        	 $scope.equipmentModalErrorMessage="";
+			        	 $('#fileerrorasset').text("File size exceeds 100KB");
+				    	 $('#equipmentModalMessageDiv').show();
+						
+			         }else{
+						var reader = new FileReader();
+						reader.onload = $scope.onImageFileUploadReader;
+						reader.readAsDataURL(file[0]);
+			         }
+				}else{
+					 $('#fileerrorasset').text("Invalid file format");
+			    	 $('#equipmentModalMessageDiv').show();
+			    	 $('#inputImgfilepath').val('');
+				}
+			 }
+			 
+		 $scope.getDocumentFile=function(serviceId, e, errorDiv, msgDiv){
+			 var documentId = serviceId.id
+			 var ext = $('#' + documentId).val().split(".")	.pop().toLowerCase();
+			$scope.fileSize2 = null;
+			$scope.fileExtension2 = ext;
+			if ($.inArray(ext, [ "PDF", "pdf" ]) == -1) {
+				$('#'+msgDiv).text("Supported file types to upload is pdf");
+				$('#'+errorDiv).show();
+				$('#'+errorDiv).alert();
+				$scope.serviceModalErrorMessage = "";
+				$scope.isfileselected = false;
+				$('#' + documentId).val('');
+				return false;
+			} else if (e.target.files != undefined) {
+				$('#'+errorDiv).hide();
+				$scope.isfileselected = true;
+				file = $('#' + documentId).prop('files');
+				$scope.fileSize2 = file[0].size / 1024;
+				if($scope.fileSize2 > 100){
+		        	 $scope.serviceModalErrorMessage="";
+		        	 $('#'+msgDiv).text("File size exceeds 100KB");
+			    	 $('#'+errorDiv).show();
+					
+		         }else{
+					var reader = new FileReader();
+					reader.onload = $scope.onFileDocUploadReader;
+					reader.readAsDataURL(file[0]);
+		         }
+			}else{
+				 $('#fileerrorservice').text("Invalid file format");
+				 $('#'+msgDiv).show();
+		    	 $('#' + documentId).val('');
+			}
+		 }
+		
+		$scope.getIndexedName=function(val, e, licenseSelected){
+			console.log(val.id);
+			var licenseId=val.id;
+			 $scope.indexPos=licenseId.charAt(licenseId.length-1);
+			$scope.licenseId=licenseId;
+			console.log($('#'+licenseSelected+$scope.indexPos).val());
+			if($('#'+licenseSelected+$scope.indexPos).val()==""){
+				$scope.licenseInfo=null;
+			}else{
+				$scope.licenseInfo=parseInt($('#'+licenseSelected+$scope.indexPos).val());
+			}
+			 var ext=$("input#"+licenseId).val().split(".").pop().toLowerCase();
+			 console.log($('#'+licenseId).val());
+		     $scope.fileExtension = ext;
+		     if($.inArray(ext, ["jpg","jpeg","JPEG", "JPG","PDF","pdf","png","PNG"]) == -1) {
+		    	 $scope.modalErrorMessage="Supported file types to upload are jpg, png and pdf";
+		    	 $('#fileerror').text("Supported File types are jpg, png and pdf");
+		    	 $('#modalSiteMessageDiv').show();
+		    	 $('#'+licenseId).val('');
+		    	 e.target.files=undefined;
+		          $scope.isfileselected=false;
+		     }else if (e.target.files != undefined) {
+		         $scope.isfileselected=true;
+		         file = $('#'+licenseId).prop('files');
+		         var fileSize= file[0].size / 1024;
+		         if(fileSize > 100){
+		        	 $scope.modalErrorMessage="File size exceeds 100KB";
+		        	 $('#fileerror').text("Supported File types are jpg, png and pdf");
+			    	 $('#modalSiteMessageDiv').show();
+			    	 e.target.files=undefined;
+					
+		         }else{
+		      	 var reader = new FileReader();
+		     	 reader.onload = $scope.onLicenseFileUploadReader;
+		     	 reader.readAsDataURL(file[0]);
+		         }
+		       }else{
+					 $('#fileerror').text("Invalid file format");
+			    	 $('#modalSiteMessageDiv').show();
+			    	 $('#'+licenseId).val('');
+				}
+			
+		}
+		
+		
+		$scope.onLicenseFileUploadReader=function(e){
+			var fileUrl = e.target.result;
+			var licenseImage={
+						licenseId:$scope.licenseInfo,
+						fileName:$('#licenseDetail'+$scope.indexPos).val(),
+						base64ImageString:e.target.result,
+						fileExtension: $scope.fileExtension
+					}
+			
+			$scope.licenseAttachments.push(licenseImage);
+			console.log($scope.licenseAttachments);
+			
+		}
+		
+		$scope.enableDisableIsAssetPowersensor=function(){
+			$("#drpIsAsset").change(
+					function() {
+
+						var selectedText = $(this).find("option:selected")
+								.text();
+						var powersensorSelectedText = $('#drpIsPowersensor :selected').text();
+
+						var selectedValue = $(this).val();
+						if (selectedText == "NO") {
+							$('#drpIsPowersensor').val("");
+							$('#txtSensorNumber').val("");
+							$("#drpIsPowersensor").prop("disabled", true);
+							$("#txtSensorNumber").prop("disabled", true);
+							$scope.equipmentData.pwSensorNumber=null;
+						} else if (selectedText == "YES" && powersensorSelectedText == "Select Sensor Attached") {
+							$("#drpIsPowersensor").prop("disabled", false);
+							$("#txtSensorNumber").prop("disabled", false);
+							$("#drpIsPowersensor").attr('required', true);
+						} else if (selectedText == "YES"
+								&& powersensorSelectedText == "YES") {
+							$("#txtSensorNumber").prop("disabled", false);
+							$("#txtSensorNumber").attr('required', true);
+						} else if (selectedText == "YES"
+								&& powersensorSelectedText == "NO") {
+							$("#txtSensorNumber").prop("disabled", true);
+							$('#txtSensorNumber').val("");
+						}
+						else if (selectedText == "YES"	) {
+							$("#drpIsPowersensor").prop("disabled", false);
+							$("#txtSensorNumber").prop("disabled", false);
+					}
+						$scope.equipmentData.isAssetElectrical=selectedValue;
+
+					});
+
+			$("#drpIsPowersensor").change(
+					function() {
+
+						var selectedText = $(this).find("option:selected")
+								.text();
+						var assetSelectedText = $('#drpIsAsset :selected')
+								.text();
+
+						var selectedValue = $(this).val();
+						if (selectedText == "NO"
+								&& assetSelectedText == "YES") {
+							$("#txtSensorNumber").prop("disabled", true);
+						} else if (selectedText == "YES"
+								&& assetSelectedText == "YES") {
+							$("#txtSensorNumber").prop("disabled", false);
+							$("#txtSensorNumber").attr('required', true);
+						}
+						$scope.equipmentData.isPWSensorAttached=selectedValue;
+					});
+		}
+		
+		 $scope.addEquipment=function(){
+			 $scope.equipmentData={};
+			 $scope.equipmentData.sites=[];
+			 $('#resetAssetForm').click();
+			 $("#categorySelect option").each(function() {
+					if ($(this).val() == "") {
+						$(this).attr('selected', 'selected');
+						 $scope.assetCategory.selected=null;
+						return false;
+					}
+			 	});
+		 	
+		 	$("#locationSelect option").each(function() {
+				if ($(this).val() == "") {
+					$(this).attr('selected', 'selected');
+					 $scope.assetLocation.selected=null;
+					return false;
+				}
+			});
+		 	
+		 	$("#spSelect option").each(function() {
+				if ($(this).val() == "") {
+					$(this).attr('selected', 'selected');
+					 $scope.serviceProvider.selected=null;
+					return false;
+				}
+			});
+			 /*$scope.accessSite.selected={};
+			 $("#siteSelect option").each(function(){
+			 		if($(this).val() == ""){
+			 			$(this).attr('selected', 'selected');
+			 			 $scope.accessSite.selected=null;
+						return false;
+			 		}
+			 	});*/
+		 	/*$("#siteSelect option").each(function(){
+		 		if($(this).val() == $scope.accessSite.siteId){
+		 			$(this).attr('selected', 'selected');
+		 			$scope.accessSite.selected.siteId = $scope.accessSite.siteId;
+					return false;
+		 		}
+		 	});*/
+		 	
+		 	
+			 	$("#drpIsAsset option").each(function(){
+		 		if($(this).val() == ""){
+		 			$(this).attr('selected', 'selected');
+		 			$scope.equipmentData.isAssetElectrical=null;
+					return false;
+		 		}
+		 	});
+		 	
+		 	$("#drpIsPowersensor option").each(function(){
+		 		if($(this).val() == ""){
+		 			$(this).attr('selected', 'selected');
+		 			$scope.equipmentData.isPWSensorAttached=null;
+					return false;
+		 		}
+		 	});
+		 	
+		 	$scope.getServiceProviders($scope.sessionUser.company);
+			$scope.retrieveAssetCategories();
+			$scope.getAssetLocations();
+		 	$scope.populateSelectedSite();
+		 	
+			 $('#equipmentModal').modal('show');
+			 $('#assetModalLabel').text("Add new Asset");
+		 }
+		 
+		 $scope.addService=function(){
+			 $scope.serviceData={};
+			 $scope.serviceData.sites=[];
+			 $('#resetServiceAssetForm').click();
+				$("#categorySelect option").each(function() {
+					if ($(this).val() == "") {
+						$(this).attr('selected', 'selected');
+						 $scope.assetCategory.selected=null;
+						return false;
+					}
+			 	});
+		 	
+		 	$("#locationSelect option").each(function() {
+				if ($(this).val() == "") {
+					$(this).attr('selected', 'selected');
+					 $scope.assetLocation.selected=null;
+					return false;
+				}
+			});
+		 	
+		 	$("#spSelect option").each(function() {
+				if ($(this).val() == "") {
+					$(this).attr('selected', 'selected');
+					 $scope.serviceProvider.selected=null;
+					return false;
+				}
+			});
+		 	
+		
+		 	
+		 	$("#siteSelect option").each(function(){
+		 		if($(this).val() == ""){
+		 			$(this).attr('selected', 'selected');
+		 			 $scope.accessSite.selected=null;
+					return false;
+		 		}
+		 	});
+		 	
+		 	$scope.getServiceProviders($scope.sessionUser.company);
+			$scope.retrieveAssetCategories();
+			$scope.getAssetLocations();
+		 	$scope.populateSelectedSite();
+		 	
+			 $('#serviceModal').modal('show');
+			 $('#assetServiceModalLabel').text("Add new Asset");
+		 }
+		
+		 $scope.retrieveAssetCategories=function(){
+			 $('#loadingDiv').show();
+			 assetService.retrieveAssetCategories()
+			 .then(function(data) {
+	    			console.log(data);
+	    			$scope.assetCategory.equipmentList=[];
+	    			$scope.assetCategory.serviceList = []
+	    			
+	    			$("#categorySelect").empty();
+	    			$("#serviceCategorySelect").empty();
+	    			$.each(data,function(key,val){
+	    				if(val.assetType=='E'){
+	    					$scope.assetCategory.equipmentList.push(val);
+	    				}
+	    				
+	    				else if(val.assetType=='S'){
+	    					$scope.assetCategory.serviceList.push(val);
+	    				}
+	    				
+	    			});	
+	    			var options = $("#categorySelect");
+					options.append($("<option />").val("").text(
+					"Select Category"));
+					$.each($scope.assetCategory.equipmentList,function() {
+						options.append($("<option />").val(	this.assetCategoryId).text(	this.assetCategoryName));
+					});
+					
+					var options = $("#serviceCategorySelect");
+					options.append($("<option />").val("").text(
+					"Select Category"));
+					$.each($scope.assetCategory.serviceList,function() {
+						options.append($("<option />").val(	this.assetCategoryId).text(	this.assetCategoryName));
+					});
+					 $('#loadingDiv').hide();
+	            },
+	            function(data) {
+	                console.log('Asset Categories retrieval failed.')
+	                $('#loadingDiv').hide();
+	            });
+		 }
+		 
+		 $scope.getAssetLocations=function(){
+			 $('#loadingDiv').show();
+			 assetService.getAssetLocations()
+			 .then(function(data) {
+	    			console.log(data);
+	    			$scope.assetLocation.list=[];
+	    			$("#locationSelect").empty();
+	    			$("#serviceLocationSelect").empty();
+	    			$.each(data,function(key,val){
+	    				$scope.assetLocation.list.push(val);
+	    				
+	    			});	
+	    			
+	    			var options = $("#locationSelect");
+					options.append($("<option />").val("").text(
+					"Select Location"));
+					$.each($scope.assetLocation.list,function() {
+						options.append($("<option />").val(	this.locationId).text(	this.locationName));
+					});
+					
+					var options = $("#serviceLocationSelect");
+					options.append($("<option />").val("").text(
+					"Select Location"));
+					$.each($scope.assetLocation.list,function() {
+						options.append($("<option />").val(	this.locationId).text(	this.locationName));
+					});
+	    			console.log($scope.assetLocation.list);
+	    			 $('#loadingDiv').hide();
+	            },
+	            function(data) {
+	                console.log('Asset Locations retrieval failed.')
+	            });
+			 
+		 }
+		 
+		 $scope.getServiceProviders=function(customer){
+			 $('#loadingDiv').show();
+				serviceProviderService.getServiceProviderByCustomer(customer)
+				.then(function(data) {
+	    			console.log(data);
+	    			$scope.serviceProvider.list=[];
+	    			$("#spSelect").empty();
+	    			$("#serviceSPSelect").empty();
+	    			if(data.statusCode == 200){
+	    				$.each(data.object,function(key,val){
+	    					$scope.serviceProvider.list.push(val);
+	    				});
+	    			}
+	    			var options = $("#spSelect");
+					options.append($("<option />").val("").text(
+					"Select Service Provider"));
+					$.each($scope.serviceProvider.list,function() {
+						options.append($("<option />").val(	this.serviceProviderId).text(this.name));
+					});
+					
+					var options = $("#serviceSPSelect");
+					options.append($("<option />").val("").text("Select Service Provider"));
+					$.each($scope.serviceProvider.list,function() {
+						options.append($("<option />").val(	this.serviceProviderId).text(this.name));
+					});
+					 $('#loadingDiv').hide();
+	            },
+	            function(data) {
+	                console.log('Unable to get  Service Provider list')
+	                $('#loadingDiv').hide();
+	            });
+			}
+		 
+		 $scope.populateSelectedSite=function(){
+			 $('#loadingDiv').show();			
+	    					$scope.accessSite.list=[];
+	    					$("#siteSelect").empty();
+	    					$("#serviceSiteSelect").empty();
+		    				//$.each(data.object,function(key,val){
+		    					var accessedSite={
+			    						accessId:$scope.selectedSite.accessId,
+			    						site:$scope.selectedSite,
+			    						siteId:$scope.selectedSite.siteId,
+			    						siteName:$scope.selectedSite.siteName
+			    				}
+		    					$scope.accessSite.list.push(accessedSite);		    					
+		    					 $('#loadingDiv').hide();		    				
+		    				var options = $("#siteSelect");
+	    					options.append($("<option />").val("").text("Select Site"));
+	    					$.each($scope.accessSite.list,function() {
+								options.append($("<option />").val(	this.siteId).text(this.siteName));
+								
+							});
+	    					
+	    					
+	    					var options = $("#serviceSiteSelect");
+	    					options.append($("<option />").val("").text("Select Site"));
+	    					$.each($scope.accessSite.list,function() {
+								options.append($("<option />").val(	this.siteId).text(this.siteName));
+							});
+	    				
+		 }
+		 
+		 $scope.saveAssetEquipment=function(){	
+			 $scope.equipmentData.sites=[];
+			 $scope.equipmentData.sites.push($scope.selectedSite.siteId);
+	          if($scope.IsValidDate($scope.equipmentData.deCommissionedDate,$scope.equipmentData.commisionedDate)){
+	        	  $('#equipmentModalMessageDiv').hide();
+	        	  $scope.equipmentData.categoryId=$scope.assetCategory.selected.assetCategoryId;
+					 $scope.equipmentData.locationId=$scope.assetLocation.selected.locationId;
+					 $scope.equipmentData.siteId=$scope.selectedSite.siteId;
+					 if($scope.serviceProvider.selected!=null){
+						 $scope.equipmentData.serviceProviderId=$scope.serviceProvider.selected.serviceProviderId;
+					 }
+					 console.log($scope.equipmentData);
+					// $scope.equipmentData.sites.push($scope.selectedSite.siteId);
+					 
+					 var assetImage={
+								fileName:$scope.equipmentData.assetName,
+								base64ImageString:$scope.assetImageFile,
+								fileExtension: $scope.fileExtension1,
+								size:$scope.fileSize1 || 0
+							}
+					 $scope.equipmentData.assetImage=assetImage;
+					 var assetDoc={
+								fileName:$scope.equipmentData.assetName,
+								base64ImageString:$scope.assetDocFile,
+								fileExtension: $scope.fileExtension2,
+								size:$scope.fileSize2 || 0
+								
+							}
+					 $scope.equipmentData.assetDoc = assetDoc;
+					 if( $scope.equipmentData.assetImage.size > 100){
+						 $scope.equipmentModalErrorMessage="File size exceeds Max limit (100KB).";
+		            	 $('#equipmentModalMessageDiv').show();
+		            	 $('#equipmentModalMessageDiv').alert();
+		                  $scope.isfileselected=false;
+		                  return false;
+		             }
+					 if( $scope.equipmentData.assetDoc.size > 100){
+						 $scope.equipmentModalErrorMessage="File size exceeds Max limit (100KB).";
+		            	 $('#equipmentModalMessageDiv').show();
+		            	 $('#equipmentModalMessageDiv').alert();
+		                  $scope.isfileselected=false;
+		                  return false;
+		             }else{
+		            	 $scope.equipmentModalErrorMessage="";
+		            	 $('#equipmentModalMessageDiv').hide();
+		            	 $scope.saveAssetInfo($scope.equipmentData);
+		             }
+   				
+	          }
+	          else{
+	        	  $scope.equipmentModalErrorMessage = "Decommission date should be after Commission date";
+	                $('#equipmentModalMessageDiv').show();
+	                $('#equipmentModalMessageDiv').alert();							
+	          }		          
+			 
+		 }
+		 
+		 $scope.saveAssetService =function(){
+			 $scope.serviceData.sites=[];
+			 $scope.serviceData.sites.push($scope.selectedSite.siteId);
+			 if($scope.IsValidDate($scope.serviceData.deCommissionedDate,$scope.serviceData.commisionedDate)){
+	        	  $('#serviceModalMessageDiv').hide();
+	        	  $scope.serviceData.categoryId=$scope.assetCategory.selected.assetCategoryId;
+					 $scope.serviceData.locationId=$scope.assetLocation.selected.locationId;
+					 $scope.serviceData.siteId=$scope.selectedSite.siteId;
+					 if($scope.serviceProvider.selected!=null){
+					   $scope.serviceData.serviceProviderId=$scope.serviceProvider.selected.serviceProviderId;
+					 }
+			//		 $scope.serviceData.sites.push($scope.selectedSite.siteId);
+					 
+					 var serviceDoc={
+								fileName:$scope.serviceData.assetName,
+								base64ImageString:$scope.assetDocFile,
+								fileExtension: $scope.fileExtension2,
+								size:$scope.fileSize2 || 0
+							}
+					 $scope.serviceData.assetDoc = serviceDoc;
+					 
+					 if($scope.serviceData.assetDoc.size > 100){
+		            	 $scope.serviceModalErrorMessage="File size exceeds Max limit (100KB).";
+		            	 $('#serviceModalMessageDiv').show();
+		            	 $('#serviceModalMessageDiv').alert();
+		                  $scope.isfileselected=false;
+		                  return false;
+		             }else{
+		            	 $scope.serviceModalErrorMessage="";
+		            	 $('#serviceModalMessageDiv').hide();
+		            	 $scope.saveAssetInfo($scope.serviceData);
+		             }
+    				
+	          }
+	          else{
+	        	  	$scope.serviceModalErrorMessage = "Decommission date should be after Commission date";
+	                $('#serviceModalMessageDiv').show();
+    				$('#serviceModalMessageDiv').alert();							
+	          }		     
+			
+		 }
+		 
+		 $scope.saveAssetInfo=function(assetData){
+			 $('#loadingDiv').show();
+			 assetService.saveAssetObject(assetData)
+			 .then(function(data) {
+	    			console.log(data);
+	    			if(data.statusCode == 200){
+	    				$scope.successMessage = data.message;
+	    				$('#messageWindow').show();
+	    				$('#successMessageDiv').show();
+	    				$('#successMessageDiv').alert();
+	    				$('#infoMessageDiv').hide();
+	    				if(assetData.assetType == 'E'){
+	    					$('#assetModalCloseBtn').click();
+	    				}
+	    				else if(assetData.assetType == 'S'){
+	    					$('#serviceModalCloseBtn').click();
+	    				}
+	    				//$scope.getAllAsset();
+	    				$('#loadingDiv').hide();
+	    			}
+	            },
+	            function(data) {
+	                console.log('Error while saving asset data')
+	                $('#modalMessageDiv').show();
+    				$('#modalMessageDiv').alert();
+    				if(assetData.assetType == 'E'){
+    					$scope.equipmentModalErrorMessage = data.message;
+    					$('#equipmentModalMessageDiv').show();
+	    				$('#equipmentModalMessageDiv').alert();
+    				}
+    				else if(assetData.assetType == 'S'){
+    					$scope.serviceModalErrorMessage = data.message;
+    					$('#serviceModalMessageDiv').show();
+	    				$('#serviceModalMessageDiv').alert();
+    				}
+    				$('#loadingDiv').hide();
+	            });
+		 }
+		 
+		 $scope.viewAssetForSelectedSite=function(){
+			 if($scope.selectedSite!=null){
+					window.location.href=hostLocation+"/asset/info/"+$scope.selectedSite.siteId;
+			 }
+				else{
+					$('#messageWindow').show();
+					$('#infoMessageDiv').show();
+					$('#infoMessageDiv').alert();
+					$scope.InfoMessage="Please select a site to view.";
+				}
+			}
+		 
 		 $scope.getLoggedInUserAccess =function(){
 				
 			 authService.loggedinUserAccess()
@@ -138,6 +784,10 @@ chrisApp.controller('siteController',  ['$rootScope', '$scope', '$filter','siteS
     				$scope.sessionUser=angular.copy(data.object);
     				$scope.siteData.company=$scope.sessionUser.company;
     				$scope.getAllSites();
+    				/*$scope.getServiceProviders($scope.sessionUser.company);
+    				$scope.retrieveAssetCategories();
+    				$scope.getAssetLocations();*/
+    				//$scope.populateSelectedSite();
    				 	$('.dpedit').editableSelect();
     			}
             },
@@ -322,24 +972,22 @@ chrisApp.controller('siteController',  ['$rootScope', '$scope', '$filter','siteS
 		}
 		
 		//License related logic
-		$scope.licenseDetails = [
-	      {
-	        'licenseName':'',
-	        'validfrom':'',
-	        'validto':''
-	    }];
+		
 	              			 
 		$scope.addNewLicense = function(licenseDetails){
 			 $scope.licenseDetails.push({ 
+			  "licenseId":null,	 
 			  'licenseName': "", 
 			  'validfrom': "" ,
 			  'validto': "",
+			  'attachment':null
 			 });
 			 $scope.LD = {};
 			 
 			 $(".licensedate").datepicker({
 				 format:'dd-mm-yyyy',
 			 },"destroy");
+			console.log($scope.licenseDetails) 
 		};
 			 
 		$scope.removeLicense = function(){
@@ -352,6 +1000,8 @@ chrisApp.controller('siteController',  ['$rootScope', '$scope', '$filter','siteS
 			    }); 
 			   $scope.licenseDetails = newDataList;
 		};
+		
+		
 		   
     $scope.checkAllLicense = function () {
     	if (!$scope.selectedAll) {
@@ -508,7 +1158,7 @@ chrisApp.controller('siteController',  ['$rootScope', '$scope', '$filter','siteS
  				$("#"+targetId+""+from).attr("required",true);
  				$("#"+targetId+""+from).attr("style","background-color:#5ccaae;color:#fff")
  			}else{
- 				var selectedStartTime = value.to;	
+ 				var selectedStartTime = value.from;	
 	 			$("#"+targetId+""+from).val(selectedStartTime.name)
 	 			$("#"+targetId+""+from).attr("style","background-color:#5ccaae;color:#fff");
  			}
@@ -708,9 +1358,11 @@ chrisApp.controller('siteController',  ['$rootScope', '$scope', '$filter','siteS
 	    	});
 
 	    	$scope.siteData.operator = $scope.sessionUser.company;
+	    	
 	    	var finalSiteObj = {
 	    			siteData: $scope.siteData,
 	    			siteLicense:$scope.licenseDetails,
+	    			licenseAttachments:$scope.licenseAttachments,
 	    			siteOperation:$scope.salesOperations,
 	    			siteDelivery:$scope.deliveryOperations,
 	    			siteSubmeter:$scope.submeterDetails,
@@ -739,7 +1391,7 @@ chrisApp.controller('siteController',  ['$rootScope', '$scope', '$filter','siteS
 	    	 if(finalSiteObj.siteDelivery.length==7){
 		    	$.each(finalSiteObj.siteDelivery,function(key,val){
 		    		if(val.from == "" && val.to==""){
-		    			$('#modalMessageDiv').show();
+		    			$('#modalSiteMessageDiv').show();
 	    				$('#messageWindow').hide();
 	    				$('#successMessageDiv').hide();
 	    				$('#errorMessageDiv').show();
@@ -770,7 +1422,7 @@ chrisApp.controller('siteController',  ['$rootScope', '$scope', '$filter','siteS
 		    		 console.log(finalSiteObj);
 		    		$scope.modalErrorMessage ="";
 		    	 }else if(isValidLicense == false) {
-		    		 $('#modalMessageDiv').show();
+		    		 $('#modalSiteMessageDiv').show();
 	 				$('#messageWindow').hide();
 	 				$('#successMessageDiv').hide();
 	 				$('#errorMessageDiv').show();
@@ -778,7 +1430,7 @@ chrisApp.controller('siteController',  ['$rootScope', '$scope', '$filter','siteS
 	 				$scope.modalErrorMessage = "ValidTo must be greater than ValidFrom in LicenseDetail Tab.Please enter correct date";
 		    	 }
 		    	 else{
-		    		 $('#modalMessageDiv').show();
+		    		 $('#modalSiteMessageDiv').show();
 		 				$('#messageWindow').hide();
 		 				$('#successMessageDiv').hide();
 		 				$('#errorMessageDiv').show();
@@ -790,51 +1442,94 @@ chrisApp.controller('siteController',  ['$rootScope', '$scope', '$filter','siteS
      };
 	     $scope.createSiteVOObject=function(finalSiteObj){
 	    	 $('#loadingDiv').show();
-	    	// finalSiteObj.uploadedFile = $scope.uploadedFile;
-	    	// finalSiteObj.extension=$scope.fileExtension;
-	    	var finalObject = siteCreationService.createSiteObject(finalSiteObj)
-	    	console.log(finalObject);
-	    	siteCreationService.saveSiteObject(finalObject)
-    		.then(function(data) {
-    			console.log(data)
-    			if(data.statusCode == 200){
-    				$('#messageWindow').show();
-    				$('#successMessageDiv').show();
-    				$('#successMessageDiv').alert();
-    				$('#errorMessageDiv').hide();
-    				$('#siteModalCloseBtn').click();
-    				$('#infoMessageDiv').hide();
-    				$scope.successMessage = data.message;
-    				 $('#loadingDiv').hide();
-    				$scope.getAllSites();
-    				
-    			}else{
-    				 $('#modalMessageDiv').show();
-    				$('#messageWindow').hide();
-    				$('#successMessageDiv').hide();
-    				$('#errorMessageDiv').show();
-    				$('#errorMessageDiv').alert();
-    				$scope.modalErrorMessage = data.message;
-    				$('#loadingDiv').hide();
-    			}
-            },
-            function(data) {
-                console.log(data)
-                $('#messageWindow').hide();
-                $('#modalMessageDiv').show();
-                $('#successMessageDiv').hide();
-                $('#errorMessageDiv').show();
-				$('#errorMessageDiv').alert();
-				$scope.modalErrorMessage = data.message;
-				$('#loadingDiv').hide();
-            });
+	    	 finalSiteObj.uploadedFile = $scope.uploadedFile;
+	    	 finalSiteObj.extension=$scope.fileExtension;
+	    	 var validateSiteAndLicense=true;
+	    	 if($scope.siteFileSize!=null && $scope.siteFileSize > 100 ){
+	    		$('#modalSiteMessageDiv').show();
+ 				$('#messageWindow').hide();
+ 				$('#successMessageDiv').hide();
+ 				$('#errorMessageDiv').show();
+ 				$('#errorMessageDiv').alert();
+ 				$scope.modalErrorMessage = "File size exceeds Max 100KB";
+ 				 $('#loadingDiv').hide();
+ 				validateSiteAndLicense=false;
+ 				
+	    	 }
+	    	if(finalSiteObj.licenseAttachments.length > 0){
+	    		 $.each(finalSiteObj.licenseAttachments,function(key,val){
+	    			 if(val.fileExtension=="gif"){
+	    				 $scope.modalErrorMessage = "Supported File types are jpg, png and pdf";
+	    				 $('#fileerror').text("Supported File types are jpg, png and pdf");
+	    		 			$('#modalSiteMessageDiv').show();
+	    		 			validateSiteAndLicense=false;
+	    		 			return false;
+	    			 }
+	    		 });
+	    		 $('#loadingDiv').hide();	
+		    }else if($scope.fileExtension=="gif"){
+		    	 $scope.modalErrorMessage = "Supported File types are jpg, png and pdf";
+				 $('#fileerror').text("Supported File types are jpg, png and pdf");
+		 			$('#modalSiteMessageDiv').show();
+		 			validateSiteAndLicense=false;
+		    }
+	    	 
+	    	if(validateSiteAndLicense){
+	    		var finalObject = siteCreationService.createSiteObject(finalSiteObj)
+		    	console.log(finalObject);
+		    	siteCreationService.saveSiteObject(finalObject)
+	    		.then(function(data) {
+	    			console.log(data)
+	    			if(data.statusCode == 200){
+	    				$('#messageWindow').show();
+	    				$('#successMessageDiv').show();
+	    				$('#successMessageDiv').alert();
+	    				$('#errorMessageDiv').hide();
+	    				$('#siteModalCloseBtn').click();
+	    				$('#infoMessageDiv').hide();
+	    				$scope.successMessage = data.message;
+	    				 $('#loadingDiv').hide();
+	    				$scope.getAllSites();
+	    				
+	    			}else{
+	    				 $('#modalSiteMessageDiv').show();
+	    				$('#messageWindow').hide();
+	    				$('#successMessageDiv').hide();
+	    				$('#errorMessageDiv').show();
+	    				$('#errorMessageDiv').alert();
+	    				$scope.modalErrorMessage = data.message;
+	    				$('#loadingDiv').hide();
+	    			}
+	            },
+	            function(data) {
+	                console.log(data)
+	                $('#messageWindow').hide();
+	                $('#modalSiteMessageDiv').show();
+	                $('#successMessageDiv').hide();
+	                $('#errorMessageDiv').show();
+					$('#errorMessageDiv').alert();
+					$scope.modalErrorMessage = data.message;
+					$('#loadingDiv').hide();
+	            });
+	    	}else{
+	    		$('#modalSiteMessageDiv').show();
+ 				$('#messageWindow').hide();
+ 				$('#successMessageDiv').hide();
+ 				$('#errorMessageDiv').show();
+ 				$('#errorMessageDiv').alert();
+ 				$scope.modalErrorMessage = "Please verify site and license attachments.";
+ 				$('#loadingDiv').hide();
+	    	}
 	    	
 	     }
 	     $scope.closeMessageWindow=function(){
 				$('#messageWindow').hide();
 				$('#successMessageDiv').hide();
 				$('#errorMessageDiv').hide();
+				$('#modalSiteMessageDiv').hide();
 				$('#modalMessageDiv').hide();
+				$('#serviceModalMessageDiv').hide();
+				$('#equipmentModalMessageDiv').hide();
 				$scope.modalErrorMessage="";
 				$scope.successMessage="";
 			}
@@ -847,7 +1542,7 @@ chrisApp.controller('siteController',  ['$rootScope', '$scope', '$filter','siteS
 		 $scope.getSiteDetails=function(site){
 			console.log(site);
 				$scope.getSelectedSiteData(site.siteId);
-			 
+				//$scope.getSelectedSiteAttachments(site.siteId);
 			}
 		 
 		 $scope.getSelectedSiteData=function(siteId){
@@ -860,14 +1555,13 @@ chrisApp.controller('siteController',  ['$rootScope', '$scope', '$filter','siteS
 					$scope.selectedSite.siteName = site.siteName;
 					$scope.selectedSite.siteNumber1 = site.siteNumber1;
 					$scope.selectedSite.siteNumber2 = site.siteNumber2;
+					$scope.selectedSite.salesAreaSize = site.salesAreaSize;
 					$scope.selectedSite.siteAddress = site.fullAddress;
 					
 					$scope.selectedSite.siteAddress1 = site.siteAddress1;
 					$scope.selectedSite.siteAddress2 = site.siteAddress2;
 					$scope.selectedSite.siteAddress3 = site.siteAddress3;
 					$scope.selectedSite.siteAddress4 = site.siteAddress4;
-					
-					
 					
 					$scope.selectedSite.district = site.district;
 					$scope.selectedSite.area=site.area;
@@ -893,10 +1587,31 @@ chrisApp.controller('siteController',  ['$rootScope', '$scope', '$filter','siteS
 					$scope.siteSubmeterDetails = $scope.selectedSite.submeterDetails;
 					$scope.siteData.siteId = $scope.selectedSite.siteId;
 	    			//$scope.siteData = angular.copy( $scope.selectedSite);
+					console.log($scope.selectedSite.siteAttachments);
 	    		},function(data){
 	    			console.log(data);
 	    		})
+	    		
 		 }
+		 
+		 $scope.getSelectedSiteAttachments=function(keyName){ 
+			 siteService.siteFileDownload(keyName)
+	 		.then(function(data) {
+	 			console.log(data)
+	 			if(data.statusCode==200){
+	 				$scope.selectedSite.imageClicked=data.object;
+	 			}
+	 		},function(data){
+	 			console.log(data);
+	 		});
+		 }
+		 
+		 $scope.viewImage=function(){
+			 if($scope.selectedSite.fileInput!=null){
+			  $('#imageviewer').html("<img src='"+$('#siteImg').val()+"' style='width:50%'></img>");
+			 }
+		 }
+		 
 		 
 		 $scope.updateSiteModal = function(selectedSite) {
 			 console.log(selectedSite);
@@ -1293,3 +2008,94 @@ function setTimeValues(dropDownId, option){
 		
 	}
 	
+function assetValidateDropdownValues(dropDownId, assetType){
+	var scope = angular.element("#siteWindow").scope();
+	 var valueId = parseInt($("#"+dropDownId).val());
+	 if(valueId == ""){
+		 
+	 }else{
+		 if(assetType == 'E'){
+				 if(dropDownId.toUpperCase() == "CATEGORYSELECT"){
+					 var category={
+							 assetCategoryId:parseInt($("#categorySelect").val()),
+					 		 assetCategoryName:$("#categorySelect option:selected").text()
+					 }
+					 scope.assetCategory.selected = category;
+				 }
+				 if(dropDownId.toUpperCase() == "LOCATIONSELECT"){
+					 var location={
+							 locationId:parseInt($("#locationSelect").val()),
+					 		 locationName:$("#locationSelect option:selected").text()
+					 }
+					 scope.assetLocation.selected =location;
+				 }
+				 if(dropDownId.toUpperCase() == "SPSELECT"){
+					 var serviceProvider={
+							 serviceProviderId:parseInt($("#spSelect").val()),
+					 		 serviceProviderName:$("#spSelect option:selected").text()
+					 }
+					 scope.serviceProvider.selected = serviceProvider;
+				 }
+				 if(dropDownId.toUpperCase() == "SITESELECT"){
+					 var site={
+							 siteId:parseInt($("#siteSelect").val()),
+					 		 siteName:$("#siteSelect option:selected").text()
+					 }
+					 scope.accessSite.selected =site;
+				 }
+				 scope.equipmentData.assetType=assetType;
+		 }else if(assetType == 'S'){
+			 if(dropDownId.toUpperCase() == "SERVICECATEGORYSELECT"){
+				 var category={
+						 assetCategoryId:parseInt($("#serviceCategorySelect").val()),
+				 		 assetCategoryName:$("#serviceCategorySelect option:selected").text()
+				 }
+				 scope.assetCategory.selected = category;
+			 }
+			 if(dropDownId.toUpperCase() == "SERVICELOCATIONSELECT"){
+				 var location={
+						 locationId:parseInt($("#serviceLocationSelect").val()),
+				 		 locationName:$("#serviceLocationSelect option:selected").text()
+				 }
+				 scope.assetLocation.selected =location;
+			 }
+			 if(dropDownId.toUpperCase() == "SERVICESPSELECT"){
+				 var serviceProvider={
+						 serviceProviderId:parseInt($("#serviceSPSelect").val()),
+				 		 serviceProviderName:$("#serviceSPSelect option:selected").text()
+				 }
+				 
+				 scope.serviceProvider.selected = serviceProvider;
+			 }
+			 if(dropDownId.toUpperCase() == "SERVICESITESELECT"){
+				 var site={
+						 siteId:parseInt($("#serviceSiteSelect").val()),
+				 		 siteName:$("#siteSelect option:selected").text()
+				 }
+				 scope.accessSite.selected =site;
+			 }
+			 scope.serviceData.assetType=assetType;
+		 }
+	 }
+}
+
+/*function getIndexedName(val){
+	console.log(val.id);
+	var licenceId=val.id;
+	 var ext=$('input#licenseInputFile'+licenceId).val().split(".").pop().toLowerCase();
+     $scope.fileExtension = ext;
+     if($.inArray(ext, ["jpg","jpeg","JPEG", "JPG","PDF","pdf","doc","docx","DOC","DOCX","png","PNG"]) == -1) {
+    	 $('#messageWindow').show();
+    	 $('#errorMessageDiv').show();
+			 $scope.errorMessage="Supported file types to upload are jpg, docx and png";
+          $scope.isfileselected=false;
+         return false;
+     }else if (e.target.files != undefined) {
+         $scope.isfileselected=true;
+         file = $('#licenseInputFile').prop('files');
+      	 var reader = new FileReader();
+     	 reader.onload = $scope.onFileUploadReader;
+     	 reader.readAsDataURL(file[0]);
+       }
+	
+}*/

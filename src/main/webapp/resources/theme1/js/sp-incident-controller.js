@@ -75,7 +75,7 @@ chrisApp.controller('spIncidentController',  ['$rootScope', '$scope', '$filter',
 			$('#ticketList').on('click', 'tbody tr',function(){
 				 $('#ticketList tbody > tr').removeClass('currentSelected');
 				  $(this).addClass('currentSelected');
-				  var rowIndex =  $(this).find('td:eq(0)').text();
+				  var rowIndex =  $(this).find('td:eq(1)').text();
 			            var currentTicket={
 				        		ticketNumber:rowIndex
 				        }
@@ -356,8 +356,13 @@ function populateDataTable(data, tableDivName){
 	
 	$('#'+tableDivName).dataTable({
 		"aaData" : data,
-		"order": [[ 0, "asc" ]],
-		"aoColumns" : [ {
+		"order": [[ 0, "desc" ]],
+		"aoColumns" : [{
+			"sTitle" : "Ticket ID",
+			"mData" : "ticketId",
+			"sClass": "hidden"
+			
+		}, {
 			"sTitle" : "Ticket Number",
 			"mData" : "ticketNumber"
 		},{
@@ -387,6 +392,9 @@ function populateDataTable(data, tableDivName){
 				}
 				else if(full.statusId==6){
 					return '<a href style="color:red"> <i class="fa fa-times-circle" aria-hidden="true"></i> '+data+'</a>';
+				 }
+				else if(full.statusId==7){
+					return '<a href style="color:#F033FF"> <i class="fa fa-check-circle-o" aria-hidden="true"></i> '+data+'</a>';
 				 }
 			}
 		}]

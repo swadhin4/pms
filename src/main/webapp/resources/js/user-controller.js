@@ -46,6 +46,7 @@ productApp.controller('userController', ['$rootScope','$scope','$http','$filter'
 										lastName:val.lastName,
 										userName:val.userName,
 										roles:roles,
+										phone:val.phoneNo,
 										assignedRoles:roleAssigned.join(", ")
 									};
 							 $rootScope.appUsers.push(userInfo);

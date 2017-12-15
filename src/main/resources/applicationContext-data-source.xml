@@ -13,7 +13,7 @@
   
 </bean>
 
-   <bean id="jdbcQueryDAO" class="com.jpa.repositories.JDBCQueryDAO">
+   <bean id="jdbcQueryDAO" class="com.pms.jpa.repositories.JDBCQueryDAO">
         <property name="dataSource" ref="dataSource"/>
     </bean>
    

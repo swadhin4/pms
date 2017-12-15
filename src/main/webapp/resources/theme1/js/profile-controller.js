@@ -11,6 +11,13 @@ chrisApp.controller('profileController',  ['$rootScope', '$scope', '$filter', '$
 	$scope.loggedInUserDetail = [];
 	$scope.selectedUser ={};
 	
+	$scope.onlyNumbers = /^\d+$/;
+	$scope.filterValue = function($event){
+	    if(isNaN(String.fromCharCode($event.keyCode))){
+	        $event.preventDefault();
+	    }
+	};
+	
 	$scope.passwordDetail = {};
 		angular.element(document).ready(function(){		
 			 
@@ -73,23 +80,33 @@ chrisApp.controller('profileController',  ['$rootScope', '$scope', '$filter', '$
 			}
 		    
 		    $scope.updateProfile=function($securityForm){
-		    	 /*if ($securityForm.$valid) {
-		    	        //do stuff
-		    	    }*/ 
-		    	console.log($scope.loggedInUserDetail);
+		    	if ($scope.profileForm.$valid) {
+		    		console.log($scope.loggedInUserDetail);
+		    	}
+		    	 $scope.updateProfileDetails($scope.loggedInUserDetail);
 		    	
 		    };
 		    
+		    $scope.updateProfileDetails=function(updatedUserDetails){
+		    	userService.updateProfile(updatedUserDetails)
+		    	.then(function(data){
+		    		$('#profile-success-alert').show();
+					$('#profile-success-alert').alert();
+					$scope.successMessage = data.message;
+					$('#profile-error-alert').hide();
+		    	},function(data){
+		    		 	$('#profile-error-alert').show();
+						$('#profile-error-alert').alert();
+						$('#profile-success-alert').hide();
+						$scope.errorMessage = data.message;
+		    	});
+		    }
+		    
 		    $scope.updatePassword=function($securityForm){
-		    	
 		    	if ($scope.securityForm.$valid) {
 	    	        //do stuff
-		    		console.log($scope.passwordDetail);
 		    		$scope.changePassword($scope.passwordDetail);
-		    		
 	    	    } 
-		    	
-		    	
 		    };
 		    
 		    $scope.changePassword=function(userPasswords){
@@ -106,7 +123,7 @@ chrisApp.controller('profileController',  ['$rootScope', '$scope', '$filter', '$
 						$('#profile-error-alert').show();
 						$('#profile-error-alert').alert();
 						$('#profile-success-alert').hide();
-						$scope.successMessage = data.message;
+						$scope.errorMessage = data.message;
 					}
 	            },
 	            function(data) {
@@ -114,7 +131,7 @@ chrisApp.controller('profileController',  ['$rootScope', '$scope', '$filter', '$
 	                $('#profile-error-alert').show();
 					$('#profile-error-alert').alert();
 					$('#profile-success-alert').hide();
-					$scope.successMessage = data.message;
+					$scope.errorMessage = data.message;
 	            });
 		    }
 		    
@@ -122,6 +139,7 @@ chrisApp.controller('profileController',  ['$rootScope', '$scope', '$filter', '$
 		    	$('#profile-success-alert').hide();
 		    	$('#profile-error-alert').hide();
 				$scope.successMessage="";
+				$scope.errorMessage="";
 			}
 		    
 		    

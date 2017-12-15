@@ -76,7 +76,7 @@ chrisApp.controller('incidentController',  ['$rootScope', '$scope', '$filter','s
 			$('#ticketList').on('click', 'tbody tr',function(){
 				 $('#ticketList tbody > tr').removeClass('currentSelected');
 				  $(this).addClass('currentSelected');
-				  var rowIndex =  $(this).find('td:eq(0)').text();
+				  var rowIndex =  $(this).find('td:eq(1)').text();
 			            var currentTicket={
 				        		ticketNumber:rowIndex
 				        }
@@ -402,11 +402,16 @@ function ticketStatusChange(dropDownId){
 }
 
 function populateDataTable(data, tableDivName){
-	
+	console.log(data);
 	$('#'+tableDivName).dataTable({
 		"aaData" : data,
-		"order": [[ 0, "asc" ]],
+		"order": [[ 0, "desc" ]],
 		"aoColumns" : [ {
+			"sTitle" : "Ticket ID",
+			"mData" : "ticketId",
+			"sClass": "hidden"
+			
+		},{
 			"sTitle" : "Ticket Number",
 			"mData" : "ticketNumber"
 		},{

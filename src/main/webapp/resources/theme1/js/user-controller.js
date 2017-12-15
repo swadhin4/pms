@@ -10,6 +10,14 @@ chrisApp.controller('userController',  ['$rootScope', '$scope', '$filter', '$loc
 	$scope.selectedUser ={};
 	$scope.sessionUser={};
 	$scope.loggedInUserEmail = "";
+	
+	$scope.onlyNumbers = /^\d+$/;
+	$scope.filterValue = function($event){
+	    if(isNaN(String.fromCharCode($event.keyCode))){
+	        $event.preventDefault();
+	    }
+	};
+	
 		angular.element(document).ready(function(){
 			 $scope.findAllUsers();
 			 $scope.rowHighilited(0);
@@ -124,7 +132,8 @@ chrisApp.controller('userController',  ['$rootScope', '$scope', '$filter', '$loc
 	    							role:role,
 	    							createdAt:val.createdAt,
 	    							company:val.company,
-	    							isEnabled:val.enabled
+	    							isEnabled:val.enabled,
+	    							phone:val.phoneNo
 	    					}
 	    					$scope.appUsers.push(userData);
 	    					$scope.getUserDetail($scope.appUsers[0]);

@@ -63,9 +63,9 @@ background-color: rgba(60, 141, 188, 0.58) !important;
     background-color: #fff;
     position: fixed;
 }
- #modalMessageDiv{
+ #modalMessageDiv,  #serviceModalMessageDiv, #equipmentModalMessageDiv{
    top: -7%;
-    left: 47%;
+    left: 64%;
     /* width: 45em; */
     height: 3em;
     margin-top: 4em;
@@ -95,7 +95,15 @@ background-color: rgba(60, 141, 188, 0.58) !important;
 }
 .popover {max-width:500px;}
 
+.entry:not(:first-of-type)
+{
+    margin-top: 10px;
+}
 
+.glyphicon
+{
+    font-size: 12px;
+}
 
 </style>
 
@@ -122,13 +130,50 @@ $(function() {
        $('.modal').removeClass('fade');
    } 
   
+   $('#btnUploadCancel').click(function(){
+		$('#upload-files').modal('toggle');
+	});
+});
+   
+/*    $(document).on('click', '.btn-add', function(e)
+		    {
+		        e.preventDefault();
+
+		        var controlForm = $('.controls:first'),
+		            currentEntry = $(this).parents('.entry:first'),
+		            newEntry = $(currentEntry.clone()).appendTo(controlForm);
+
+		        newEntry.find('input').val('');
+		        newEntry.find('input#incidentFile').Id('2');
+		        controlForm.find('.entry:not(:last) .btn-add')
+		            .removeClass('btn-add').addClass('btn-remove')
+		            .removeClass('btn-success').addClass('btn-danger')
+		            .html('<span class="glyphicon glyphicon-minus"></span>');
+		    }).on('click', '.btn-remove', function(e)
+		    {
+		      $(this).parents('.entry:first').remove();
+		      angular.element(this).scope().getFileDetails(this); 
+				e.preventDefault();
+				return false;
+			});
+   
+   $(document).on('click', '.btn-close', function(e)
+		    {
+	   			
+		        e.preventDefault();
+
+		        var controlForm = $('.controls:first'),
+		            currentEntry = $(this).parents('.entry:first'),
+		            newEntry = $(currentEntry.clone()).appendTo(controlForm);
+
+		        newEntry.find('input').val('');
+		        
+		    })
       
-  })
+  }) */
   
-  function validate_tab(thisform) {          
-    
-         $('.tab-pane input, .tab-pane select, .tab-pane textarea').on(
-                'invalid', function() {
+	  function validate_tab(thisform) {          
+         $('.tab-pane input, .tab-pane select, .tab-pane textarea').on('invalid', function() {
                 
                     // Find the tab-pane that this element is inside, and get the id
                     var $closest = $(this).closest('.tab-pane');
@@ -180,7 +225,7 @@ $(function() {
 									
 								</div>
 							</div>
-					<div class="box-body">
+					<div class="box-body" style="height:72%" >
 					<input type="hidden" id="mode" value="${mode}">
 					 <div class="row" >
 					 	<div class="col-md-12">
@@ -202,7 +247,7 @@ $(function() {
 							</div>
 							
 							<div class="row">							
-							 <div class="col-md-12 reqDiv required">							  	
+							 <div class="col-md-12">							  	
 							 <label class="control-label" for="ticketDescription">Ticket Description</label>
 								  <textarea class="form-control" style="width: 100%;
    				 height: 100px;" rows="3" placeholder="Enter ticket description" name="title" 
@@ -313,10 +358,12 @@ $(function() {
 					                
 								</div>								
 							<div class="row">
-					               <div class="col-xs-12">
-					                <label for="fileInput">Attach File</label>
-					                  <input type="file" multiple="multiple" class="form-control" name="inputfilepath" ng-model="ticketData.fileObject">
-					                </div>
+					               <div class="col-xs-4">
+					               Please click <a href data-toggle="modal" ng-click="openFileAttachModal()"><b>Here</b></a> to attach File.
+					              
+					              <a href class="btn btn-warning">Files attached <span class="badge">{{incidentImages.length}}</span> <span class="badge">{{totalIncidentImageSize}} KB</span></a>
+					              
+					               </div>
 							</div>
 							<div class="row" id="ticketCloseDiv">
 							<div class="col-xs-4 reqDiv required">
@@ -343,13 +390,14 @@ $(function() {
 								
 								
 						</div>
+						<div class="box-footer">
+							<div class="row">	
+								<div class="col-md-12">		
+								<button type="submit" class="btn btn-success" >Save changes</button>
+								<button type="reset" id="reseCreateTicketForm" class="btn btn-success">RESET</button>
+								</div>
+							</div>	
 						</div>
-						<div class="modal-footer">			
-						
-						 				
-							<button type="submit" class="btn btn-success" >Save changes</button>
-							<button type="reset" id="reseCreateTicketForm" class="btn btn-success">RESET</button>
-					</div>
 					</div>
 									</form>									
 								
@@ -359,7 +407,7 @@ $(function() {
 			
 		
 		
-		<div class="modal fade" id="equipmentModal">
+		<div class="modal fade" id="equipmentModal" data-keyboard="false" data-backdrop="static">
 		<div class="modal-dialog" style="width: 80%;">
 			<div class="modal-content">
 			 <form name="createassetform" ng-submit="saveAssetEquipment()" >
@@ -370,9 +418,9 @@ $(function() {
 			</button>
 			<h4 class="modal-title"><span id="assetModalLabel">Add new Asset</span>   |  <a class="btn btn-info">Asset Type 
 			<span class="badge">Equipment</span></a></h4>
-			<div class="alert alert-danger alert-dismissable" id="modalMessageDiv"
+			<div class="alert alert-danger " id="equipmentModalMessageDiv"
 				style="display: none;  height: 34px;white-space: nowrap;">
-				<strong>Error! </strong> {{modalErrorMessage}} 
+				<strong>Error! </strong> {{equipmentModalErrorMessage}} <span id="fileerrorasset"></span>
 				<a href><span class="messageClose" ng-click="closeMessageWindow()">X</span></a>
 			</div>
 
@@ -433,14 +481,16 @@ $(function() {
 								<input type="hidden" ng-model="assetLocation.selected" required>
 						</div>
 						<div class="col-xs-3">
-							<label for="exampleInputEmail1">Picture</label> <input
-								type="file" class="form-control" name="inputfilepath"
-								ng-model="equipmentData.imagePath">
+							<label for="exampleInputEmail1">Picture (Max Size 100KB)</label> <input
+								type="file" class="form-control" id="inputImgfilepath" 
+								name="inputImgfilepath" ng-model="equipmentData.imagePath"  accept="image/*"
+								onchange="angular.element(this).scope().getImageFile(this, event )">
 						</div>
-						<div class="col-xs-3">
+						<div class="col-xs-3" >
 							<label for="exampleInputEmail1">Additional
-								document</label> <input type="file" class="form-control"
-								name="inputfilepath" ng-model="equipmentData.documentPath">
+								document (Max Size 100KB)</label> <input type="file" class="form-control"
+								id="inputDocfilepath" name="inputDocfilepath" ng-model="equipmentData.documentPath" 
+								accept=".doc, .docx,.pdf" onchange="angular.element(this).scope().getDocumentFile(this, event , 'equipmentModalMessageDiv', 'fileerrorasset')">
 						</div>
 
 					</div>
@@ -457,7 +507,7 @@ $(function() {
 							<input type="hidden" ng-model="serviceProvider.selected">
 						</div>
 						<div class="col-xs-3 required">
-							<label class="control-label">Date of
+							<label class="control-label">Date of Asset
 								commission</label>
 							<div class="input-group date">
 								<div class="input-group-addon">
@@ -468,7 +518,7 @@ $(function() {
 							</div>
 						</div>
 						<div class="col-xs-3 ">
-							<label class="control-label">Date of
+							<label class="control-label">Date of Asset
 								decommission</label>
 							<div class="input-group date">
 								<div class="input-group-addon">
@@ -478,11 +528,7 @@ $(function() {
 									id="decommission" ng-model="equipmentData.deCommissionedDate" >
 							</div>
 						</div>
-						<div class="col-xs-3">
-							<label for="exampleInputEmail1">Comments</label> <input
-								type="text" maxlength="50" class="form-control"
-								placeholder="Enter comment" name="comment" ng-model="equipmentData.assetDescription">
-						</div>
+						
 
 					</div>
 					<div class="row">
@@ -513,6 +559,22 @@ $(function() {
 						</div>
 
 					</div>
+					<div class="row">
+					<div class="col-xs-9">
+							<!-- <label for="exampleInputEmail1">Comments</label> <input
+								type="text" maxlength="50" class="form-control"
+								placeholder="Enter comment" name="comment" ng-model="equipmentData.assetDescription"> -->
+								
+								<label for="exampleInputEmail1">Comments</label> <!-- <input
+								type="text" maxlength="500" class="form-control"
+								placeholder="Enter comment" name="comment" ng-model="equipmentData.assetDescription"> -->
+								<textarea class="form-control" maxlength="1000" style="width: 100%;
+   				 height: 70px;" rows="3" placeholder="Enter comment" name="comment" ng-model="equipmentData.assetDescription"></textarea>
+						</div>
+						</div>
+						
+						
+					
 					</div>
 						</div>
 						</div>
@@ -540,11 +602,12 @@ $(function() {
 				aria-label="Close">
 				<span aria-hidden="true">&times;</span>
 			</button>
-			<h4 class="modal-title"><span id="assetServiceModalLabel">Add new Asset</span>   |  <a class="btn btn-info">Asset Type 
+			<h4 class="modal-title"><span id="assetServiceModalLabel">Add new Asset</span>   |  <a class="btn btn-info">Asset or Service type 
 			<span class="badge">Service</span></a></h4>
 			<div class="alert alert-danger alert-dismissable" id="serviceModalMessageDiv"
 				style="display: none;  height: 34px;white-space: nowrap;">
-				<strong>Error! </strong> {{modalErrorMessage}} <span class="messageClose" ng-click="closeMessageWindow()">X</span>
+				<strong>Error! </strong> {{serviceModalErrorMessage}} <span id="fileerrorservice"></span> 
+				<a href><span class="messageClose" ng-click="closeMessageWindow()">X</span></a>
 			</div>
 
 		</div>
@@ -567,7 +630,7 @@ $(function() {
 								placeholder="Enter service name" required>
 						</div>
 						<div class="col-xs-4 required">
-							<label class="control-label">Asset Code</label> <input
+							<label class="control-label">Service Code</label> <input
 								name="modalInput" type="text" class="form-control"
 								maxlength="20" name="serviceCode" ng-model="serviceData.assetCode"
 								placeholder="Enter service code" required>
@@ -605,18 +668,12 @@ $(function() {
 						
 						<div class="col-xs-4">
 							<label for="exampleInputEmail1">Additional
-								document</label> <input type="file" class="form-control"
-								name="inputfilepath" ng-model="serviceData.documentPath">
+								document (Max Size 100KB)</label> <input type="file" class="form-control" 
+								id="inputServiceDocfilepath" accept=".doc, .docx,.pdf"
+								name="inputServiceDocfilepath" ng-model="serviceData.documentPath" 
+								onchange="angular.element(this).scope().getDocumentFile(this, event, 'serviceModalMessageDiv','fileerrorservice' )">
 						</div>
-						<div class="col-xs-4">
-							<label for="exampleInputEmail1">Comments</label> <input
-								type="text" maxlength="50" class="form-control"
-								placeholder="Enter comment" name="comment" ng-model="serviceData.assetDescription">
-						</div>
-
-					</div>
-
-					<div class="row">
+						
 						<div class="col-xs-4">
 							<label class="control-label">Service Provider</label> <!-- <select
 							ng-options="val as val.name for val in serviceProvider.list"
@@ -627,9 +684,14 @@ $(function() {
 							</select> 
 							<input type="hidden" ng-model="serviceProvider.selected">
 						</div>
+						
+
+					</div>
+
+					<div class="row">
+						
 						<div class="col-xs-4 required">
-							<label class="control-label">Date of
-								commission</label>
+							<label class="control-label">Service contract start date</label>
 							<div class="input-group date">
 								<div class="input-group-addon">
 									<i class="fa fa-calendar"></i>
@@ -639,8 +701,7 @@ $(function() {
 							</div>
 						</div>
 						<div class="col-xs-4 ">
-							<label class="control-label">Date of
-								decommission</label>
+							<label class="control-label">Service contract end date</label>
 							<div class="input-group date">
 								<div class="input-group-addon">
 									<i class="fa fa-calendar"></i>
@@ -654,7 +715,16 @@ $(function() {
 					</div>
 					<div class="row">
 						
-
+					<div class="col-xs-8">
+					
+							<label for="exampleInputEmail1">Comments</label> <!-- <input
+								type="text" maxlength="500" class="form-control"
+								placeholder="Enter comment" name="comment" ng-model="equipmentData.assetDescription"> -->
+								<textarea class="form-control" maxlength="1000" style="width: 100%;
+   				 height: 70px;" rows="3" placeholder="Enter comment" name="comment" ng-model="serviceData.assetDescription"></textarea>
+							
+							
+						</div>
 						
 						<!-- <div class="col-xs-4 required">
 							<label class="control-label">Site</label> <select
@@ -686,6 +756,58 @@ $(function() {
 							</div>
 
 						</div>
+						
+<div class="modal" id="fileAttachModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="false">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h4 class="modal-title" id="upload-avatar-title">Upload new files</h4>
+          <div class="alert alert-danger alert-dismissable" id="incidentImageModalMessageDiv"
+				style="display: none;  height: 34px;white-space: nowrap;">
+				<strong>Error! </strong> {{incidentImageModalErrorMessage}} <span id="fileerrorincident"></span>
+				<a href><span class="messageClose" ng-click="closeMessageWindow()">X</span></a>
+			</div>
+        </div>
+        <div class="modal-body">
+          <p>Please choose a file to upload. image/*,.pdf only.</p>
+          <form role="form">
+          <div class="controls">
+              <div class="entry input-group col-xs-12">
+                <input type="button" class="btn btn-success addnew" style="margin-right: 5px;" onclick="" ng-click="addNewImage()" value="Add New">
+                <div  style="overflow-y:auto;height:250px">
+                <table id="example2" class="table  table-hover table-condensed">
+                 <tbody>
+                <tr ng-repeat="incidentImage in incidentImageList">
+                  <td>
+                  <input type="file" id="incidentImage{{$index}}" class="form-control" 
+                  name="incidentImage[{{$index}}]" accept="image/*,.doc, .docx,.pdf" 
+                  onchange="angular.element(this).scope().getIndexedName(this, event)" style="width:80%">
+                   <a class="btn btn-danger" href  ng-click="removeImage($index)" >
+                               <i class="fa fa-trash-o" aria-hidden="true" style="font-size: 1.4em;"></i>
+                  </a>
+                  </td>
+                </tr>
+                <tr>
+                	<td colspan="2">Total Size : {{totalIncidentImageSize}} KB</td>
+                </tr>	
+                </tbody>
+                </table>
+                </div>
+              </div>
+              
+           
+          </div>
+            </br>
+            <button type="button" class="btn btn-default" id="btnUploadCancel" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-success" ng-click="uploadFiles()" value="Upload">Upload</button>
+          </form>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+<!-- </div> -->
+
+</div>
 						</div>
 						</div>
 

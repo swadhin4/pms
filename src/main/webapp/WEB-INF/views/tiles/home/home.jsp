@@ -17,54 +17,93 @@ var webContextPath="${pageContext.request.contextPath}";
 </head>
 <div class="content-wrapper">
 			<section class="content">
-			<h3 >Summarized view of Site and Service Providers Incidents</h3>
+			<h3 >Summarized View of Site and Service Providers Incidents</h3>
+			<div class="row">
+			<div class="col-sm-6 col-md-6 col-lg-6">
 			<div class="box" >
-							<div class="box-header with-border">
-								
-									<div class="box-tools pull-right" style="margin-top: 0px;">
-										<sec:authorize access="hasAnyRole('ROLE_SITE_STAFF','ROLE_SALES_MANAGER', 'ROLE_OPS_MANAGER')">
-										<!-- <a href class="btn btn-success pull-right" id="syncBtn">
-											Synchronize Views <i class="fa fa-refresh fa-spin  fa-fw"></i>
-											<span class="sr-only">Loading...</span>
-									  	</a> -->
-										</sec:authorize>	
-									</div>
-								</div>
+				<div class="box-header with-border">
+						<div id="filter_site_pie_div" align="left"></div>
+					</div>
 				<div class="box-body">				
 				<div class="row">
 				<div class="col-md-12" id="dashboard_div">
-					<div id="siteDiv" >
-						<div class="col-md-6 col-sm-6" >
-							  <!--Divs that will hold each control and chart-->
-							  <div id="filter_site_pie_div" align="left"></div>
-							  <div id="chart_site_pie_div" align="left"></div>
+					<div id="siteDiv1" style="overflow-x:hidden; overflow-y:hidden">
+						<div class="row" >
+							  <div class="col-md-12">
+							  <div id="chart_site_pie_div"></div>
+							  </div>
 						</div>
-						<div class="col-md-6 col-sm-6">
-							  <!--Divs that will hold each control and chart-->
-							  <div id="filter_site_bar_div" align="left"></div>
-							  <div id="chart_site_bar_div" align="left" ></div>
-						</div>
-					</div>
-				</div>
-		</div>
-		<div class="row">
-			<div class="col-md-12" id="dashboard_SP_div">
-				<div id="spDiv" >
-					<div class="col-md-6 col-sm-6" >
-						  <!--Divs that will hold each control and chart-->
-						  <div id="filter_SP_pie_div" align="left"></div>
-						  <div id="chart_SP_pie_div" align="left"></div>
-					</div>
-					<div class="col-md-6 col-sm-6">
-						  <!--Divs that will hold each control and chart-->
-						  <div id="filter_SP_bar_div" align="left"></div>
-						  <div id="chart_SP_bar_div" align="left"></div>
 					</div>
 				</div>
 			</div>
-		</div>	
-</div>
-</div>
+			</div>
+			</div>
+			</div>
+		 
+			<div class="col-sm-6 col-md-6 col-lg-6">
+			<div class="box" >
+				<div class="box-header with-border">
+						<div id="filter_site_bar_div" align="left"></div>
+					</div>
+				<div class="box-body">				
+				<div class="row">
+				<div class="col-md-12" id="dashboard_div">
+					<div id="siteDiv2" style="overflow-x:hidden; overflow-y:hidden" >
+					<div class="row" >
+							  <div class="col-md-12">
+							  <div id="chart_site_bar_div"></div>
+							  </div>
+						</div>
+					</div>
+				</div>
+			</div>
+			</div>
+			</div>
+			</div>
+		 </div>
+					<div class="row">
+			<div class="col-sm-6 col-md-6 col-lg-6">
+			<div class="box" >
+				<div class="box-header with-border">
+						<div id="filter_SP_pie_div" align="left"></div>
+					</div>
+				<div class="box-body">				
+				<div class="row">
+				<div class="col-md-12" id="dashboard_SP_div">
+					<div id="spDiv1" style="overflow-x:hidden; overflow-y:hidden">
+						<div class="row" >
+							  <div class="col-md-12">
+							  <div id="chart_SP_pie_div"></div>
+							  </div>
+						</div>
+					</div>
+				</div>
+			</div>
+			</div>
+			</div>
+			</div>
+		 
+			<div class="col-sm-6 col-md-6 col-lg-6">
+			<div class="box" >
+				<div class="box-header with-border">
+						<div id="filter_SP_bar_div" align="left"></div>
+					</div>
+				<div class="box-body">				
+				<div class="row">
+				<div class="col-md-12" id="dashboard_div">
+					<div id="spDiv2" style="overflow-x:hidden; overflow-y:hidden">
+					<div class="row" >
+							  <div class="col-md-12">
+							  <div id="chart_SP_bar_div"></div>
+							  </div>
+						</div>
+					</div>
+				</div>
+			</div>
+			</div>
+			</div>
+			</div>
+		 </div>
 
 			</section>
 				

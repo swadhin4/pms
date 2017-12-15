@@ -136,10 +136,9 @@ $(function() {
   
 </script>
 </head>
-<div id="page-content-wrapper" >
-	<div class="page-content">
+<div class="content-wrapper">
 	<c:set var="contextPath" value="${pageContext.request.contextPath}"></c:set>
-		<div class="container-fluid" ng-controller="spIncidentController" id="spIncidentWindow">
+		<div  ng-controller="spIncidentController" id="spIncidentWindow">
 		<div style="display:none" id="loadingDiv"><div class="loader">Loading...</div></div>
 			<section class="content" style="min-height: 35px; display: none"
 				id="messageWindow">
@@ -165,7 +164,6 @@ $(function() {
 			<section class="content">
 				<div class="row">
 				<div class="col-md-12">
-				<div class="row">
 						<div class="box">
 							<div class="box-header with-border">
 								<h3 class="box-title">List of Tickets</h3>
@@ -227,7 +225,6 @@ $(function() {
 								</div>
 							</div>
 						</div>
-							</div>
 							
 						</div>
 						
@@ -240,8 +237,4 @@ $(function() {
 		
 		</div>
 	</div>
-</div>
-</section>
-</div>
-</div>
-</div>
+

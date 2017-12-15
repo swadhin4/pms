@@ -77,7 +77,6 @@ function jsonToDataTableConversion(finalKeys, finalValues,retObj, tableDivName){
 				'id'	: index,  
 				'sTitle' : finalKeys[index],
 				'mData' : finalValues[index],
-				"bSearchable": searchable,
 				'sWidth' : "100%",
 				//"render": function ( data, type, full, meta ) {
 					//if($.isArray(data)){
@@ -120,7 +119,7 @@ function displayDataTable(arrayForTable,jsonObject, tableDivName){
 	if(oTableAssum==null){
 		oTableAssum = $('#'+tableDivName).dataTable({			
 			"bInfo": true,
-			"bLengthChange": false,
+			"bLengthChange": true,
 		    "bFilter": true,
 			"bDestroy": true,  
 			'aoColumns': arrayForTable,
@@ -146,14 +145,13 @@ function displayDataTable(arrayForTable,jsonObject, tableDivName){
 		$('#'+tableDivName+' thead').html('');
 		oTableAssum = $('#'+tableDivName).dataTable({			
 			"bInfo": true,
-			"bLengthChange": false,
+			"bLengthChange": true,
 		    "bFilter": true,
 			"bDestroy": true,  
 			'aoColumns': arrayForTable,
 			'aaData':jsonObject,
 			'useFloater': false,
 			'isResponsive': true,
-			'bSearchable':true,
 			'plugins': ["C"],
 			"oColVis": { //configure the column vis plugin
 				"activate": "mouseover",

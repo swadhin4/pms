@@ -18,6 +18,8 @@
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/site-controller.js?n=${System.currentTimeMillis()  + UUID.randomUUID().toString()}"></c:url>'></script>
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/site-service.js?n=${System.currentTimeMillis()  + UUID.randomUUID().toString()}"></c:url>'></script>
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/services.js?n=${System.currentTimeMillis()  + UUID.randomUUID().toString()}"></c:url>'></script>
+<script type="text/javascript" 	src='<c:url value="/resources/theme1/js/asset-service.js?n=${System.currentTimeMillis()  + UUID.randomUUID().toString()}"></c:url>'></script>
+<script type="text/javascript" 	src='<c:url value="/resources/theme1/js/service-provider-service.js?n=${System.currentTimeMillis()  + UUID.randomUUID().toString()}"></c:url>'></script>
 <style>
 	.main-box.no-header {
     padding-top: 20px;
@@ -41,9 +43,9 @@
     background-color: #fff;
     position: fixed;
 }
- #modalMessageDiv{
-   top: -7%;
-    left: 47%;
+ #modalMessageDiv, #modalSiteMessageDiv, #serviceModalMessageDiv, #equipmentModalMessageDiv{
+   top: -8%;
+    left: 55%;
     /* width: 45em; */
     height: 3em;
     margin-top: 4em;
@@ -64,6 +66,15 @@
   color:red;
 }
 
+.col-xs-3.required .control-label:after {
+  content:"*";
+  color:red;
+}
+
+.col-xs-4.required .control-label:after {
+  content:"*";
+  color:red;
+}
 
 
 </style>
@@ -73,6 +84,10 @@ $(function() {
 	 $('.toggle-on').removeAttr('style');
 	 $('.toggle-off').removeAttr('style');
 	 
+	 $(".dt1").datepicker({
+         format:"dd-mm-yyyy"
+     })
+     
    $('body').on('focus',".licensedate", function(){
        $(this).datepicker({
     	   format:'dd-mm-yyyy',
@@ -191,7 +206,7 @@ $(function() {
 									
 								</div>
 							</div>
-							<div class="box-body" style="height:72%" >
+							<div class="box-body" style="height:72%;overflow-y:visible;overflow-x:hidden" >
 								<div class="row">
 	 								<div class="col-md-12">
 										<input type="text" class="form-control"	placeholder="Search Site" ng-model="searchSite">
@@ -206,10 +221,20 @@ $(function() {
 													</div>
 													<div class="product-info">
 														<a href="javascript:void(0)"
-															ng-click="getSiteDetails(site)" class="product-title">{{site.siteName}}
+															ng-click="getSiteDetails(site); viewImage()" class="product-title">{{site.siteName}}
 														</a> <span class="product-description">
 															{{site.fullAddress}} </span>
+													<div class="col-sm-4">
+													 <i class="fa fa-map-marker" aria-hidden="true" ng-if="site.district.districtName!=null"></i> {{site.district.districtName || ''}}
 													</div>
+													<div class="col-sm-4">
+													<i class="fa fa-map-marker" aria-hidden="true" ng-if="site.area.areaName!=null"></i> {{site.area.areaName || ''}}
+													</div>
+													<div class="col-sm-4">
+													<i class="fa fa-map-marker" aria-hidden="true" ng-if="site.cluster.clusterName!=null"></i> {{site.cluster.clusterName || ''}}
+													</div>		
+													</div>
+													
 												</li>
 
 											</ul>
@@ -261,52 +286,84 @@ $(function() {
 										style="margin-right: 5px;" data-toggle="dropdown">
 										Manage Site <span class="caret"></span>
 									</button>
+
 									<ul class="dropdown-menu" role="menu">
-										<li ng-if="siteList.length> 0"><a href  style="margin-right: 5px;"
-									 data-toggle="modal" ng-click="manageUserAccess(selectedSite)">
-									 <span class="fa fa-user"></span> Manage User Access </a></li>
-									 	<li><a href  style="margin-right: 5px;"
-									 data-toggle="modal" ng-click="updateSiteModal(selectedSite)">
-									 <span class="fa fa-edit"></span> Edit Site </a></li>
+										<li> <a href data-toggle="modal" ng-click="addEquipment()" >  <span class="fa fa-cubes" aria-hidden="true"></span> Add Equipment</a></li>
+										<li>  <a href data-toggle="modal" ng-click="addService()"><span  class="fa fa-cubes" aria-hidden="true"></span> Add	Service</a></li>
+										<li>  <a href data-toggle="modal" ng-click="viewAssetForSelectedSite()" ><span  class="fa fa-cubes" aria-hidden="true"></span> View Asset</a></li>
+										<li ng-if="siteList.length> 0"><a href  style="margin-right: 5px;" data-toggle="modal" ng-click="manageUserAccess(selectedSite)">
+									 		<span class="fa fa-user"></span> Manage User Access </a></li>
+									 	<li><a href  style="margin-right: 5px;" data-toggle="modal" ng-click="updateSiteModal(selectedSite)">
+									 		<span class="fa fa-edit"></span> Edit Site </a></li>
 										<!-- <li><a href data-toggle="modal" >Add an Equipment</a></li>
 										<li><a href data-toggle="modal">Add	a Service</a></li> -->
+										
 									</ul>
 
 								</div>
 								</sec:authorize>
 								</div>
 							</div>
-							<div class="box-body" style="overflow-y:auto;overflow-x:hidden;height:72%">
-							   <div >
+							<div class="box-body" style="overflow-y:auto;overflow-x:hidden;height:77%">
 								<div class="row">
-									
 									<div class="col-md-12">
 									 <div class="table-responsive">
 										<table class="table no-margin">
 											<thead>											
-											<tr><td style="width:40%">Site Name</td><td align="right">{{selectedSite.siteName}}</td>
-											</tr>
-											<!-- <tr><td style="width:40%">Address</td><td align="right">{{selectedSite.siteAddress}}</td>
-											</tr> -->
+											<tr><th><i class="fa fa-sitemap" aria-hidden="true"></i> Site Name</th><th class="pull-right">{{selectedSite.siteName}}</th></tr>
 											</thead>
 											<tbody>
-											<tr><td>Site Owner</td><td align="right">{{selectedSite.retailerName}}</td></tr>
-											<tr><td>Retailer</td><td align="right">{{sessionUser.company.companyName}}</td></tr>
-											<tr><td>Electricity Id (MPAN)</td><td align="right">{{selectedSite.electricityId}}</td></tr>
-											<tr><td>Site Number1</td><td align="right">{{selectedSite.siteNumber1}}</td></tr>
-											<tr><td>Site Number2</td><td align="right">{{selectedSite.siteNumber2}}</td></tr>
-											<!-- <tr><td>Contact</td><td align="right">{{selectedSite.contactName}}</td></tr>
-											<tr><td>Phone</td><td align="right">{{selectedSite.primaryContact}}</td></tr> -->
+											<tr><td><i class="fa fa-user" aria-hidden="true"></i> Site Operator</td><td align="right">{{selectedSite.retailerName}}</td></tr>
+											<tr><td><i class="fa fa-building" aria-hidden="true"></i> Site Owner</td><td align="right">{{sessionUser.company.companyName}}</td></tr>
+											<tr><td><i class="fa fa-id-badge" aria-hidden="true"></i> Electricity Id (MPAN)</td><td align="right">{{selectedSite.electricityId}}</td></tr>
+											<tr><td><i class="fa fa-phone-square" aria-hidden="true"></i> Site ID Number 1</td><td align="right">{{selectedSite.siteNumber1}}</td></tr>
+											<tr><td><i class="fa fa-phone-square" aria-hidden="true"></i> Site ID Number 2</td><td align="right">{{selectedSite.siteNumber2}}</td></tr>
+											<tr><td><i class="fa fa-area-chart" aria-hidden="true"></i> Sales Area Size (M<sup>2</sup>)</td><td align="right">{{selectedSite.salesAreaSize}}</td></tr>
+											
 											</tbody>
 										</table>
 										</div>
 									</div>
+										<div class="col-md-12"> 
+											<div class="box box-danger">
+												<div class="box-header with-border">
+													<h3 class="box-title"><i class="fa fa-picture-o" aria-hidden="true"></i> Attachments</h3>
+													<a class="users-list-name"	href="javascript:void(0);"  ></a>
+													<!-- <div class="box-tools pull-right">
+														<span class="label label-danger">{{selectedSite.siteAttachments.length}} Files</span>
+														<button type="button" class="btn btn-box-tool"
+															data-widget="collapse">
+															<i class="fa fa-minus"></i>
+														</button>
+														<button type="button" class="btn btn-box-tool"
+															data-widget="remove">
+															<i class="fa fa-times"></i>
+														</button>
+													</div> -->
+												</div>
+												<!-- /.box-header -->
+												<div class="box-body no-padding">
+													 <input type="hidden" id="siteImg" value="${contextPath}/selected/file/download?keyname={{selectedSite.fileInput}}">
+												 <div class="col-md-12">
+												 	<div id="imageviewer" ng-if="selectedSite.fileInput!=null">
+												 	</div>
+												 	<div id="noimage" ng-if="selectedSite.fileInput==null">
+												 	 <img src="${contextPath}/resources/theme1/img/no-available-image.png" style="width:50%"></img>
+												 	</div>
+												 </div>
+												</div>
+												<div class="box-footer" ng-if="selectedSite.fileInput!=null">
+													<a href="${contextPath}/selected/file/download?keyname={{selectedSite.fileInput}}" class="uppercase" download><i class="fa fa-cloud-download fa-2x" aria-hidden="true"></i></a>
+												</div>
+												<!-- /.box-footer -->
+											</div>
+										</div>
 								</div>
 								
 								
 										<div class="box">
 							<div class="box-header with-border">
-								<h3 class="box-title">Contact Information</h3>
+								<h3 class="box-title"><i class="fa fa-bars" aria-hidden="true"></i> Contact Information</h3>
 							<div class="box-tools pull-right">
 							<sec:authorize access="hasAnyRole('ROLE_SALES_MANAGER', 'ROLE_OPS_MANAGER')">
 								<div class="btn-group pull-right">
@@ -323,22 +380,22 @@ $(function() {
                 <table class="table no-margin">
                   <thead>
                   <tr>
-                    <th>Name</th><td>{{selectedSite.contactName}}</td>
+                    <th><i class="fa fa-user" aria-hidden="true"></i> Name</th><td align="right">{{selectedSite.contactName}}</td>
                     </tr>
                     <tr>
-                    <th>Email</th><td>{{selectedSite.email}}</td>
+                    <th><i class="fa fa-envelope" aria-hidden="true"></i> Email</th><td align="right">{{selectedSite.email}}</td>
                     </tr>
                     <tr>
-                    <th>Address</th><td>{{selectedSite.siteAddress}} </td>
+                    <th><i class="fa fa-address-book" aria-hidden="true"></i> Address</th><td align="right">{{selectedSite.siteAddress}} </td>
                     </tr>
                     <tr>
-                    <th>Latitude</th><td>{{selectedSite.latitude}} </td>
+                    <th><i class="fa fa-map-marker" aria-hidden="true"></i> Latitude</th><td align="right">{{selectedSite.latitude}} </td>
                     </tr>
-                      <th>Longitude</th><td>{{selectedSite.longitude}} </td>
+                      <th><i class="fa fa-map-marker" aria-hidden="true"></i> Longitude</th><td align="right">{{selectedSite.longitude}} </td>
                     </tr>
                     <tr>
-                    <th>Contact No</th><td><i class="fa fa-phone-square" aria-hidden="true"></i> {{selectedSite.primaryContact}}<br> 
-                    					<i class="fa fa-phone-square" aria-hidden="true"></i> {{selectedSite.secondaryContact}}</td>
+                    <th><i class="fa fa-phone-square" aria-hidden="true"></i>  Contact No</th><td align="right">{{selectedSite.primaryContact}}<br> 
+                    					 {{selectedSite.secondaryContact || ''}}</td>
                     </tr>
                   </tr>
                   </thead>
@@ -381,7 +438,8 @@ $(function() {
                     <td><a href>{{license.licenseName}}</a></td>
                     <td>{{license.validfrom}}</td>
 					<td>{{license.validto}}</td>
-                    <td><span class="label label-success">Link</span></td>
+                    <td><a href="${contextPath}/selected/file/download?keyname={{license.attachment}}" download ng-if="license.attachment!=null">
+                    <span class="label label-success" >Download</span></a></td>
                    
                   </tr>
 
@@ -631,61 +689,40 @@ $(function() {
 							</div>
 						</div>
 								</div>
-							<div class="box-footer">
-								<div class="row">
-									<div class="col-sm-3 col-xs-6">
-										<div class="description-block border-right">
-											
-										</div>
-									</div>
-									<!-- /.col -->
-									<div class="col-sm-3 col-xs-6">
-										<div class="description-block border-right">
-											
-										</div>
-									</div>
-									<!-- /.col -->
-									<div class="col-sm-3 col-xs-6">
-										<div class="description-block border-right">
-											
-										</div>
-									</div>
-									<!-- /.col -->
-									<div class="col-sm-3 col-xs-6">
-										<div class="description-block">
-											
-										</div>
-									</div>
-								</div>
-							</div>
-							</div>
 								<div class="box-footer">
 								<div class="row">
-									<div class="col-sm-4 col-xs-6">
+									<div class="col-sm-3 col-xs-6">
 										<div class="description-block border-right">
-											<a href class="btn btn-success pull-left"> {{selectedSite.district.districtName}}</a>
+											
 										</div>
 									</div>
 									<!-- /.col -->
-									<div class="col-sm-4 col-xs-6">
+									<div class="col-sm-3 col-xs-6">
 										<div class="description-block border-right">
-											<a href class="btn btn-success"> {{selectedSite.area.areaName}}</a>
+											
 										</div>
 									</div>
 									<!-- /.col -->
-									<div class="col-sm-4 col-xs-6">
+									<div class="col-sm-3 col-xs-6">
+										<div class="description-block border-right">
+											
+										</div>
+									</div>
+									<!-- /.col -->
+									<div class="col-sm-3 col-xs-6">
 										<div class="description-block">
-											<a href class="btn btn-success pull-right"> {{selectedSite.cluster.clusterName}}</a>
+											
 										</div>
 									</div>
 								</div>
+							</div>
 							</div>
 						</div>
 							
 						</div>
 						
 						
-						<div class="modal fade" id="createSiteModal" data-keyboard="false" data-backdrop="static">
+						<div class="modal fade" id="createSiteModal" data-keyboard="false" data-backdrop="static">						
 	<div class="modal-dialog" style="width:82%;">
       <div class="modal-content">
        <form  name="createsiteform" ng-submit="saveSiteForm(createsiteform)">
@@ -695,9 +732,9 @@ $(function() {
 				<span aria-hidden="true">&times;</span>
 			</button>
 			<h4 class="modal-title"><span id="siteModalLabel">Create New Site</span>   |  <a class="btn btn-info">Company <span class="badge">{{sessionUser.company.companyName}}</span></a></h4>
-			<div class="alert alert-danger alert-dismissable" id="modalMessageDiv"
+			<div class="alert alert-danger alert-dismissable" id="modalSiteMessageDiv"
 				style="display: none;  height: 34px;white-space: nowrap;">
-				<strong>Error! </strong> {{modalErrorMessage}} 
+				<strong>Error! </strong> {{modalErrorMessage}} <span id="fileerror"></span>
 				<a href><span class="messageClose" ng-click="closeMessageWindow()">X</span></a>
 			</div>
 
@@ -741,7 +778,7 @@ $(function() {
                  					name="siteName" ng-model="siteData.siteName" required >	
 							 </div>
 							<div class="col-md-4 reqDiv required">
-							 <label class="control-label" for="owner">Site Owner</label>
+							 <label class="control-label" for="owner">Site Operator</label>
 								  <input type="text" maxlength="50" class="form-control" placeholder="Enter Site Owner" 
                   				name="owner" ng-model="siteData.owner" required>	
 							</div>
@@ -791,22 +828,28 @@ $(function() {
 									  placeholder="Enter Electricity ID (MPAN)" name="electricityId" ng-model="siteData.electricityId">
 					                </div>
 									<div class="col-xs-4 reqDiv required">
-					                <label class="control-label" for="siteNumber1">Site Number1</label>
-					                  <input type="text" maxlength="11" class="form-control" placeholder="Enter Site Number1" 
+					                <label class="control-label" for="siteNumber1">Site ID Number 1</label>
+					                  <input type="text" maxlength="11" class="form-control" placeholder="Enter Site ID Number 1" 
 					                  name="sitenumber1" ng-model="siteData.siteNumber1" required ng-pattern="onlyNumbers" ng-keypress="filterValue($event)">
 					                </div>
 					                <div class="col-xs-4">
-					                <label for="siteNumber2">Site Number2</label>
-					                  <input type="text" maxlength="11" class="form-control" placeholder="Enter Site Number2" 
+					                <label for="siteNumber2">Site ID Number 2</label>
+					                  <input type="text" maxlength="11" class="form-control" placeholder="Enter Site ID Number 2" 
 					                  name="sitenumber2" ng-model="siteData.siteNumber2" ng-pattern="onlyNumbers" ng-keypress="filterValue($event)">
 					               </div>
 								</div>
 								<div class="row">
-									   <div class="col-xs-6">
-					                <label for="fileInput">File Input</label>
+									   <div class="col-xs-8">
+					                <label for="fileInput">File Input (Max Size 100KB)</label>
 					                  <input type="file" id="siteInputFile" class="form-control" 
 					                  name="inputfilepath"  accept="image/*,.doc, .docx,.pdf" >
 					                </div>
+					                
+					                <div class="col-xs-4">
+					                <label for="siteNumber2">Size of Sales Area (M<sup>2</sup>)</label>
+					                  <input type="text" maxlength="8" class="form-control" placeholder="Enter Size of Sales Area" 
+					                  name="salesareasize" ng-model="siteData.salesAreaSize" valid-number >
+					               </div>
 								</div>
 								
 						</div>
@@ -972,7 +1015,8 @@ $(function() {
                   <th><b>License Name</b></th>
                   <th><b>Valid From</b></th>
                   <th><b>Valid To</b></th>
-                  <th><b>Attach File</b></th>                  
+                  <th><b>Attach File</b>
+                  </th>                  
                 </tr>
                 </thead>
                 <tbody>
@@ -981,8 +1025,8 @@ $(function() {
                      <input type="checkbox" ng-change="disableRemoveButton(licenseDetail.licenseId)"
                       ng-model="licenseDetail.selected"/></td>
                   <td>
-                   <input type="hidden" class="form-control" ng-model="licenseDetail.licenseId">
-                  <input type="text" class="form-control" ng-model="licenseDetail.licenseName" maxlength="50" required>
+                   <input type="hidden" class="form-control" ng-model="licenseDetail.licenseId" value="{{licenseDetail.licenseId}}" id="licenseBoxId{{$index}}">
+                  <input type="text" class="form-control" ng-model="licenseDetail.licenseName" value="{{licenseDetail.licenseName}}" id="licenseDetail{{$index}}" maxlength="50" required >
                    </td>
                   <td>
                   <div class="input-group date">
@@ -1006,7 +1050,9 @@ $(function() {
                   
                   </td>
                   <td>
-                  <input type="file" id="exampleInputFile"> 
+                   <input type="file" id="licenseInputFile{{$index}}" class="form-control" name="licenseInputFile[{{$index}}]" 
+                   accept="image/*,.doc, .docx,.pdf" onchange="angular.element(this).scope().getIndexedName(this, event, 'licenseBoxId')">
+                  
                   </td>
                   
                 </tr>
@@ -1051,11 +1097,12 @@ $(function() {
                   <td >
 	               <div class="input-group">
 	                 <input type="hidden" ng-model="salesoperationdetail.opId">
-	                <select class="form-control" style="width: 50%;"  id="salesoperationdetailFrom{{$index}}"
-	                ng-model="salesoperationdetail.selected.from" ng-change="setStartTime(salesoperationdetail, 'salesDayFrom' , {{$index}})" 
-	                ng-options="val.name for val in  operatingTimes" >
-	                <option value="">Start Time</option>
-	                </select>
+		                <select class="form-control" style="width: 50%;"  id="salesoperationdetailFrom{{$index}}"
+		                ng-model="salesoperationdetail.selected.from" ng-change="setStartTime(salesoperationdetail, 'salesDayFrom' , {{$index}})" 
+		                ng-options="val.name for val in  operatingTimes" >
+		                <option value="">Start Time</option>
+		                </select>
+	                </div>
 	                
 	                   
 	                <select class="form-control" style="width: 50%;" id="salesoperationdetailTo{{$index}}"
@@ -1304,6 +1351,358 @@ $(function() {
 		 </div>
 		 </div>
 		 </div>
+		 
+		 <div class="modal fade" id="equipmentModal" data-keyboard="false" data-backdrop="static">
+		<div class="modal-dialog" style="width: 80%;">
+			<div class="modal-content">
+			 <form name="createassetform" ng-submit="saveAssetEquipment()" >
+				<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal"
+				aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+			<h4 class="modal-title"><span id="assetModalLabel">Add new Asset</span>   |  <a class="btn btn-info">Asset Type 
+			<span class="badge">Equipment</span></a></h4>
+			<div class="alert alert-danger alert-dismissable" id="equipmentModalMessageDiv"
+				style="display: none;  height: 34px;white-space: nowrap;">
+				<strong>Error! </strong> {{equipmentModalErrorMessage}} <span id="fileerrorasset"></span>
+				<a href><span class="messageClose" ng-click="closeMessageWindow()">X</span></a>
+			</div>
+
+		</div>
+
+
+			 <div class="modal-body" style="background-color: #eee">
+			 	<div class="row">
+			 	<div class="col-md-12">
+			 	<div class="box">
+					<div class="box-body">
+					 
+					<div class="row">
+						<div class="col-xs-3 required">
+						<input
+								name="modalInput" type="hidden" class="form-control"
+								 name="sitename" ng-model="equipmentData.assetId">
+							<label class="control-label">Name</label> <input
+								name="modalInput" type="text" class="form-control"
+								maxlength="50" name="sitename" ng-model="equipmentData.assetName"
+								placeholder="Enter equipment name" required tabindex="1">
+						</div>
+						<div class="col-xs-3 required">
+							<label class="control-label">Asset Code</label> <input
+								name="modalInput" type="text" class="form-control"
+								maxlength="20" name="assetcode" ng-model="equipmentData.assetCode"
+								placeholder="Enter asset code" required tabindex="2">
+						</div>
+						<div class="col-xs-3">
+							<label for="exampleInputEmail1">Model</label> <input
+								name="modalInput" type="text" class="form-control" tabindex="3"
+								maxlength="20" name="model" ng-model="equipmentData.modelNumber"
+								placeholder="Enter model number">
+						</div>
+						<div class="col-xs-3 required">
+								<label class="control-label">Category</label> 
+								<select name="categorySelect" id="categorySelect" class="form-control" required tabindex="3"
+								onchange="assetValidateDropdownValues('categorySelect','E')">
+									
+								</select>
+								<input type="hidden" ng-model="assetCategory.selected" >
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-xs-3">
+							<label for="exampleInputEmail1">Content</label> <input
+								name="modalInput" type="text" class="form-control"
+								maxlength="50" name="content" ng-model="equipmentData.content"
+								placeholder="Enter content">
+						</div>
+						<div class="col-xs-3 required">
+								<label class="control-label">Location</label> 
+								<select name="locationSelect" id="locationSelect" class="form-control" required 
+								onchange="assetValidateDropdownValues('locationSelect','E')">
+									
+								</select>
+								<input type="hidden" ng-model="assetLocation.selected" required>
+						</div>
+					<div class="col-xs-3" >
+							<label for="exampleInputEmail1">Picture (Max Size 100KB)</label> <input
+								type="file" class="form-control" id="inputImgfilepath" 
+								name="inputImgfilepath" ng-model="equipmentData.imagePath"  accept="image/*"
+								onchange="angular.element(this).scope().getImageFile(this, event )">
+						</div>
+						<div class="col-xs-3" >
+							<label for="exampleInputEmail1">Additional
+								document (Max Size 100KB)</label> <input type="file" class="form-control"
+								id="inputDocfilepath" name="inputDocfilepath" ng-model="equipmentData.documentPath" 
+								accept=".doc, .docx,.pdf" 
+								onchange="angular.element(this).scope().getDocumentFile(this, event, 'equipmentModalMessageDiv','fileerrorasset' )">
+						</div>
+
+					</div>
+
+					<div class="row">
+						<div class="col-xs-3">
+							<label class="control-label">Service Provider</label> <!-- <select
+							ng-options="val as val.name for val in serviceProvider.list"
+								class="form-control" ng-model="serviceProvider.selected" required>
+							</select> -->
+							<select	name="spSelect" id="spSelect"	class="form-control" 
+							onchange="assetValidateDropdownValues('spSelect','E')">
+							</select> 
+							<input type="hidden" ng-model="serviceProvider.selected">
+						</div>
+						<div class="col-xs-3 required">
+							<label class="control-label">Date of Asset
+								commission</label>
+							<div class="input-group date">
+								<div class="input-group-addon">
+									<i class="fa fa-calendar"></i>
+								</div>
+								<input type="text" class="form-control pull-right dt1"
+									id="commission" ng-model="equipmentData.commisionedDate" required>
+							</div>
+						</div>
+						<div class="col-xs-3 ">
+							<label class="control-label">Date of Asset
+								decommission</label>
+							<div class="input-group date">
+								<div class="input-group-addon">
+									<i class="fa fa-calendar"></i>
+								</div>
+								<input type="text" class="form-control pull-right dt1"
+									id="decommission" ng-model="equipmentData.deCommissionedDate" >
+							</div>
+						</div>
+						<div class="col-xs-3 required">
+							<label class="control-label">Site</label> <!-- <select
+							   ng-options="val as val.siteName for val in accessSite.list"
+								class="form-control" ng-model="accessSite.selected" required>
+							</select> -->
+							<label class="form-control" ng-show="selectedSite.siteId !=null ">{{selectedSite.siteName}}</label>
+							<select ng-if="selectedSite.siteId == null " class="form-control" id="siteSelect" name="siteSelect" required
+							onchange="assetValidateDropdownValues('siteSelect','E')">
+							</select>
+							<input type="hidden" ng-model="accessSite.selected">
+						</div>
+						
+
+					</div>
+					<div class="row">
+						<div class="col-xs-3 required">
+							<label class="control-label">Is Asset
+								Electrical</label> <select id="drpIsAsset"  required
+								class="form-control" >
+								<option value="">Select Asset Electrical</option>
+								<option value="YES">YES</option>
+								<option value="NO">NO</option>
+							</select>
+						</div>
+						<div class="col-xs-3">
+							<label for="exampleInputEmail1">Is a power sensor
+								attached</label> <select id="drpIsPowersensor"
+								class="form-control" >
+								<option value="">Select Sensor Attached</option>
+								<option value="YES">YES</option>
+								<option value="NO">NO</option>
+							</select>
+						</div>
+
+						<div class="col-xs-3">
+							<label for="exampleInputEmail1">Sensor Number</label> <input
+								type="text" maxlength="20" id="txtSensorNumber"
+								class="form-control" placeholder="Enter sensor Number"
+								name="comment" ng-model="equipmentData.pwSensorNumber">
+						</div>
+
+						
+
+					</div>
+					
+					<div class="row">
+					
+					<div class="col-xs-9">
+							<label for="exampleInputEmail1">Comments</label> <!-- <input
+								type="text" maxlength="500" class="form-control"
+								placeholder="Enter comment" name="comment" ng-model="equipmentData.assetDescription"> -->
+								<textarea class="form-control" maxlength="1000" style="width: 100%;
+   				 height: 70px;" rows="3" placeholder="Enter comment" name="comment" ng-model="equipmentData.assetDescription"></textarea>
+						</div>
+						
+					
+					</div>
+					</div>
+						</div>
+						</div>
+						</div>
+					</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default pull-left"	id="assetModalCloseBtn" data-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-success" >Save changes</button>
+					<button type="reset" id="resetAssetForm" class="btn btn-success">RESET</button>
+			</div>
+									</form>
+									
+									
+								</div>
+							</div>
+
+						</div>
+						
+		<div class="modal fade" id="serviceModal" data-keyboard="false" data-backdrop="static">
+		<div class="modal-dialog" style="width: 80%;">
+			<div class="modal-content">
+			 <form name="createServiceAssetform" ng-submit="saveAssetService()" >
+				<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal"
+				aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+			<h4 class="modal-title"><span id="assetServiceModalLabel">Add new Asset</span>   |  <a class="btn btn-info">Asset Type 
+			<span class="badge">Service</span></a></h4>
+			<div class="alert alert-danger alert-dismissable" id="serviceModalMessageDiv"
+				style="display: none;  height: 34px;white-space: nowrap;">
+				<strong>Error! </strong> {{serviceModalErrorMessage}}  <span id="fileerrorservice"></span> 
+				<a href><span class="messageClose" ng-click="closeMessageWindow()">X</span></a>
+			</div>
+
+		</div>
+
+
+			 <div class="modal-body" style="background-color: #eee">
+			 	<div class="row">
+			 	<div class="col-md-12">
+			 	<div class="box">
+					<div class="box-body">
+					 
+					<div class="row">
+						<div class="col-xs-4 required">
+						<input
+								name="modalInput" type="hidden" class="form-control"
+								 name="serviceName" ng-model="serviceData.assetId">
+							<label class="control-label">Name</label> <input
+								name="modalInput" type="text" class="form-control"
+								maxlength="50" name="serviceName" ng-model="serviceData.assetName"
+								placeholder="Enter service name" required>
+						</div>
+						<div class="col-xs-4 required">
+							<label class="control-label">Service Code</label> <input
+								name="modalInput" type="text" class="form-control"
+								maxlength="20" name="serviceCode" ng-model="serviceData.assetCode"
+								placeholder="Enter service code" required>
+						</div>
+						
+						<div class="col-xs-4 required">
+							<div class="form-group">
+								<label class="control-label">Category</label> <!-- <select 
+								ng-options="val as val.assetCategoryName for val in assetCategory.list"
+									class="form-control" ng-model="assetCategory.selected" required>
+								</select> -->
+								<select name="serviceCategorySelect" id="serviceCategorySelect" class="form-control" required
+								onchange="assetValidateDropdownValues('serviceCategorySelect','S')">
+									
+								</select>
+								<input type="hidden" ng-model="assetCategory.selected">
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						
+						<div class="col-xs-4  required">
+								<label class="control-label">Location</label> <!-- <select
+								ng-options="val as val.locationName for val in assetLocation.list"
+									class="form-control" ng-model=" assetLocation.selected" required>
+									<option></option>
+								</select> -->
+								<select name="serviceLocationSelect" id="serviceLocationSelect" class="form-control" required 
+								onchange="assetValidateDropdownValues('serviceLocationSelect','S')">
+									
+								</select>
+								<input type="hidden" ng-model="assetLocation.selected">
+						</div>
+						
+						<div class="col-xs-4" >
+							<label for="exampleInputEmail1">Additional
+								document (Max Size 100KB)</label> <input type="file" class="form-control" 
+								id="inputServiceDocfilepath" accept=".doc, .docx,.pdf"
+								name="inputServiceDocfilepath" ng-model="serviceData.documentPath" 
+								onchange="angular.element(this).scope().getDocumentFile(this, event, 'serviceModalMessageDiv','fileerrorservice' )">
+						</div>
+						<div class="col-xs-4 required">
+							<label class="control-label">Site</label> <!-- <select
+							   ng-options="val as val.siteName for val in accessSite.list"
+								class="form-control" ng-model="accessSite.selected" required>
+							</select> -->
+							<label class="form-control" ng-if="selectedSite.siteId !=null ">{{selectedSite.siteName}}</label>
+							
+						<!-- 	<select ng-if="selectedSite.siteId ==null" class="form-control" id="serviceSiteSelect" 
+							name="serviceSiteSelect" required 
+							onchange="assetValidateDropdownValues('serviceSiteSelect','S')">
+							</select> -->
+							<input type="hidden" ng-model="accessSite.selected">
+						</div>
+
+					</div>
+
+					<div class="row">
+						<div class="col-xs-4">
+							<label class="control-label">Service Provider</label> <!-- <select
+							ng-options="val as val.name for val in serviceProvider.list"
+								class="form-control" ng-model="serviceProvider.selected" required>
+							</select> -->
+							<select	name="spSelect" id="serviceSPSelect"	class="form-control" 
+							onchange="assetValidateDropdownValues('serviceSPSelect','S')">
+							</select> 
+							<input type="hidden" ng-model="serviceProvider.selected">
+						</div>
+						<div class="col-xs-4 required">
+							<label class="control-label">Service contract start date</label>
+							<div class="input-group date">
+								<div class="input-group-addon">
+									<i class="fa fa-calendar"></i>
+								</div>
+								<input type="text" class="form-control pull-right dt1"
+									id="commissionDate" ng-model="serviceData.commisionedDate" required>
+							</div>
+						</div>
+						<div class="col-xs-4 ">
+							<label class="control-label">Service contract end date</label>
+							<div class="input-group date">
+								<div class="input-group-addon">
+									<i class="fa fa-calendar"></i>
+								</div>
+								<input type="text" class="form-control pull-right dt1"
+									id="decommissionDate" ng-model="serviceData.deCommissionedDate" >
+							</div>
+						</div>
+						
+
+					</div>
+					<div class="row">
+					<div class="col-xs-8">
+							<label for="exampleInputEmail1">Comments</label> 
+								<textarea class="form-control" maxlength="1000" style="width: 100%;
+   				 height: 70px;" rows="3" placeholder="Enter comment" name="comment" ng-model="serviceData.assetDescription"></textarea>
+						</div>
+					</div>
+					</div>
+						</div>
+						</div>
+						</div>
+					</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default pull-left"	id="serviceModalCloseBtn" data-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-success" >SAVE CHANGES</button>
+					<button type="reset" id="resetServiceAssetForm" class="btn btn-success">RESET</button>
+			</div>
+									</form>
+									
+									
+								</div>
+							</div>
+
+						</div>				
 						</div>
 						</section>
 				

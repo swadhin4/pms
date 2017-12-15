@@ -28,7 +28,9 @@ chrisApp.controller('incidentCreateController',  ['$rootScope', '$scope', '$filt
 		$scope.sessionUser={};
 		$scope.slaPercent = '60';
 		$scope.ticketComments=[];
-		
+		$scope.files = [];
+		$scope.incidentImages=[];
+		$scope.totalIncidentImageSize = 0;
 		$scope.statusList=[];
 		$scope.status={
 				selected:{},
@@ -141,21 +143,87 @@ chrisApp.controller('incidentCreateController',  ['$rootScope', '$scope', '$filt
 						$scope.equipmentData.isPWSensorAttached=selectedValue;
 					});
 			
-			/*$('#confirmEscalate').on('show.bs.modal', function (e) {  
-			      $message = $(e.relatedTarget).attr('data-message'); 
-			      $(this).find('.modal-body p').text($message);  
-			      $title = $(e.relatedTarget).attr('data-title'); 
-			      $(this).find('.modal-title').text($title);  
-			      // Pass form reference to modal for submission on yes/ok 
-			       var form = $(e.relatedTarget).closest('form'); 
-			 
-			      $(this).find('.modal-footer #confirm').data('form', form);  
-
-			  }); */
 			
 		});
 		
-		
+		 $scope.getImageFile=function(assetId, e){
+				var ext = $('#inputImgfilepath').val().split(".").pop().toLowerCase();
+				$scope.fileSize1 = null;
+				$scope.fileExtension1 = ext;
+				if ($.inArray(ext, [ "jpg", "jpeg", "JPEG",	"JPG", "png", "PNG" ]) == -1) {
+					$('#equipmentModalMessageDiv').show();
+					$('#equipmentModalMessageDiv').alert();
+					$scope.equipmentModalErrorMessage = "";
+					 $('#fileerrorasset').text("Supported file types to upload are jpg and png");
+					$scope.isfileselected = false;
+					$('#inputImgfilepath').val('');
+					return false;
+				} else if (e.target.files != undefined) {
+					$('#equipmentModalMessageDiv').hide();
+					$scope.isfileselected = true;
+					file = $('#inputImgfilepath').prop('files');
+					$scope.fileSize1 = file[0].size / 1024;
+					if($scope.fileSize1 > 100){
+			        	 $scope.equipmentModalErrorMessage="";
+			        	 $('#fileerrorasset').text("File size exceeds 100KB");
+				    	 $('#equipmentModalMessageDiv').show();
+						
+			         }else{
+						var reader = new FileReader();
+						reader.onload = $scope.onImageFileUploadReader;
+						reader.readAsDataURL(file[0]);
+			         }
+				}else{
+					 $('#fileerrorasset').text("Invalid file format");
+			    	 $('#equipmentModalMessageDiv').show();
+			    	 $('#inputImgfilepath').val('');
+				}
+			 }
+			 
+			 $scope.getDocumentFile=function(serviceId, e, errorDiv, msgDiv){
+				 var documentId = serviceId.id
+				 var ext = $('#' + documentId).val().split(".")	.pop().toLowerCase();
+				$scope.fileSize2 = null;
+				$scope.fileExtension2 = ext;
+				if ($.inArray(ext, [ "PDF", "pdf"]) == -1) {
+					$('#'+msgDiv).text("Supported file types to upload is pdf");
+					$('#'+errorDiv).show();
+					$('#'+errorDiv).alert();
+					$scope.serviceModalErrorMessage = "";
+					$scope.isfileselected = false;
+					$('#' + documentId).val('');
+					return false;
+				} else if (e.target.files != undefined) {
+					$('#'+errorDiv).hide();
+					$scope.isfileselected = true;
+					file = $('#' + documentId).prop('files');
+					$scope.fileSize2 = file[0].size / 1024;
+					if($scope.fileSize2 > 100){
+			        	 $scope.serviceModalErrorMessage="";
+			        	 $('#'+msgDiv).text("File size exceeds 100KB");
+				    	 $('#'+errorDiv).show();
+						
+			         }else{
+						var reader = new FileReader();
+						reader.onload = $scope.onFileDocUploadReader;
+						reader.readAsDataURL(file[0]);
+			         }
+				}else{
+					 $('#'+msgDiv).text("Invalid file format");
+					 $('#'+errorDiv).show();
+			    	 $('#' + documentId).val('');
+				}
+			 }
+			 
+			 $scope.onImageFileUploadReader=function(e){
+					var fileUrl = e.target.result;
+					$scope.assetImageFile=e.target.result;
+				}
+			 
+			 $scope.onFileDocUploadReader=function(e){
+					var fileUrl = e.target.result;
+					$scope.assetDocFile=e.target.result;
+				}
 		
 		$scope.getIncidentSelected=function(){
 			ticketService.getSelectedTicketFromSession()
@@ -187,6 +255,19 @@ chrisApp.controller('incidentCreateController',  ['$rootScope', '$scope', '$filt
 							  $scope.ticketComments.push(val);
 						 })
 						 
+					}
+					
+					if($scope.ticketData.attachments.length>0){
+						$scope.ticketData.files=[];
+						$.each($scope.ticketData.attachments,function(key,val){
+							var  fileInfo={
+									fileId:val.attachmentId,
+									fileName: val.attachmentPath.substring(val.attachmentPath.lastIndexOf("/")+1),
+									createdOn: val.createdDate,
+									filePath: val.attachmentPath
+							}
+							$scope.ticketData.files.push(fileInfo);
+						});
 					}
 				}
 			},function(data){
@@ -426,7 +507,7 @@ chrisApp.controller('incidentCreateController',  ['$rootScope', '$scope', '$filt
 			$("#closeCodeSelect").empty();
 			
 			var options = $("#closeCodeSelect");
-			options.append($("<option />").val("0").text("Select close code"));
+			options.append($("<option />").val("0").text("Select option"));
 			$.each($scope.closeCodeList,function() {
 				options.append($("<option />").val(	this.id).text(	this.code));
 			});
@@ -697,7 +778,7 @@ $scope.setTicketraisedOnDate=function(){
 			 
 			 console.log($scope.ticketData);
 			 
-			 $scope.persistTicket($scope.ticketData);
+			 $scope.persistTicket($scope.ticketData, "NEW");
 		 }
 		 
 		 $scope.updateTicket=function(){
@@ -707,16 +788,17 @@ $scope.setTicketraisedOnDate=function(){
 				 $scope.ticketData.closeCode =  parseInt($("#closeCodeSelect").val());
 			 }
 			 console.log($scope.ticketData);
-			 $scope.persistTicket($scope.ticketData);
+			 
+			 $scope.persistTicket($scope.ticketData, "UPDATE");
 			 
 		 }
-		 $scope.persistTicket=function(ticketData){
+		 $scope.persistTicket=function(ticketData, type){
 			 $('#loadingDiv').show();
 			 ticketService.saveTicket(ticketData)
 			 .then(function(data){
 				 console.log(data);
 				 if(data.statusCode == 200){
-					 $scope.successMessage = data.message;
+					 	$scope.successMessage = data.message;
 					 	$('#messageWindow').show();
 	    				$('#successMessageDiv').show();
 	    				$('#successMessageDiv').alert();
@@ -724,7 +806,27 @@ $scope.setTicketraisedOnDate=function(){
 	    				if(viewMode.toUpperCase()=='NEW'){
 	    					window.location.href=hostLocation+"/incident/details";
 	    				}else{
-	    					
+	    					if(type.toUpperCase()=='UPLOAD'){
+	    						$scope.successMessage = "Files uploaded successfully";
+	    					 	$('#messageWindow').show();
+	    	    				$('#successMessageDiv').show();
+	    	    				$('#successMessageDiv').alert();
+	    	    				$('#errorMessageDiv').hide();
+	    	    				if(data.object.attachments.length>0){
+	    	    					$scope.ticketData.files=[];
+	    	    					$.each(data.object.attachments,function(key,val){
+	    	    						var  fileInfo={
+	    	    								fileId:val.attachmentId,
+	    	    								fileName: val.attachmentPath.substring(val.attachmentPath.lastIndexOf("/")+1),
+	    	    								createdOn: val.createdDate,
+	    	    								filePath: val.attachmentPath
+	    	    						}
+	    	    						$scope.ticketData.files.push(fileInfo);
+	    	    					});
+	    	    				}else{
+	    	    					$scope.ticketData.files=[];
+	    	    				}
+	    					 }
 	    				}
 				 }
 				 $('#loadingDiv').hide();
@@ -741,6 +843,8 @@ $scope.setTicketraisedOnDate=function(){
 		 $scope.closeMessageWindow=function(){
 			 $('#messageWindow').hide();
 			 $('#modalMessageDiv').hide();
+			 $('#serviceModalMessageDiv').hide();
+				 $('#equipmentModalMessageDiv').hide();
 			 
 		 }
 	$scope.getTicketComment=function(){
@@ -970,7 +1074,116 @@ $scope.setTicketraisedOnDate=function(){
 		
 	}
 	
-
+	$scope.openFileAttachModal=function(){
+		$scope.incidentImageList=[{
+			id:0,
+			attachment:""
+		}];
+		$('#incidentImage0').val('');
+		$('#fileAttachModal').modal('show');
+		$('#fileAttachModal').removeData();
+		$scope.incidentImages=[];
+		
+	}
+	
+	$scope.addNewImage=function(){
+		$scope.incidentImageList=[];
+		$scope.incidentImages=[];
+		var length=$scope.incidentImageList.length;
+		var imageComponent={
+				id:length,
+				attachment:""	
+		}
+		$scope.incidentImageList.push(imageComponent);
+	};
+	
+	
+    // GET THE FILE INFORMATION.
+    $scope.getIndexedName = function (val, e) {
+    	console.log(val.id);
+		var incidentImageId=val.id;
+		$scope.incidentImageId=incidentImageId;
+		 var ext=$("input#"+incidentImageId).val().split(".").pop().toLowerCase();
+		 var fileSize = Math.round((val.files[0].size / 1024)) ;
+		 $scope.totalIncidentImageSize = $scope.totalIncidentImageSize + fileSize ;
+		 console.log($('#'+incidentImageId).val());
+	     $scope.fileExtension = ext;
+	     $scope.indexPos=incidentImageId.charAt(incidentImageId.length-1);
+	     if($.inArray(ext, ["jpg","jpeg","JPEG", "JPG","PDF","pdf","png","PNG"]) == -1) {
+	    	 $scope.incidentImageModalErrorMessage="";
+        	 $('#errorMessageDiv').show();
+        	 $('#errorMessageDiv').alert();
+        	 $('#fileerrorincident').text('Supported file types to upload are jpg,  png and pdf');
+              $scope.isfileselected=false;	  
+              $('#'+incidentImageId).val('');
+              e.target.files=undefined;
+	         return false;
+	     }else if($scope.totalIncidentImageSize > 500){
+	    	 $scope.incidentImageModalErrorMessage="";
+	    	 $('#fileerrorincident').text('File size exceeds Max limit (500KB)');
+        	 $('#errorMessageDiv').show();
+        	 $('#errorMessageDiv').alert();
+              $scope.isfileselected=false;
+              e.target.files=undefined;
+         }
+	     else if (e.target.files != undefined) {
+	    	// console.log(URL.createObjectURL(e.target.files[0]));
+	         $scope.isfileselected=true;
+	         file = $('#'+incidentImageId).prop('files');
+	      	 var reader = new FileReader();
+	     	 reader.onload = $scope.onFileUploadReader;
+	     	 reader.readAsDataURL(file[0]);
+	       }
+    };
+    $scope.onFileUploadReader=function(e){
+    	var fileUrl = e.target.result;
+		
+		var incidentImage={
+					fileName:$scope.ticketData.ticketNumber,
+					incidentImgId:$scope.incidentImageId,
+					incidentImgPos:$scope.indexPos,
+					base64ImageString:e.target.result,
+					fileExtension: $scope.fileExtension
+				}
+		
+		$scope.incidentImages.push(incidentImage);
+		console.log($scope.incidentImages);
+	}
+    
+    $scope.removeImage=function(indexPos){
+		$scope.incidentImageList.splice(indexPos,1);
+		  $.each($scope.incidentImages,function(key,val){
+			 if(val.incidentImgPos==indexPos) {
+					$scope.incidentImages.splice(indexPos,1);					
+					return false;
+			 }
+		  });
+		//console.log($scope.incidentImageList);
+		console.log($scope.incidentImages);
+	}
+    
+    // NOW UPLOAD THE FILES.
+    $scope.uploadFiles = function () {
+    	if($scope.incidentImages.length>0){
+			 $scope.ticketData.incidentImageList=$scope.incidentImages;
+			 $scope.persistTicket( $scope.ticketData, "UPLOAD");
+			
+		 }
+    }
+    
+    /*// UPDATE PROGRESS BAR.
+    function updateProgress(e) {
+        if (e.lengthComputable) {
+            document.getElementById('pro').setAttribute('value', e.loaded);
+            document.getElementById('pro').setAttribute('max', e.total);
+        }
+    }
+    
+ // CONFIRMATION.
+    function transferComplete(e) {
+        alert("Files uploaded successfully.");
+    }*/
+    
 	$scope.openAssetModal=function(){
 		 var selectedSite = $('#siteSelect').val();
 		 if(selectedSite == ""){
@@ -982,9 +1195,11 @@ $scope.setTicketraisedOnDate=function(){
 			 
 		 }else{
 			if($scope.assetTypechecked == 'E'){
+				$('#equipmentModalMessageDiv').hide();
 				$scope.addEquipmentModal();
 			}
 			else if($scope.assetTypechecked == 'S'){
+				$('#serviceModalMessageDiv').hide();
 				$scope.addServiceModal();
 			}else{
 				$('#messageWindow').show();
@@ -1000,6 +1215,7 @@ $scope.setTicketraisedOnDate=function(){
 		//var scope = angular.element("#incidentWindow").scope();
 		 console.log("shibasish");
 		 $scope.equipmentData={};
+		 $scope.equipmentData.sites=[];
 		 $('#resetAssetForm').click();
 		 $("#categorySelect option").each(function() {
 				if ($(this).val() == "") {
@@ -1053,6 +1269,7 @@ $scope.setTicketraisedOnDate=function(){
 
 	$scope.addServiceModal=function(){
 		 $scope.serviceData={};
+		 $scope.serviceData.sites=[];
 		 $('#resetServiceAssetForm').click();
 			$("#categorySelect option").each(function() {
 				if ($(this).val() == "") {
@@ -1195,43 +1412,96 @@ $scope.setTicketraisedOnDate=function(){
 	 }*/
 	 
 	 $scope.saveAssetEquipment=function(){				 	          
-          
-          if($scope.IsValidDate($scope.equipmentData.deCommissionedDate,$scope.equipmentData.commisionedDate)){
-        	  $('#modalMessageDiv').hide();
-        	  $scope.equipmentData.categoryId=$scope.assetCategory.selected.assetCategoryId;
+		 $scope.equipmentData.sites.push($scope.accessSite.selected.siteId);
+         if($scope.IsValidDate($scope.equipmentData.deCommissionedDate,$scope.equipmentData.commisionedDate)){
+       	  $('#equipmentModalMessageDiv').hide();
+       	  $scope.equipmentData.categoryId=$scope.assetCategory.selected.assetCategoryId;
 				 $scope.equipmentData.locationId=$scope.assetLocation.selected.locationId;
 				 $scope.equipmentData.siteId=$scope.accessSite.selected.siteId;
 				 if($scope.serviceProvider.selected!=null){
 					 $scope.equipmentData.serviceProviderId=$scope.serviceProvider.selected.serviceProviderId;
 				 }
 				 console.log($scope.equipmentData);
+				// $scope.equipmentData.sites.push($scope.selectedSite.siteId);
 				 
-				$scope.saveAssetInfo($scope.equipmentData);
+				 var assetImage={
+							fileName:$scope.equipmentData.assetName,
+							base64ImageString:$scope.assetImageFile,
+							fileExtension: $scope.fileExtension1,
+							size:$scope.fileSize1 || 0
+						}
+				 $scope.equipmentData.assetImage=assetImage;
+				 var assetDoc={
+							fileName:$scope.equipmentData.assetName,
+							base64ImageString:$scope.assetDocFile,
+							fileExtension: $scope.fileExtension2,
+							size:$scope.fileSize2 || 0
+							
+						}
+				 $scope.equipmentData.assetDoc = assetDoc;
+				 if( $scope.equipmentData.assetImage.size > 100){
+					 $scope.equipmentModalErrorMessage="File size exceeds Max limit (100KB).";
+	            	 $('#equipmentModalMessageDiv').show();
+	            	 $('#equipmentModalMessageDiv').alert();
+	                  $scope.isfileselected=false;
+	                  return false;
+	             }
+				 if( $scope.equipmentData.assetDoc.size > 100){
+					 $scope.equipmentModalErrorMessage="File size exceeds Max limit (100KB).";
+	            	 $('#equipmentModalMessageDiv').show();
+	            	 $('#equipmentModalMessageDiv').alert();
+	                  $scope.isfileselected=false;
+	                  return false;
+	             }else{
+	            	 $scope.equipmentModalErrorMessage="";
+	            	 $('#equipmentModalMessageDiv').hide();
+	            	 $scope.saveAssetInfo($scope.equipmentData);
+	             }
 				
-          }
-          else{
-        	  $scope.modalErrorMessage = "Decommission date should be after Commission date";
-                $('#modalMessageDiv').show();
-				$('#modalMessageDiv').alert();							
-          }		          
+         }
+         else{
+       	  $scope.modalErrorMessage = "Decommission date should be after Commission date";
+               $('#equipmentModalMessageDiv').show();
+               $('#equipmentModalMessageDiv').alert();							
+         }		          
 		 
 	 }
 	 
 	 $scope.saveAssetService =function(){
-		 
+		 $scope.serviceData.sites.push($scope.accessSite.selected.siteId);
 		 if($scope.IsValidDate($scope.serviceData.deCommissionedDate,$scope.serviceData.commisionedDate)){
         	  $('#serviceModalMessageDiv').hide();
         	  $scope.serviceData.categoryId=$scope.assetCategory.selected.assetCategoryId;
 				 $scope.serviceData.locationId=$scope.assetLocation.selected.locationId;
 				 $scope.serviceData.siteId=$scope.accessSite.selected.siteId;
 				 if($scope.serviceProvider.selected!=null){
-				 $scope.serviceData.serviceProviderId=$scope.serviceProvider.selected.serviceProviderId;
+				   $scope.serviceData.serviceProviderId=$scope.serviceProvider.selected.serviceProviderId;
 				 }
-				 $scope.saveAssetInfo($scope.serviceData);
+		//		 $scope.serviceData.sites.push($scope.selectedSite.siteId);
+				 
+				 var serviceDoc={
+							fileName:$scope.serviceData.assetName,
+							base64ImageString:$scope.assetDocFile,
+							fileExtension: $scope.fileExtension2,
+							size:$scope.fileSize2 || 0
+						}
+				 $scope.serviceData.assetDoc = serviceDoc;
+				 
+				 if($scope.serviceData.assetDoc.size > 100){
+	            	 $scope.serviceModalErrorMessage="File size exceeds Max limit (100KB).";
+	            	 $('#serviceModalMessageDiv').show();
+	            	 $('#serviceModalMessageDiv').alert();
+	                  $scope.isfileselected=false;
+	                  return false;
+	             }else{
+	            	 $scope.serviceModalErrorMessage="";
+	            	 $('#serviceModalMessageDiv').hide();
+	            	 $scope.saveAssetInfo($scope.serviceData);
+	             }
 				
           }
           else{
-        	  $scope.modalErrorMessage = "Decommission date should be after Commission date";
+        	  	$scope.serviceModalErrorMessage = "Decommission date should be after Commission date";
                 $('#serviceModalMessageDiv').show();
 				$('#serviceModalMessageDiv').alert();							
           }		     
@@ -1248,19 +1518,32 @@ $scope.setTicketraisedOnDate=function(){
     				$('#successMessageDiv').show();
     				$('#successMessageDiv').alert();
     				$('#loadingDiv').hide();
-    				var ticketSite={
-    						siteId : data.object.siteId
+    				if(assetData.assetType == 'E'){
+    					$('#assetModalCloseBtn').click();
     				}
-    				$('#assetModalCloseBtn').click();
-    				$scope.getAsset(ticketSite);
+    				else if(assetData.assetType == 'S'){
+    					$('#serviceModalCloseBtn').click();
+    				}
+    				//$scope.getAllAsset();
+    				$('#loadingDiv').hide();
+    				$scope.getAsset($scope.accessSite.selected);
     			}
             },
             function(data) {
-                console.log('Error while saving asset data')
-                $scope.modalErrorMessage = data.message;
-                $('#modalMessageDiv').show();
-				$('#modalMessageDiv').alert();
-				$('#loadingDiv').hide();
+            	 console.log('Error while saving asset data')
+	              //  $('#equipmentModalMessageDiv').show();
+ 				//$('#equipmentModalMessageDiv').alert();
+ 				if(assetData.assetType == 'E'){
+ 					  $scope.equipmentModalErrorMessage = data.message;
+ 					$('#equipmentModalMessageDiv').show();
+	    				$('#equipmentModalMessageDiv').alert();
+ 				}
+ 				else if(assetData.assetType == 'S'){
+ 					$scope.serviceModalErrorMessage = data.message;
+ 					$('#serviceModalMessageDiv').show();
+	    				$('#serviceModalMessageDiv').alert();
+ 				}
+ 				$('#loadingDiv').hide();
             });
 	 }
 	 
@@ -1355,7 +1638,47 @@ $scope.setTicketraisedOnDate=function(){
 			 console.log(data);
 		 });
 	 }
+	 
+	 $scope.openChatBox=function(){
+			$('#chatWindow').fadeIn();
+			$scope.chatBoxView="ON";
+	}
+	$scope.closeWindow=function(){
+		$('#chatWindow').fadeOut();
+	}
 
+	$scope.deleteFile=function(feature, file){
+		console.log($scope.ticketData.files);
+		 $('#loadingDiv').show();
+		var incidentAttached=[];
+		incidentAttached.push(file.fileId);
+		var fileStr = incidentAttached.join(",");
+		ticketService.deleteFileAttached(feature, fileStr)
+		.then(function(data){
+			console.log(data);
+			if(data.statusCode==200){
+				if(data.object.attachments.length>0){
+					$scope.ticketData.files=[];
+					$.each(data.object.attachments,function(key,val){
+						var  fileInfo={
+								fileId:val.attachmentId,
+								fileName: val.attachmentPath.substring(val.attachmentPath.lastIndexOf("/")+1),
+								createdOn: val.createdDate,
+								filePath: val.attachmentPath
+						}
+						$scope.ticketData.files.push(fileInfo);
+					});
+					 $('#loadingDiv').hide();
+				}else{
+					$scope.ticketData.files=[];
+					$('#loadingDiv').hide();
+				}
+			}
+		},function(data){
+			console.log(data);
+			$('#loadingDiv').hide();
+		});
+	}
 			 
 }]);
 

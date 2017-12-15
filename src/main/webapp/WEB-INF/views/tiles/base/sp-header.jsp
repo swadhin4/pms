@@ -39,10 +39,13 @@
 
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/tether.min.js"></c:url>'></script>
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/bootstrap.min.js"></c:url>'></script>
+<script type="text/javascript" 	src='https://adminlte.io/themes/AdminLTE/bower_components/fastclick/lib/fastclick.js'></script>
 
+<script type="text/javascript" 	src='<c:url value="/resources/dist/js/adminlte.min.js"></c:url>'></script>
+<script type="text/javascript" 	src='<c:url value="/resources/dist/js/app.js"></c:url>'></script>
 
-<script type="text/javascript" 	src='<c:url value="/resources/theme1/js/transition.js"></c:url>'></script>
-<script type="text/javascript" 	src='<c:url value="/resources/dist/js/app.min.js"></c:url>'></script>
+<%-- <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/transition.js"></c:url>'></script>
+
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/ripples.min.js"></c:url>'></script>
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/material.min.js"></c:url>'></script>
 
@@ -51,11 +54,12 @@
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/jquery.inview.min.js"></c:url>'></script>
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/classie.js"></c:url>'></script>
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/jquery.nav.js"></c:url>'></script>
-<%-- <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/smooth-on-scroll.js"></c:url>'></script>
-<script type="text/javascript" 	src='<c:url value="/resources/theme1/js/smooth-scroll.js"></c:url>'></script> --%>
+<script type="text/javascript" 	src='<c:url value="/resources/theme1/js/smooth-on-scroll.js"></c:url>'></script>
+<script type="text/javascript" 	src='<c:url value="/resources/theme1/js/smooth-scroll.js"></c:url>'></script>
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/main.js"></c:url>'></script>
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/mdb.min.js"></c:url>'></script>
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/wow.js"></c:url>'></script>
+--%>
 
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/angular.min.js"></c:url>'></script>
 <script type="text/javascript" 	src='<c:url value="/resources/theme1/js/jstorage.js"></c:url>'></script>
@@ -177,6 +181,20 @@
 /* $(window).on('load', function(){
   setTimeout(removeLoader, 2000); //wait for page load PLUS two seconds.
 }); */
+$(function () {
+	 $('i').each(function (i, e) {
+		    var label;
+		    switch ($(e).attr('id')) {
+		        
+		        case 'inc':
+		            label = 'Incident';
+		            break;
+		        
+		    }
+		    $(e).tooltip({ 'trigger': 'focus', 'title': label });
+		});
+	})
+
 function removeLoader(){
     $( "#loadingDiv" ).fadeOut(500, function() {
       // fadeOut complete. Remove the loading div
@@ -185,97 +203,78 @@ function removeLoader(){
 }
 </script>
 </head>
-
 <c:set var="contextPath" value="${pageContext.request.contextPath}"></c:set>
-	
-    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-		<div class="container-fluid">
-			     	<div class="navbar-header">
-                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-backyard">
-                            <span class="sr-only">Toggle navigation</span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                        </button>
-                        
-                        <div  class="navbar-brand">
-                    <a id="menu-toggle" href="#" class="btn-menu toggle" style="font-size: 1.5em;">
-                        <i class="fa fa-bars"></i>
-                    </a>
-    				<a class="navbar-brand site-name" href="#top">
-    				<img src="${contextPath}/resources/img/sigma.png" style="width: 29%;
-    margin-top: -3px;"></a>
-                </div>
-                    </div>
-                    <div id="navbar-scroll" class="collapse  navbar-collapse navbar-backyard navbar-right">
-                    <div class="navbar-custom-menu">
-                <ul class="nav navbar-nav">
-               <li class="dropdown notifications-menu">
+	 <header class="main-header">
+	 <a href class="logo">
+      <!-- mini logo for sidebar mini 50x50 pixels -->
+      <span class="logo-mini"> <img src="${contextPath}/resources/img/logo.png" style="width: 100%;"></span>
+      <span class="logo-lg"><img src="${contextPath}/resources/img/sigma.png" style="width: 100%; margin-top: 0px;"></span>
+    </a>
+    <nav class="navbar navbar-static-top">
+		<a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+            
+      </a>
+      
+      <div >
+        <ul class="nav navbar-nav">
+        <li class="dropdown notifications-menu">
+        <a><span >For support enquiries contact: info@sigmasurge.com</span></a>
+        </li>
+        </ul>
+        </div>
+      <div class="navbar-custom-menu">
+        <ul class="nav navbar-nav">
+          <!-- User Account: style can be found in dropdown.less -->
+          <li class="dropdown user user-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              <i class="fa fa-bell-o fa-2x" style="    font-size: 1.5em;"></i>
-              <span class="label label-danger" id="msgCountElmId">0</span>
+              <img src="${contextPath}/resources/img/swadhin.jpg" class="user-image" alt="User Image">
+              <span class="hidden-xs">${savedsp.spName}</span>
             </a>
-            <ul class="dropdown-menu" style="width: 500px;">
-              <li class="header">You have <span id="msgCountElmId2">0</span> notifications</li>
-              <li>
-                <!-- inner menu: contains the actual data -->
-                <ul class="menu" id="msgDropdown">
-                </ul>
+            <ul class="dropdown-menu">
+              <!-- User image -->
+              <li class="user-header">
+                <img src="${contextPath}/resources/img/swadhin.jpg" class="img-circle" alt="User Image">
+                <p style="color: #000">
+                 ${savedsp.spName}
+                  <small> ${savedsp.role}</small>
+                </p>
               </li>
-              <li class="footer"><a href="#">View all</a></li>
+                <li class="user-footer">
+                <div class="pull-right">
+                  <a href="${contextPath}/logout" class="btn btn-default btn-flat">Sign out</a>
+                </div>
+              </li>
+              </li>
             </ul>
           </li>
-              <!-- User Account Menu -->
-              <li class="dropdown user user-menu">
-                <!-- Menu Toggle Button -->
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                  <!-- The user image in the navbar-->
-                 <i class="fa fa-user" aria-hidden="true"></i>
-                  <!-- hidden-xs hides the username on small devices so only the image appears. -->
-                  <span class="hidden-xs">${savedsp.spName}</span>
-                </a>
-                <ul class="dropdown-menu " style="margin-top: 9px;border:0px">
-                 <li class="header" style="margin-left: 10px;">You have following Roles</li>
-                  <ul class="menu">
-                  <li>
-                    <a href="#">
-                      <h4>
-                       <i class="fa fa-users text-aqua"> ${savedsp.role}</i>
-                      </h4>
-                    </a>
-                  </li>
-                  </ul>
-                               
-                  <li class="user-footer">
-                    <div class="pull-right">
-                      <a href="${contextPath}/logout" class="btn btn-default btn-flat">Sign out</a>
-                    </div>
-                  </li>
-                </ul>
-              </li>
-            </ul>
-            </div>
-                    </div>
-		</div>
+        </ul>
+      </div>
+    </nav>
 	</nav>
-    <!-- Sidebar -->
-    <div id="wrapper1">
-    <div id="sidebar-wrapper" style="background-color:E1DDDD">
-    
-   <ul class="list-group">
-  	<li class="list-group-item">
-	  <a  class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-	  <i class="fa fa-cog" arial="hidden"></i> <span class="menulink">MANAGE </span> </a>
-	  <ul  role="menu" style="padding: 24px 12px;
-    margin: -9px 0 0;
-    font-size: 16px;">
-	  	
-	    <li class="list-group-item"><a href="${contextPath}/sp/incident/details"><i class="fa fa-ticket" aria-hidden="true"></i> <span class="menulink">Incidents<span></a></li>
-	    
-	    <!-- <li class="divider"></li>
-	    	<li><a href="#">Separated link</a></li> -->
-	  </ul>      
-      
-  </li>
-</ul>
-  </div>
+	</header>
+    <aside class="main-sidebar">
+    <section class="sidebar">
+      <div class="user-panel">
+        <div class="pull-left image">
+          <img src="${contextPath}/resources/img/swadhin.jpg" class="img-circle" alt="User Image">
+        </div>
+        <div class="pull-left info">
+          <p >${user.firstName}  ${user.lastName}</p>
+         
+        </div>
+      </div>
+      <ul class="sidebar-menu" data-widget="tree">
+          <li>
+          <a href="${contextPath}/sp/incident/details"><i class="fa fa-ticket" aria-hidden="true" data-toggle="tooltip" data-placement="right"  id="inc"></i> 
+            <span>Incident</span>
+          </a>
+        </li>
+      </ul>
+    </section>
+  </aside>
+  
+   

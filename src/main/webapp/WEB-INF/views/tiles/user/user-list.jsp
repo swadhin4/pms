@@ -189,7 +189,8 @@ $(function() {
 													</tr>
 												</thead>
 												<tbody>
-													<tr ng-repeat="user in appUsers | filter: searchUser" ng-click="getUserDetail(user);rowHighilited($index)"
+													<tr ng-repeat="user in appUsers | filter: searchUser" 
+													ng-click="getUserDetail(user);rowHighilited($index)"
 													ng-class="{currentSelected:$index == selectedRow}">
 														<td><a href >
 																{{user.firstName}} {{user.lastName}}</a></td>	
@@ -261,6 +262,8 @@ $(function() {
 												</b>
 												<br>
 												 <i class="fa fa-envelope" aria-hidden="true"></i> {{selectedUser.email}}
+												 <br>
+												 <i class="fa fa-phone-square" aria-hidden="true"></i> {{selectedUser.phone}}
 											</a>
 										</div>
 										 <div class="col-md-5">
@@ -386,7 +389,7 @@ $(function() {
 						
 						</div>
 						
-								<div class="modal fade" id="createUserModal">
+								<div class="modal fade" id="createUserModal" data-keyboard="false" data-backdrop="static">
 									<div class="modal-dialog" style="width: 60%">
 										<div class="modal-content">
 											<form role="form" name="userForm" ng-submit="saveNewUser()">
@@ -433,6 +436,15 @@ $(function() {
 																			id="email" ng-model="user.email"  maxlength="50"
 																			placeholder="Email Address" required>
 																	</div>
+																	<div class="col-md-6 reqDiv required">
+																		<label class="control-label">Phone / Mobile</label> <input
+																			ng-model="user.phoneNo"  type="text" class="form-control" id="lastName"
+																			placeholder="Enter Phone Number"
+																			ng-pattern="onlyNumbers" ng-keypress="filterValue($event)"  maxlength="11" required>
+																	</div>
+																	</div>
+																	<div class="row">
+																	
 																	<div class="col-md-6 reqDiv required">
 																		<label class="control-label">Select Role</label> 
 																		<!-- <select ng-model="roles.selected"

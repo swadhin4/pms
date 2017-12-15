@@ -32,18 +32,20 @@
 				// once grabbed, we run this callback
 				//alert(x);
 				// setup the new map and its variables
+				console.log(data);
 				if(data.statusCode == 200){
 				var DT = new google.visualization.DataTable();
 				console.log(DT);
+				console.log(data);
 					DT.addRows(data.object.length);  // length gives us the number of results in our returned data
-					DT.addColumn('string', 'priority');
+					DT.addColumn('string', 'Priority');
 					DT.addColumn('number', 'Ticket Count');
 					DT.addColumn({type:'string', label:'Site Name', role: 'annotation'});
 	      		
 				// now we need to build the map data, loop over each result
 				$.each(data.object, function(i,v) {
 					// set the values for both the name and the population
-					DT.setValue(i, 0, v.priority);
+					DT.setValue(i, 0, v.priorityId);
 					DT.setValue(i, 1, v.ticketCount);
 					DT.setValue(i, 2, v.siteName);
 				});
@@ -70,6 +72,11 @@
 				  'options': {
 					'width': 600,
 					'height': 250,
+					'animation':{
+								startup: true,
+								duration: 500,
+								easing: 'out',
+							  },
 					'pieSliceText': 'value',
 					'legend': 'right',
 					'title': 'Tickets By Priority',
@@ -100,14 +107,14 @@
 				var DT = new google.visualization.DataTable();
 				console.log(DT);
 					DT.addRows(data.object.length);  // length gives us the number of results in our returned data
-					DT.addColumn('string', 'priority');
+					DT.addColumn('string', 'Priority');
 					DT.addColumn('number', 'Ticket Count');
 					DT.addColumn({type:'string', label:'Service Provider', role: 'annotation'});
 	      		
 				// now we need to build the map data, loop over each result
 				$.each(data.object, function(i,v) {
 					// set the values for both the name and the population
-					DT.setValue(i, 0, v.priority);
+					DT.setValue(i, 0, v.priorityId);
 					DT.setValue(i, 1, v.ticketCount);
 					DT.setValue(i, 2, v.serviceProviderName);
 				});
@@ -134,6 +141,11 @@
 				  'options': {
 					'width': 600,
 					'height': 250,
+					'animation':{
+								startup: true,
+								duration: 500,
+								easing: 'out',
+							  },
 					'pieSliceText': 'value',
 					'legend': 'right',
 					'title': 'Tickets By Priority',
@@ -218,10 +230,16 @@
 					'pieSliceText': 'value',
 					'title': 'Tickets By Status',
 					'bars': 'horizontal',
+					'animation':{
+								startup: true,
+								duration: 500,
+								easing: 'out',
+							  },
+
 					 'hAxis': {
 				              'format': 0
 				          },
-				          'chartArea': {left: 50, width: '100%', height:'70%'}
+				          'chartArea': {left: 120, width: '100%', height:'70%'}
 				     }
 				     
 				});
@@ -305,10 +323,15 @@
 					'pieSliceText': 'value',
 					'title': 'Tickets By Status',
 					'bars': 'horizontal',
+					'animation':{
+								startup: true,
+								duration: 500,
+								easing: 'out',
+							  },
 					'hAxis': {
 			              'format': 0
 			          },
-			          'chartArea': {left: 50, width: '100%', height:'70%'}
+			          'chartArea': {left: 120, width: '100%', height:'70%'}
 				  }
 				});
 				

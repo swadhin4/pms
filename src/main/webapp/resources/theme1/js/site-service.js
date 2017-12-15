@@ -26,6 +26,7 @@ chrisApp.factory('siteCreationService',  ['$http', '$q',function ($http, $q) {
  					siteNumber2:parseInt(finalObject.siteData.siteNumber2) || null, 
  					fileInput:finalObject.uploadedFile || null,
  					fileExtension:finalObject.extension || null,
+ 					salesAreaSize:finalObject.siteData.salesAreaSize || null,
  					
  				//-------------- X -----------------------//
  					
@@ -44,6 +45,7 @@ chrisApp.factory('siteCreationService',  ['$http', '$q',function ($http, $q) {
  				//-------------- X -----------------------//	
  					
  					siteLicense:finalObject.siteLicense || null,
+ 					licenseAttachments:finalObject.licenseAttachments,
  					siteOperation:finalObject.siteOperation || null,
  					siteDelivery:finalObject.siteDelivery || null,
  					siteSubmeter:finalObject.siteSubmeter || null
